@@ -90,12 +90,30 @@ public class UnitManager : MonoBehaviour
     }
 
     /// <summary>
-    /// »ñÈ¡ËùÓĞµ¥Î»ÁĞ±í£¨°´ÓÅÏÈ¼¶ÅÅĞò£©
+    /// è·å–æ‰€æœ‰å•ä½åˆ—è¡¨ï¼ˆæŒ‰ä¼˜å…ˆçº§æ’åºï¼‰
     /// </summary>
     public List<Unit> GetAllUnits()
     {
         return unitList
             .OrderBy(u => u.GetPriority())
             .ToList();
+    }
+
+    /// <summary>
+    /// è·å–å½“å‰æœ€åè¡ŒåŠ¨é¡ºåº
+    /// </summary>
+    public int GetEndOrder()
+    {
+        int endOrder = 0;
+
+        foreach (Unit unit in friendlyUnitList)
+        {
+            BaseActionParameter baseActionParameter = unit.GetActionQueue().GetActions()[^1];
+            if (endOrder < baseActionParameter.executeTurn)
+            {
+                endOrder = baseActionParameter.executeTurn;
+            }
+        }
+        return endOrder;
     }
 }

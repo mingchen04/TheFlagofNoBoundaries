@@ -77,7 +77,7 @@ public class Unit : MonoBehaviour
     {
         return baseActionArray;
     }
-
+     
     public bool IsEnemy()
     {
         return isEnemy;
@@ -160,8 +160,7 @@ public class Unit : MonoBehaviour
         if (isMove)
         {
             // 移动类行动使用目标位置
-            finalPos = targetPos;
-            
+            finalPos = targetPos;           
         }
         else
         {

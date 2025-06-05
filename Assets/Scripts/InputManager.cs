@@ -24,7 +24,7 @@ public class InputManager : MonoBehaviour
 
 
     /// <summary>
-    /// »ñÈ¡Êó±êÎ»ÖÃ
+    /// è·å–é¼ æ ‡ä½ç½®
     /// </summary>
     public Vector2 GetMouseScreenPosition()
     {
@@ -38,7 +38,7 @@ public class InputManager : MonoBehaviour
 
 
     /// <summary>
-    /// µ±Ç°Ö¡°´¼ü°´ÏÂ
+    /// å½“å‰å¸§æŒ‰é”®æŒ‰ä¸‹
     /// </summary>
     public bool IsMouseButtonDownThisFrame()
     {
@@ -50,7 +50,7 @@ public class InputManager : MonoBehaviour
     }
 
     /// <summary>
-    /// µ±Ç°Ö¡°´¼üÌ§Æğ
+    /// å½“å‰å¸§æŒ‰é”®æŠ¬èµ·
     /// </summary>
     public bool IsMouseButtonUpThisFrame()
     {
@@ -62,7 +62,7 @@ public class InputManager : MonoBehaviour
     }
 
     /// <summary>
-    /// °´¼ü±»°´×¡£¨¶àÖ¡
+    /// æŒ‰é”®è¢«æŒ‰ä½ï¼ˆå¤šå¸§
     /// </summary>
     public bool IsMouseButtonPressed()
     {
@@ -139,5 +139,10 @@ public class InputManager : MonoBehaviour
 
         return zoomAmount;
 #endif
+    }
+
+    public bool IsShiftButtonDown()
+    {
+        return playerInputActions.Player.Shift.IsPressed();
     }
 }

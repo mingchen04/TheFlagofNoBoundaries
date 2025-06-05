@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
+/// <summary>
+/// 存储和操作单位的行为队列
+/// </summary>
 public class ActionQueue
 {
     private List<BaseActionParameter> pendingActions; //行为队列
