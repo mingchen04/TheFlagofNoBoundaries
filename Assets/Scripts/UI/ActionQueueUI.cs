@@ -57,8 +57,8 @@ public class ActionQueueUI : MonoBehaviour
     {
         //生成选中单位的行为队列UI
         Transform selectedUnit_actionQueueScrollView = Instantiate(ActionQueueScrollView, transform);
-        Transform actionQueueList = selectedUnit_actionQueueScrollView.GetChild(0);
-        TextMeshProUGUI unitName = selectedUnit_actionQueueScrollView.GetChild(1).GetComponent<TextMeshProUGUI>();
+        Transform actionQueueList = selectedUnit_actionQueueScrollView.Find("ActionQueueList");
+        TextMeshProUGUI unitName = selectedUnit_actionQueueScrollView.Find("UnitName/UnitNameText").GetComponent<TextMeshProUGUI>();
         unitName.text = unit.name;
 
         //销毁队列中的按钮
@@ -82,9 +82,10 @@ public class ActionQueueUI : MonoBehaviour
                     baseActionIcon,
                     () =>
                     {
-                        unit.CancelAction(currentIndex, baseActionParameter.baseAction); UpdateVisual();
+                        unit.CancelAction(currentIndex, baseActionParameter.baseAction);
+                        UpdateVisual();
                     },
-                    baseActionParameter.executeTurn+1
+                    baseActionParameter.executeTurn + 1
                 );
         }
 
@@ -97,10 +98,10 @@ public class ActionQueueUI : MonoBehaviour
         // 等待两帧确保布局更新
         yield return null; // 第一帧：ContentSizeFitter计算
         yield return null; // 第二帧：ScrollRect应用新尺寸
-        if(actionQueueScrollView != null)
+        if (actionQueueScrollView != null)
         {
             actionQueueScrollView.GetComponent<ScrollRect>().horizontalNormalizedPosition = 1; // 0=最右，1=最左
         }
-        
+
     }
 }

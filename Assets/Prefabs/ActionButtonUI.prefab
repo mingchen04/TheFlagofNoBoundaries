@@ -390,8 +390,9 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\u4F60\u597D"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: b5cd69d8972d93d45b388cc4d76228f3, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: 295e57c91a82b6645a32f4c4d3f419ca, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: dd6a6522dcb2463459b07883fb1b972e, type: 2}
+  m_sharedMaterial: {fileID: 8004256861863104719, guid: dd6a6522dcb2463459b07883fb1b972e,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -415,7 +416,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 16.2
+  m_fontSize: 14.65
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -423,7 +424,7 @@ MonoBehaviour:
   m_fontSizeMax: 24
   m_fontStyle: 1
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 256
+  m_VerticalAlignment: 8192
   m_textAlignment: 65535
   m_characterSpacing: -4.92
   m_wordSpacing: 0

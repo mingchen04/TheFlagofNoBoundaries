@@ -13,7 +13,6 @@ public class UnitActionSystem : MonoBehaviour
     public event EventHandler<bool> OnBusyChanged;
     public event EventHandler OnActionAddQueue;
 
-
     private List<Unit> selectedUnits; //选中的单位
     private BaseAction selectedAction;
     private bool isBusy;
@@ -75,9 +74,20 @@ public class UnitActionSystem : MonoBehaviour
     {
         GridPosition mouseGridPosition = LevelGrid.Instance.GetGridPosition(MouseWorld.GetPosition());
 
+        if (!LevelGrid.Instance.IsValidGridPosition(mouseGridPosition))
+        {
+            return;
+        }
+
         if (!selectedAction.IsValidActionGridPosition(mouseGridPosition))
         {
             ClearSelectedUnits();
+            Unit unit = LevelGrid.Instance.GetUnitAtGridPosition(mouseGridPosition);
+            if (unit != null)
+            {
+                AddSelectedUnit(unit);
+            }
+
             return;
         }
 
@@ -100,7 +110,7 @@ public class UnitActionSystem : MonoBehaviour
         {
             endExecutionOrder++;
         }
-        
+
         OnActionAddQueue?.Invoke(this, EventArgs.Empty); //触发行动点更新
     }
 
@@ -124,7 +134,7 @@ public class UnitActionSystem : MonoBehaviour
             {
                 ClearSelectedUnits();
             }
-            
+
             AddSelectedUnit(unit);
             return true;
         }
@@ -165,9 +175,9 @@ public class UnitActionSystem : MonoBehaviour
         foreach (Unit unit in selectedUnits)
         {
             this.selectedUnits.Add(unit);
-            
         }
-        SetSelectedAction(selectedUnits[0].GetAction<MoveAction>());
+
+        if(selectedUnits.Count > 0) SetSelectedAction(selectedUnits[0].GetAction<MoveAction>());
         OnSelectedUnitChanged?.Invoke(this, EventArgs.Empty);
     }
 

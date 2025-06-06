@@ -11,15 +11,15 @@ public class BaseActionParameterObjUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI textActionIndex;
 
     /// <summary>
-    /// ����UI��������
+    /// 设置UI基本参数
     /// </summary>
-    /// <param name="ActionSprite">�ж�ͼ��</param>
-    /// <param name="cancelAction">�ж�ȡ���¼�</param>
-    /// <param name="actionIndex">�ж�λ��</param>
+    /// <param name="ActionSprite">行动图标</param>
+    /// <param name="cancelAction">行动取消事件</param>
+    /// <param name="actionIndex">行动位置</param>
     public void setUp(Sprite ActionSprite, Action cancelAction,int actionIndex)
     {
         actionIcon.sprite = ActionSprite;
-        cancelButton.onClick.AddListener(() => { cancelAction(); });
+        cancelButton.onClick.AddListener(() => { Debug.Log("杀杀杀"); cancelAction(); });
         textActionIndex.text = actionIndex.ToString();
     }
 }
