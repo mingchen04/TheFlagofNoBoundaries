@@ -741,8 +741,8 @@ GameObject:
   - component: {fileID: -3975354192596948010}
   - component: {fileID: 3029014702042351316}
   - component: {fileID: 8781643674633829981}
-  - component: {fileID: 7602184059769150796}
   - component: {fileID: 6515417029740260954}
+  - component: {fileID: 7602184059769150796}
   - component: {fileID: -1834504458823042407}
   - component: {fileID: 5315356020833175202}
   m_Layer: 3
@@ -883,18 +883,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09801e5edbf0b684698a50f9382dfc94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &7602184059769150796
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8362551573780112002}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dfb24f6979c77524d84dc0b589f67116, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &6515417029740260954
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -913,6 +901,19 @@ MonoBehaviour:
   shootPointTransform: {fileID: 944207148107139238}
   rifleTransform: {fileID: 6984768665934665362}
   swordTransform: {fileID: 7192043205576271530}
+--- !u!114 &7602184059769150796
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8362551573780112002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfb24f6979c77524d84dc0b589f67116, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actionPoints: 9
 --- !u!114 &-1834504458823042407
 MonoBehaviour:
   m_ObjectHideFlags: 0

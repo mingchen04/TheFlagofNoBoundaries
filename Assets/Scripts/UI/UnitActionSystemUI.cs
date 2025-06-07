@@ -21,8 +21,8 @@ public class UnitActionSystemUI : MonoBehaviour
         UnitActionSystem.Instance.OnSelectActionChanged += UnitActionSystem_OnSelectActionChanged;
         //UnitActionSystem.Instance.OnActionStarted += UnitActionSystem_OnActionStarted;
 
-        //ÎŞ·¨È·¶¨½Å±¾Ö´ĞĞË³Ğò¿ÉÄÜµ¼ÖÂÊı¾İÓëÊÓÍ¼²»Í¬²½
-        //·½·¨Ò» µ÷ÕûÏîÄ¿½Å±¾Ö´ĞĞË³Ğò ·½·¨¶ş ÉèÖÃÌØ¶¨¼àÌıÊÂ¼ş OnAnyActionPointsChanged
+        //æ— æ³•ç¡®å®šè„šæœ¬æ‰§è¡Œé¡ºåºå¯èƒ½å¯¼è‡´æ•°æ®ä¸è§†å›¾ä¸åŒæ­¥
+        //æ–¹æ³•ä¸€ è°ƒæ•´é¡¹ç›®è„šæœ¬æ‰§è¡Œé¡ºåº æ–¹æ³•äºŒ è®¾ç½®ç‰¹å®šç›‘å¬äº‹ä»¶ OnAnyActionPointsChanged
         //TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged; 
         PhysicalSystem.OnAnyActionPointsChanged += Unit_OnAnyActionPointsChanged;
 
@@ -85,8 +85,14 @@ public class UnitActionSystemUI : MonoBehaviour
     public void UpdateActionPoints()
     {
         Unit unit = UnitActionSystem.Instance.GetSelectedUnit();
-        if(unit == null) return;
-        string ActionPointString = "¿ÉÓÃĞĞ¶¯µãÊı: " + unit.GetActionPoints().ToString();
+        if (unit == null)
+        {
+            actionPointsText.enabled = false;
+            return;
+        }
+
+        actionPointsText.enabled = true;
+        string ActionPointString = "å¯ç”¨è¡ŒåŠ¨ç‚¹æ•°: " + unit.GetActionPoints().ToString();
 
         if (unit.GetReductionPoints() != 0) ActionPointString += " - " + unit.GetReductionPoints();
         actionPointsText.text = ActionPointString;

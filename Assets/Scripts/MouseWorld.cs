@@ -7,7 +7,6 @@ public class MouseWorld : MonoBehaviour
 
     [SerializeField] private LayerMask mousePlaneLayerMask;
     [SerializeField] private LayerMask mouseUnitLayerMask;
-    private Vector2 mouseStartPos;
 
     private void Awake()
     {

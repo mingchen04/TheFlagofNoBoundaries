@@ -5,7 +5,6 @@ public class UnitRagdollSpanner : MonoBehaviour
     [SerializeField] private Transform unitRagdollPrefabs;
     [SerializeField] private Transform originalRootBone;
 
-
     private HealthSystem healthSystem;
 
     private void Awake()

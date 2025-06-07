@@ -4,17 +4,24 @@ using UnityEngine;
 
 public class PhysicalSystem : MonoBehaviour
 {
-    //ÌåÁ¦ÏµÍ³
+    //ä½“åŠ›ç³»ç»Ÿ
     public static event EventHandler OnAnyActionPointsChanged;
 
     private Unit unit;
-    private const int ACTION_POINT_MAX = 9;
-    private int actionPoints = ACTION_POINT_MAX;
-    //Ô¤²âµãÊı
-    private int forecastActionPoints = ACTION_POINT_MAX;
+    [SerializeField] private int actionPoints = 5; //åˆå§‹è¡ŒåŠ¨ç‚¹æ•°
+    private int actionPointMax;
+    
+    //é¢„æµ‹ç‚¹æ•°
+    private int forecastActionPoints;
 
-    //ÊÇ·ñÔ¤²â
+    //æ˜¯å¦é¢„æµ‹
     private bool isForecast;
+
+    private void Awake()
+    {
+        actionPointMax = actionPoints;
+        forecastActionPoints = actionPoints;
+    }
 
     void Start()
     {
@@ -26,14 +33,14 @@ public class PhysicalSystem : MonoBehaviour
     {
         if ((unit.IsEnemy() && !TurnSystem.Instance.IsPlayerTrun()) || (!unit.IsEnemy() && TurnSystem.Instance.IsPlayerTrun()))
         {
-            actionPoints = ACTION_POINT_MAX;
+            actionPoints = actionPointMax;
             forecastActionPoints = actionPoints;
             OnAnyActionPointsChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 
     /// <summary>
-    /// ³¢ÊÔ»¨·ÑĞĞ¶¯µãÊıÀ´²ÉÈ¡ĞĞ¶¯
+    /// å°è¯•èŠ±è´¹è¡ŒåŠ¨ç‚¹æ•°æ¥é‡‡å–è¡ŒåŠ¨
     /// </summary>
     public bool TrySpendActionPointsToTakeAction(BaseAction baseAction)
     {
@@ -49,7 +56,7 @@ public class PhysicalSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// ÅĞ¶ÏĞĞ¶¯µãÊıÊÇ·ñÂú×ãĞĞ¶¯ÒªÇó
+    /// åˆ¤æ–­è¡ŒåŠ¨ç‚¹æ•°æ˜¯å¦æ»¡è¶³è¡ŒåŠ¨è¦æ±‚
     /// </summary>
     public bool CanspendActionPointsToTakeAction(BaseAction baseAction)
     {
@@ -78,7 +85,7 @@ public class PhysicalSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// ÉèÖÃ¶ÓÁĞÊ±Ê¹ÓÃÔ¤²âµãÊı Ö´ĞĞĞĞ¶¯Ê¹ÓÃÊµ¼ÊµãÊı
+    /// è®¾ç½®é˜Ÿåˆ—æ—¶ä½¿ç”¨é¢„æµ‹ç‚¹æ•° æ‰§è¡Œè¡ŒåŠ¨ä½¿ç”¨å®é™…ç‚¹æ•°
     /// </summary>
     public void SetForecast(bool isForecast)
     {
@@ -95,7 +102,7 @@ public class PhysicalSystem : MonoBehaviour
         return forecastActionPoints;
     }
 
-    //È¡Ïû¶¯×÷·µ»ØĞĞ¶¯µãÊı
+    //å–æ¶ˆåŠ¨ä½œè¿”å›è¡ŒåŠ¨ç‚¹æ•°
     public void CancelActionReturnPosint(List<BaseAction> baseActions)
     {
         foreach (BaseAction baseAction in baseActions)
