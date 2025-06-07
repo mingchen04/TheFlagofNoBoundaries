@@ -47,6 +47,8 @@ public class MoveAction : BaseAction
     public override void TakeAction(GridPosition gridPosition, Action actionCompleted)
     {
         ActionStart(actionCompleted);
+        ActionPointConsumption();
+
         currentPositionIndex = 0;
         positionList = new List<Vector3>();
         //TakeAction使用Unit.GetGridPosition() 请确认ActionStart事件在之前发生才能获取实际坐标

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ActionBusyUI : MonoBehaviour
@@ -24,7 +22,6 @@ public class ActionBusyUI : MonoBehaviour
         {
             Hide();
         }
-
     }
 
     private void Show()

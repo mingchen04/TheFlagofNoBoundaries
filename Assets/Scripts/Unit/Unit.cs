@@ -110,12 +110,18 @@ public class Unit : MonoBehaviour
         return physicalSystem.GetActionPoints();
     }
 
-    //获取即将减少的点数
+    /// <summary>
+    /// 获取即将减少的点数
+    /// </summary>
+    /// <returns>实际点数和预计点数的差</returns>
     public int GetReductionPoints()
     {
         return physicalSystem.GetActionPoints() - physicalSystem.GetForecastActions();
     }
 
+    /// <summary>
+    /// 判断点数是否满足行动要求
+    /// </summary>
     public bool CanspendActionPointsToTakeAction(BaseAction baseAction)
     {
         return physicalSystem.CanspendActionPointsToTakeAction(baseAction);
@@ -143,6 +149,7 @@ public class Unit : MonoBehaviour
     {
         List<BaseAction> cancelActions = actionQueue.GetCancelActions(actionsIndex, baseAction);
         physicalSystem.CancelActionReturnPosint(cancelActions);
+        OnAnyMoveActionUnitPositionChange?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>

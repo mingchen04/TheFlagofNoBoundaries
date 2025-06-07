@@ -15,7 +15,7 @@ public class InteractAction : BaseAction
 
     public override string GetActionName()
     {
-        return "»¥¶¯";
+        return "äº’åŠ¨";
     }
 
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
@@ -37,7 +37,7 @@ public class InteractAction : BaseAction
 
             if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition))
             {
-                //Íø¸ñÎ»ÖÃ²»ºÏ·¨Ìø¹ı
+                //ç½‘æ ¼ä½ç½®ä¸åˆæ³•è·³è¿‡
                 continue;
             }
 
@@ -56,8 +56,14 @@ public class InteractAction : BaseAction
 
     public override void TakeAction(GridPosition gridPosition, Action onInteractComplete)
     {
-        ActionStart(onInteractComplete);
         IInteractable interactable = LevelGrid.Instance.GetInteractableAtGridPosition(gridPosition);
+        if (interactable == null)
+        {
+            return;
+        }
+
+        ActionStart(onInteractComplete);
+        ActionPointConsumption();
         interactable.Interact(OnInteractComplete);
     }
 

@@ -143,6 +143,10 @@ public class InputManager : MonoBehaviour
 
     public bool IsShiftButtonDown()
     {
+#if USE_NEW_INPUT_SYSTEM
         return playerInputActions.Player.Shift.IsPressed();
+#else
+        return Input.GetKey(KeyCode.LeftShift);
+#endif
     }
 }

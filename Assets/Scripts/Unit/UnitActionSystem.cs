@@ -55,47 +55,41 @@ public class UnitActionSystem : MonoBehaviour
             return;
         }
 
-        //判断点击的是否是单位
-        if (TryHandleUnitSelection())
-        {
-            return;
-        }
+        GridPosition mouseGridPosition = LevelGrid.Instance.GetGridPosition(MouseWorld.GetPosition());
 
-        if (selectedUnits.Count == 0)
+        //点击地板时检查是否有行动 没有行动可执行则选择单位
+        if (!TryHandleSelectedAction(mouseGridPosition))
         {
-            return;
+            //判断点击的是否是单位
+            if (TryHandleUnitSelection(mouseGridPosition))
+            {
+                return;
+            }
         }
-
-        //判断点击的是否是选择行动的可用范围并执行
-        HandleSelectedAction();
     }
 
-    private void HandleSelectedAction()
+    private bool TryHandleSelectedAction(GridPosition mouseGridPosition)
     {
-        GridPosition mouseGridPosition = LevelGrid.Instance.GetGridPosition(MouseWorld.GetPosition());
+        if (selectedUnits.Count == 0)
+        {
+            return false;
+        }
 
         if (!LevelGrid.Instance.IsValidGridPosition(mouseGridPosition))
         {
-            return;
+            return false;
         }
 
         if (!selectedAction.IsValidActionGridPosition(mouseGridPosition))
         {
-            ClearSelectedUnits();
-            Unit unit = LevelGrid.Instance.GetUnitAtGridPosition(mouseGridPosition);
-            if (unit != null)
-            {
-                AddSelectedUnit(unit);
-            }
-
-            return;
+            return false;
         }
 
         //开启预测
         selectedUnits[0].SetForecast(true);
         if (!selectedUnits[0].TrySpendActionPointsToTakeAction(selectedAction))
         {
-            return;
+            return false;
         }
 
         BaseActionSO.ActionTags actionTags = ScriptiptableSOManager.Instance.GetActionTags(selectedAction);
@@ -112,33 +106,39 @@ public class UnitActionSystem : MonoBehaviour
         }
 
         OnActionAddQueue?.Invoke(this, EventArgs.Empty); //触发行动点更新
+        return true;
     }
 
-    private bool TryHandleUnitSelection()
+    private bool TryHandleUnitSelection(GridPosition mouseGridPosition)
     {
         if (MouseWorld.TryGetUnit(out Unit unit))
         {
-            if (unit == IsUnitSelected(unit))
-            {
-                //选择相同的角色不触发事件
-                return false;
-            }
-
             if (unit.IsEnemy())
             {
                 //Clicked on anEnemy
                 return false;
             }
 
-            if (!InputManager.Instance.IsShiftButtonDown())
+            if (unit == IsUnitSelected(unit))
             {
-                ClearSelectedUnits();
+                //选择相同的角色不触发事件
+                return false;
             }
 
-            AddSelectedUnit(unit);
-            return true;
+            if (InputManager.Instance.IsShiftButtonDown())
+            {
+                AddSelectedUnit(unit);
+                return true;
+            }
+            else
+            {
+                ClearSelectedUnits();
+                AddSelectedUnit(unit);
+                return true;
+            }
         }
 
+        ClearSelectedUnits();
         return false;
     }
 
@@ -177,7 +177,7 @@ public class UnitActionSystem : MonoBehaviour
             this.selectedUnits.Add(unit);
         }
 
-        if(selectedUnits.Count > 0) SetSelectedAction(selectedUnits[0].GetAction<MoveAction>());
+        if (selectedUnits.Count > 0) SetSelectedAction(selectedUnits[0].GetAction<MoveAction>());
         OnSelectedUnitChanged?.Invoke(this, EventArgs.Empty);
     }
 

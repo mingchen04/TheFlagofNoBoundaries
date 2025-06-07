@@ -31,8 +31,6 @@ public class ActionButtonUI : MonoBehaviour
         else
         {
             selectedGameObject.SetActive(false);
-        }
-        
+        }        
     }
-
 }

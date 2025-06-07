@@ -7,6 +7,7 @@ using System.Linq;
 /// </summary>
 public class ActionQueue
 {
+    public static event EventHandler OnAnyActionCompleted; //行为结束触发视图更新
     private List<BaseActionParameter> pendingActions; //行为队列
     private GridPosition lastActionUnitPosition; //存储上一次行动的单位位置
 
@@ -18,15 +19,6 @@ public class ActionQueue
     public void AddAction(BaseActionParameter baseActionParameter)
     {
         pendingActions.Add(baseActionParameter);
-    }
-
-
-    private BaseActionParameter ActionsDequeue()
-    {
-        BaseActionParameter baseActionParameter = pendingActions[0];
-        lastActionUnitPosition = baseActionParameter.unitFinalPosition;
-        pendingActions.RemoveAt(0);
-        return baseActionParameter;
     }
 
     //判断行为队列是否全部完成
@@ -118,6 +110,8 @@ public class ActionQueue
                 if (completedCount == actions.Count)
                 {
                     pendingActions.RemoveAll(a => a.executeTurn == order);
+                    OnAnyActionCompleted?.Invoke(this, EventArgs.Empty);
+
                     onComplete?.Invoke();
                 }
             });

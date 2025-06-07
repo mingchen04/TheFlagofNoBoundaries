@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class MouseWorld : MonoBehaviour
@@ -21,23 +22,31 @@ public class MouseWorld : MonoBehaviour
 
     public static bool TryGetUnit(out Unit unit)
     {
+        unit = null;
         bool isUnit = TryGetMouseRaycastHit(instance.mouseUnitLayerMask, out RaycastHit raycastHit);
+        GridPosition mousePosition = GetPosition();
+
         if (isUnit)
         {
             unit = raycastHit.transform.GetComponent<Unit>();
-            if (unit != null) {
-                return true;
-            }
+        }
+        else if (LevelGrid.Instance.IsValidGridPosition(mousePosition))
+        {
+            unit = LevelGrid.Instance.GetUnitAtGridPosition(mousePosition);
         }
 
-        unit = null;
+        if (unit != null)
+        {
+            return true;
+        }
+
         return false;
     }
 
     private static bool TryGetMouseRaycastHit(LayerMask layerMask, out RaycastHit raycastHit)
     {
-        //Debug.Log(Input.mousePosition); //Êó±êÔÚÆÁÄ»µÄÎ»ÖÃ
-        Ray ray = Camera.main.ScreenPointToRay(InputManager.Instance.GetMouseScreenPosition());//ÉãÏñ»ú¸ù¾İÊó±êÎ»ÖÃ·¢ËÍÉäÏß
-        return Physics.Raycast(ray, out raycastHit, float.MaxValue, layerMask); //¼ì²âÊÇ·ñÓĞÅö×²ÎïÌå ÓĞÔòÎªtrue;
+        //Debug.Log(Input.mousePosition); //é¼ æ ‡åœ¨å±å¹•çš„ä½ç½®
+        Ray ray = Camera.main.ScreenPointToRay(InputManager.Instance.GetMouseScreenPosition());//æ‘„åƒæœºæ ¹æ®é¼ æ ‡ä½ç½®å‘é€å°„çº¿
+        return Physics.Raycast(ray, out raycastHit, float.MaxValue, layerMask); //æ£€æµ‹æ˜¯å¦æœ‰ç¢°æ’ç‰©ä½“ æœ‰åˆ™ä¸ºtrue;
     }
 }

@@ -49,7 +49,7 @@ public class PhysicalSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// 可以花费行动点数来采取行动
+    /// 判断行动点数是否满足行动要求
     /// </summary>
     public bool CanspendActionPointsToTakeAction(BaseAction baseAction)
     {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+
 public class ActionQueueUI : MonoBehaviour
 {
     [SerializeField] private BaseActionParameterObjUI baseActionParameterPre;
@@ -11,9 +12,14 @@ public class ActionQueueUI : MonoBehaviour
     private void Start()
     {
         UnitActionSystem.Instance.OnActionAddQueue += UnitActionSystem_OnActionAddQueue;
-        BaseAction.OnAnyActionStarted += BaseAction_OnAnyActionStarted;
         UnitActionSystem.Instance.OnSelectedUnitChanged += UnitActionSystem_OnSelectedUnitChanged;
+        ActionQueue.OnAnyActionCompleted += ActionQueue_OnAnyActionCompleted;
 
+        UpdateVisual();
+    }
+
+    private void ActionQueue_OnAnyActionCompleted(object sender, System.EventArgs e)
+    {
         UpdateVisual();
     }
 
@@ -22,10 +28,6 @@ public class ActionQueueUI : MonoBehaviour
         UpdateVisual();
     }
 
-    private void BaseAction_OnAnyActionStarted(object sender, System.EventArgs e)
-    {
-        UpdateVisual();
-    }
 
     private void UnitActionSystem_OnActionAddQueue(object sender, System.EventArgs e)
     {

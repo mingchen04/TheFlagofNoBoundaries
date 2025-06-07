@@ -67,7 +67,7 @@ public class SwordAction : BaseAction
 
     public override string GetActionName()
     {
-        return "Åü¿³";
+        return "åŠˆç ";
     }
 
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
@@ -88,7 +88,7 @@ public class SwordAction : BaseAction
         {
             if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition))
             {
-                //Íø¸ñÎ»ÖÃ²»ºÏ·¨Ìø¹ı
+                //ç½‘æ ¼ä½ç½®ä¸åˆæ³•è·³è¿‡
                 continue;
             }
 
@@ -111,8 +111,14 @@ public class SwordAction : BaseAction
 
     public override void TakeAction(GridPosition gridPosition, Action onActionComplete)
     {
-        ActionStart(onActionComplete);
         targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
+        if(targetUnit == null)
+        {
+            return;
+        }
+        
+        ActionStart(onActionComplete);
+        ActionPointConsumption();
         float swordBeforeHitTime = 0.7f;
         stateTimer = swordBeforeHitTime;
         state = State.SwingingSwordBeforeHit;

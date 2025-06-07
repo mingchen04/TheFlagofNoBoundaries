@@ -19,7 +19,7 @@ public class BaseActionParameterObjUI : MonoBehaviour
     public void setUp(Sprite ActionSprite, Action cancelAction,int actionIndex)
     {
         actionIcon.sprite = ActionSprite;
-        cancelButton.onClick.AddListener(() => { Debug.Log("杀杀杀"); cancelAction(); });
+        cancelButton.onClick.AddListener(() => {cancelAction(); });
         textActionIndex.text = actionIndex.ToString();
     }
 }

@@ -1,11 +1,11 @@
 using System;
 using UnityEngine;
 
-//IEquatable<T> ÊÇ .NET ÖĞµÄÒ»¸ö½Ó¿Ú£¬ÓÃÓÚÎªÀàĞÍÌá¹©Ç¿ÀàĞÍµÄÏàµÈĞÔ±È½Ï·½·¨ Equals
+//IEquatable<T> æ˜¯ .NET ä¸­çš„ä¸€ä¸ªæ¥å£ï¼Œç”¨äºä¸ºç±»å‹æä¾›å¼ºç±»å‹çš„ç›¸ç­‰æ€§æ¯”è¾ƒæ–¹æ³• Equals
 public struct GridPosition : IEquatable<GridPosition>
 {
 
-    //½á¹¹Ìå×÷Îªº¯Êı²ÎÊıÊ±¿É±»¸Ä±ä class×÷ÎªÒıÓÃÀàĞÍ²ÎÊı²»ÄÜ¸Ä±ä
+    //ç»“æ„ä½“ä½œä¸ºå‡½æ•°å‚æ•°æ—¶å¯è¢«æ”¹å˜ classä½œä¸ºå¼•ç”¨ç±»å‹å‚æ•°ä¸èƒ½æ”¹å˜
     public int x;
     public int z;
 
@@ -38,7 +38,7 @@ public struct GridPosition : IEquatable<GridPosition>
         return $"x:{x} z:{z}";
     }
 
-    //ÖØĞÂ¶¨ÒåÔËËã·û
+    //é‡æ–°å®šä¹‰è¿ç®—ç¬¦
     public static bool operator ==(GridPosition a, GridPosition b)
     {
         return a.x == b.x && a.z == b.z;
@@ -72,10 +72,18 @@ public struct GridPosition : IEquatable<GridPosition>
     => new GridPosition(a.x * k, a.z * k);
 
     /// <summary>
-    /// ÔÊĞí´ÓVector3ÒşÊ½×ª»»
+    /// å…è®¸Vector3éšå¼è½¬æ¢
     /// </summary>
     public static implicit operator Vector3(GridPosition gridPosition)
     {
         return LevelGrid.Instance.GetWorldPosition(gridPosition);
+    }
+
+    /// <summary>
+    /// å…è®¸GridPositionéšå¼è½¬æ¢
+    /// </summary>
+    public static implicit operator GridPosition(Vector3 worldPosition)
+    {
+        return LevelGrid.Instance.GetGridPosition(worldPosition);
     }
 }

@@ -28,7 +28,7 @@ public class GridSystemVisual : MonoBehaviour
     private GridSystemVisualSingle[,] gridSystemVisualSingleArray;
 
     /// <summary>
-    /// ×îºóÑ¡ÔñµÄÍø¸ñÊÓÍ¼
+    /// æœ€åé€‰æ‹©çš„ç½‘æ ¼è§†å›¾
     /// </summary>
     private GridSystemVisualSingle lastSelectedGridSystemVisualSingle;
 
@@ -115,7 +115,7 @@ public class GridSystemVisual : MonoBehaviour
         {
             if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition))
             {
-                //Íø¸ñÎ»ÖÃ²»ºÏ·¨Ìø¹ı
+                //ç½‘æ ¼ä½ç½®ä¸åˆæ³•è·³è¿‡
                 continue;
             }
             gridPositionList.Add(testGridPosition);
@@ -140,7 +140,7 @@ public class GridSystemVisual : MonoBehaviour
         BaseAction selectedAction = UnitActionSystem.Instance.GetSelectedAction();
 
         GridVisualType gridVisualType;
-        //¸ù¾İÑ¡ÔñµÄĞĞ¶¯ÏÔÊ¾²»Í¬ÑÕÉ«µÄÍø¸ñ
+        //æ ¹æ®é€‰æ‹©çš„è¡ŒåŠ¨æ˜¾ç¤ºä¸åŒé¢œè‰²çš„ç½‘æ ¼
         switch (selectedAction)
         {
             default:

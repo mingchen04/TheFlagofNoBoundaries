@@ -8,8 +8,8 @@ public class SpinAction : BaseAction
     //private SpinCompleteDelegate spinCompleteDelegate;
 
     //using System
-    //private Action<int> spinComplete; ÎŞ·µ»ØÖµ
-    //private Func<int,bool> spinCompleteFunc; ÓĞ·µ»ØÖµ ½ÓÊÜint²ÎÊı·µ»Øbool
+    //private Action<int> spinComplete; æ— è¿”å›å€¼
+    //private Func<int,bool> spinCompleteFunc; æœ‰è¿”å›å€¼ æ¥å—intå‚æ•°è¿”å›bool
 
     private float totalSpinAmount;
 
@@ -24,7 +24,7 @@ public class SpinAction : BaseAction
         transform.eulerAngles += new Vector3(0, spinAddAmount, 0);
         totalSpinAmount -= spinAddAmount;
 
-        //Ğı×ª360¡ã
+        //æ—‹è½¬360Â°
         if (totalSpinAmount <= 0)
         {
             transform.eulerAngles += new Vector3(0, totalSpinAmount, 0);
@@ -36,12 +36,13 @@ public class SpinAction : BaseAction
     public override void TakeAction(GridPosition gridPosition, Action onSpinComplete)
     {
         ActionStart(onSpinComplete);
+        ActionPointConsumption();
         totalSpinAmount = 360f;
     }
 
     public override string GetActionName()
     {
-        return "Ğı×ª";
+        return "æ—‹è½¬";
     }
 
     public override List<GridPosition> GetValidActionGridPositionList()

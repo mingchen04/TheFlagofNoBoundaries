@@ -27,7 +27,7 @@ public class LevelGrid : MonoBehaviour
         gridSystem = new GridSystemHex<GridObject>(width, height, cellSize,
             (GridSystemHex<GridObject> g, GridPosition gridPosition) => new GridObject(g, gridPosition));
 
-        //ÏÔÊ¾Íø¸ñµÄx y×ø±ê
+        //æ˜¾ç¤ºç½‘æ ¼çš„x yåæ ‡
         gridSystem.CreateDebugObject(gridDebugObjectPrefab);
     }
 
@@ -93,7 +93,7 @@ public class LevelGrid : MonoBehaviour
     }
 
     /// <summary>
-    /// Éú³ÉÒÔcenterÎªÖĞĞÄ¡¢°ë¾¶ÎªNµÄÁù±ßĞÎÇøÓòËùÓĞ×ø±ê
+    /// ç”Ÿæˆä»¥centerä¸ºä¸­å¿ƒã€åŠå¾„ä¸ºNçš„å…­è¾¹å½¢åŒºåŸŸæ‰€æœ‰åæ ‡
     /// </summary>
     public List<GridPosition> GenerateHexArea(GridPosition center, int radius)
     {
@@ -107,23 +107,23 @@ public class LevelGrid : MonoBehaviour
 
             for (int r = rMin; r <= rMax; r++)
             {
-                // ¼ÆËãxÆ«ÒÆÁ¿£¨¸ù¾İĞĞºÅÆæÅ¼ĞÔµ÷Õû£©
+                // è®¡ç®—xåç§»é‡ï¼ˆæ ¹æ®è¡Œå·å¥‡å¶æ€§è°ƒæ•´ï¼‰
                 int xOffset = q;
-                if (r != 0) // Ö»ÓĞ·ÇÖĞĞÄĞĞĞèÒªµ÷Õû
+                if (r != 0) // åªæœ‰éä¸­å¿ƒè¡Œéœ€è¦è°ƒæ•´
                 {
                     bool isNegative = r < 0;
                     int absR = Math.Abs(r);
 
-                    // Í³Ò»¼ÆËãÆ«ÒÆÁ¿
+                    // ç»Ÿä¸€è®¡ç®—åç§»é‡
                     int offset = (absR + (isEvenRow == isNegative ? 1 : 0)) / 2;
 
                     xOffset += isNegative ? -offset : offset;
 
-                    // ÌØÊâ´¦ÀíµÚÒ»ĞĞµÄÇé¿ö
+                    // ç‰¹æ®Šå¤„ç†ç¬¬ä¸€è¡Œçš„æƒ…å†µ
                     if (absR == 1)
                     {
-                        if (isEvenRow && !isNegative) xOffset = q; // Å¼ÊıĞĞÉÏ·½µÚÒ»ĞĞ²»Æ«ÒÆ
-                        else if (!isEvenRow && isNegative) xOffset = q; // ÆæÊıĞĞÏÂ·½µÚÒ»ĞĞ²»Æ«ÒÆ
+                        if (isEvenRow && !isNegative) xOffset = q; // å¶æ•°è¡Œä¸Šæ–¹ç¬¬ä¸€è¡Œä¸åç§»
+                        else if (!isEvenRow && isNegative) xOffset = q; // å¥‡æ•°è¡Œä¸‹æ–¹ç¬¬ä¸€è¡Œä¸åç§»
                     }
                 }
 

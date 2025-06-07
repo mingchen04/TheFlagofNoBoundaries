@@ -8,19 +8,19 @@ public abstract class BaseAction : MonoBehaviour
     public static event EventHandler OnAnyActionStarted;
     public static event EventHandler OnAnyActionCompleted;
 
-    //protected ×ÓÀà¿ÉÒÔ·ÃÎÊ
+    //protected å­ç±»å¯ä»¥è®¿é—®
     protected Unit unit;
     protected bool isActive;
     protected Action onActionComplete;
     protected string actionName;
  
-    //virtual ¿ÉÖØĞ´
+    //virtual å¯é‡å†™
     protected virtual void Awake()
     {
         unit = GetComponent<Unit>();
     }
 
-    /// <returns>¶¯×÷Ãû³Æ</returns>
+    /// <returns>åŠ¨ä½œåç§°</returns>
     public abstract string GetActionName();
 
     public abstract void TakeAction(GridPosition gridPosition, Action onActionComplete);
@@ -28,13 +28,13 @@ public abstract class BaseAction : MonoBehaviour
     public virtual bool IsValidActionGridPosition(GridPosition gridPosition)
     {
         List<GridPosition> validActionGridPositionList = GetValidActionGridPositionList();
-        return validActionGridPositionList.Contains(gridPosition); //¼ì²éÊı×éÖĞ°üº¬µÄÖµ
+        return validActionGridPositionList.Contains(gridPosition); //æ£€æŸ¥æ•°ç»„ä¸­åŒ…å«çš„å€¼
     }
 
     /// <summary>
-    /// »ñÈ¡¿ÉÒÔ½øĞĞĞĞ¶¯µÄµÄÍø¸ñ×ø±ê¼¯ºÏ
+    /// è·å–å¯ä»¥è¿›è¡Œè¡ŒåŠ¨çš„çš„ç½‘æ ¼åæ ‡é›†åˆ
     /// </summary>
-    /// <returns>¿ÉÑ¡µÄGridPosition¼¯ºÏ</returns>
+    /// <returns>å¯é€‰çš„GridPositioné›†åˆ</returns>
     public abstract List<GridPosition> GetValidActionGridPositionList();
 
     public virtual int GetActionPointsCost()
@@ -44,11 +44,11 @@ public abstract class BaseAction : MonoBehaviour
 
     protected void ActionStart(Action onActionComplete)
     {
-        //¹Ø±ÕÔ¤²â
+        //å…³é—­é¢„æµ‹
         unit.SetForecast(false);
-        if (!unit.TrySpendActionPointsToTakeAction(this))
+        if (!unit.CanspendActionPointsToTakeAction(this))
         {
-            Debug.Log("µãÊı²»×ã");
+            Debug.Log("ç‚¹æ•°ä¸è¶³");
             return;
         }
 
@@ -82,7 +82,7 @@ public abstract class BaseAction : MonoBehaviour
 
         if (enemyAIActionList.Count > 0)
         {
-            enemyAIActionList.Sort((EnemyAIAction a, EnemyAIAction b) => b.actionValue - a.actionValue); //¸ù¾İactionValueÅÅĞò×îÓÅĞĞ¶¯
+            enemyAIActionList.Sort((EnemyAIAction a, EnemyAIAction b) => b.actionValue - a.actionValue); //æ ¹æ®actionValueæ’åºæœ€ä¼˜è¡ŒåŠ¨
             List<EnemyAIAction> eqEnemyAIActionList = enemyAIActionList.FindAll((EnemyAIAction enemyAction) =>
             {
                 return enemyAction.actionValue == enemyAIActionList[0].actionValue;
@@ -94,11 +94,22 @@ public abstract class BaseAction : MonoBehaviour
         }
         else
         {
-            //Ã»ÓĞ¿ÉÖ´ĞĞµÄĞĞ¶¯
+            //æ²¡æœ‰å¯æ‰§è¡Œçš„è¡ŒåŠ¨
             return null;
         }
     }
 
     public abstract EnemyAIAction GetEnemyAIAction(GridPosition gridPosition);
 
+    /// <summary>
+    /// æ¶ˆè€—ç‚¹æ•°
+    /// </summary>
+    protected void ActionPointConsumption()
+    {
+        if (!unit.TrySpendActionPointsToTakeAction(this))
+        {
+            Debug.Log("è¡Œä¸ºæ‰§è¡Œå¤±è´¥,è¡ŒåŠ¨ç‚¹æ•°ä¸è¶³");
+        }
+    }
 }
+

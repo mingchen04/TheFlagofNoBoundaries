@@ -134,7 +134,7 @@ public class ShootAction : BaseAction
             if (targetUnit == null || targetUnit.IsEnemy() == isUnitEnemy)
             {
                 continue;
-            }
+            }  
 
             Vector3 unitWorldPosition = levelGrid.GetWorldPosition(unitGridPosition);
             Vector3 shootDir = (targetUnit.GetWorldPosition() - unitWorldPosition).normalized;
@@ -156,14 +156,19 @@ public class ShootAction : BaseAction
 
     public override void TakeAction(GridPosition gridPosition, Action ClearBusy)
     {
-        state = State.Aiming;
         targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
+        if (targetUnit == null)
+        {
+            return;
+        }
 
+        state = State.Aiming;
         float aimingStateTime = 1f;
         stateTimer = aimingStateTime;
-
         canShootBullet = true;
+
         ActionStart(ClearBusy);
+        ActionPointConsumption();
     }
 
     public Unit GetTargetUnit()

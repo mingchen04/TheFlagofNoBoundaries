@@ -18,7 +18,7 @@ public class GrenadeAction : BaseAction
 
     public override string GetActionName()
     {
-        return "ÊÖÀ×";
+        return "æ‰‹é›·";
     }
 
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
@@ -36,7 +36,7 @@ public class GrenadeAction : BaseAction
 
             if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition))
             {
-                //Íø¸ñÎ»ÖÃ²»ºÏ·¨Ìø¹ı
+                //ç½‘æ ¼ä½ç½®ä¸åˆæ³•è·³è¿‡
                 continue;
             }
 
@@ -48,6 +48,7 @@ public class GrenadeAction : BaseAction
     public override void TakeAction(GridPosition gridPosition, Action onActionComplete)
     {
         ActionStart(onActionComplete);
+        ActionPointConsumption();
         Transform grenadeProjectileTransform = Instantiate(grenadeProjectilePrefab, unit.GetWorldPosition(), Quaternion.identity);
         GrenadeProjectile grenadeProjectile = grenadeProjectileTransform.GetComponent<GrenadeProjectile>();
         grenadeProjectile.Setup(gridPosition, OnGrenadeBehaviourComplete);  
