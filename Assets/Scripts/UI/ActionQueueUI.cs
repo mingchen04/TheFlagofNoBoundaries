@@ -87,7 +87,7 @@ public class ActionQueueUI : MonoBehaviour
                         unit.CancelAction(currentIndex, baseActionParameter.baseAction);
                         UpdateVisual();
                     },
-                    baseActionParameter.executeTurn + 1
+                    baseActionParameter.executeTurn
                 );
         }
 

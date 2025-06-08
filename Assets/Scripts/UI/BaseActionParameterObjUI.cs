@@ -9,6 +9,8 @@ public class BaseActionParameterObjUI : MonoBehaviour
     [SerializeField] private Button cancelButton;
     [SerializeField] private Image actionIcon;
     [SerializeField] private TextMeshProUGUI textActionIndex;
+    [SerializeField] private Button orderForwardButton; //顺序向前调整
+    [SerializeField] private Button orderBackButton; //顺序向后调整
 
     /// <summary>
     /// 设置UI基本参数
@@ -20,6 +22,6 @@ public class BaseActionParameterObjUI : MonoBehaviour
     {
         actionIcon.sprite = ActionSprite;
         cancelButton.onClick.AddListener(() => {cancelAction(); });
-        textActionIndex.text = actionIndex.ToString();
+        textActionIndex.text = (actionIndex + 1).ToString();
     }
 }

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SocialPlatforms;
 
 public class ShootAction : BaseAction
 {
@@ -154,11 +153,13 @@ public class ShootAction : BaseAction
         return validActionGridPositionList;
     }
 
-    public override void TakeAction(GridPosition gridPosition, Action ClearBusy)
+    public override void TakeAction(GridPosition gridPosition, Action onActionComplete)
     {
         targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
         if (targetUnit == null)
         {
+            ActionStart(onActionComplete);
+            ActionComplete();
             return;
         }
 
@@ -167,7 +168,7 @@ public class ShootAction : BaseAction
         stateTimer = aimingStateTime;
         canShootBullet = true;
 
-        ActionStart(ClearBusy);
+        ActionStart(onActionComplete);
         ActionPointConsumption();
     }
 

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class UnitAnimator : MonoBehaviour
 {
-    [SerializeField] private Animator animator;
+    [SerializeField] private Animator unitAnimator;
     [SerializeField] private Transform bulletProjectIlePrefab;
     [SerializeField] private Transform shootPointTransform;
     [SerializeField] private Transform rifleTransform;
@@ -41,22 +41,22 @@ public class UnitAnimator : MonoBehaviour
     private void SwordAction_OnSordActionStarted(object sender, System.EventArgs e)
     {
         EquipSword();
-        animator.SetTrigger("SwordSlash");
+        unitAnimator.SetTrigger("SwordSlash");
     }
 
     private void MoveAction_OnStopMoving(object sender, System.EventArgs e)
     {
-        animator.SetBool("IsWalking", false);
+        unitAnimator.SetBool("IsWalking", false);
     }
 
     private void MoveAction_OnStartMoving(object sender, System.EventArgs e)
     {
-        animator.SetBool("IsWalking", true);
+        unitAnimator.SetBool("IsWalking", true);
     }
 
     private void ShootAction_OnShoot(object sender, ShootAction.OnShootEventArgs e)
     {
-        animator.SetTrigger("Shoot");
+        unitAnimator.SetTrigger("Shoot");
         Transform BulletProjectIle = Instantiate(bulletProjectIlePrefab, shootPointTransform.position, Quaternion.identity);
         BulletProjectIle bulletProjectIle = BulletProjectIle.GetComponent<BulletProjectIle>();
 

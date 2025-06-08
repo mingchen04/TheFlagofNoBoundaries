@@ -5,7 +5,6 @@ using UnityEngine;
 public class SwordAction : BaseAction
 {
     public static event EventHandler OnAnySwordHit;
-
     public event EventHandler OnSwordActionStarted;
     public event EventHandler OnSwordActionCompleted;
 
@@ -112,11 +111,13 @@ public class SwordAction : BaseAction
     public override void TakeAction(GridPosition gridPosition, Action onActionComplete)
     {
         targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
-        if(targetUnit == null)
+        if (targetUnit == null)
         {
+            ActionStart(onActionComplete);
+            ActionComplete();
             return;
         }
-        
+
         ActionStart(onActionComplete);
         ActionPointConsumption();
         float swordBeforeHitTime = 0.7f;
