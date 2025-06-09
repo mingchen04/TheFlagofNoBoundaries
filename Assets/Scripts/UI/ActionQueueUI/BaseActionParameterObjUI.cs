@@ -13,7 +13,6 @@ public class BaseActionParameterObjUI : MonoBehaviour
     [SerializeField] private Button orderBackButton; //顺序向后调整
 
 
-
     /// <summary>
     /// 设置UI基本参数
     /// </summary>
@@ -56,5 +55,11 @@ public class BaseActionParameterObjUI : MonoBehaviour
         {
             orderForwardButton.interactable = false; //如果行动位置为0则不能向前调整
         }
+        else if(executeTurn >= 10)
+        {
+            orderBackButton.interactable = false; //如果行动位置大于等于10则不能向后调整
+        }
+
+        
     }
 }

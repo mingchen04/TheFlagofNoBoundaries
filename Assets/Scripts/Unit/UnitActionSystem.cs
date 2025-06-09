@@ -124,12 +124,6 @@ public class UnitActionSystem : MonoBehaviour
                 //选择相同的角色不触发事件
                 return false;
             }
-
-            if (InputManager.Instance.IsShiftButtonDown())
-            {
-                AddSelectedUnit(unit);
-                return true;
-            }
             else
             {
                 ClearSelectedUnits();
@@ -181,8 +175,18 @@ public class UnitActionSystem : MonoBehaviour
         OnSelectedUnitChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    public void ClearSelectedUnits()
+    /// <summary>
+    /// 清除选中单位
+    /// </summary>
+    /// <param name="playerControl">是否由玩家控制</param>
+    public void ClearSelectedUnits(bool playerControl = true)
     {
+        // 如果是玩家控制并且按下Shift键，则不清除选中单位
+        if (playerControl && InputManager.Instance.IsShiftButtonDown())
+        {
+            return;
+        }
+
         selectedUnits.Clear();
         OnSelectActionChanged?.Invoke(this, EventArgs.Empty);
         OnSelectedUnitChanged?.Invoke(this, EventArgs.Empty);
@@ -212,6 +216,7 @@ public class UnitActionSystem : MonoBehaviour
     {
         if (!isExecutingGlobalActions)
         {
+            ClearSelectedUnits(false);
             AddSelectedUnit(UnitManager.Instance.GetFriendlyUnitList());
             StartCoroutine(ExecuteGlobalActionsCoroutine());
         }

@@ -766,6 +766,11 @@ PrefabInstance:
       propertyPath: m_SizeDelta.x
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6238026237137746047, guid: 9e7eddb23ba201542b571c4c344d7f72,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6751400513834094826, guid: 9e7eddb23ba201542b571c4c344d7f72,
         type: 3}
       propertyPath: m_AnchorMax.x
@@ -6574,8 +6579,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c8b06c632c05b8418e7ab6f1fb3f9bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseActionParameterPre: {fileID: 4885242139078030797, guid: d4d83df0f5df19e4abc08e6c89feefb0,
-    type: 3}
   ActionQueueScrollView: {fileID: 2902512862020497166, guid: 9e7eddb23ba201542b571c4c344d7f72,
     type: 3}
 --- !u!114 &1972628677
@@ -7709,6 +7712,11 @@ PrefabInstance:
     - target: {fileID: 6238026237137746047, guid: 9e7eddb23ba201542b571c4c344d7f72,
         type: 3}
       propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6238026237137746047, guid: 9e7eddb23ba201542b571c4c344d7f72,
+        type: 3}
+      propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6751400513834094826, guid: 9e7eddb23ba201542b571c4c344d7f72,
