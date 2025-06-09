@@ -1,26 +1,20 @@
 /// <summary>
-/// ²Ù×÷²ÎÊı - ·â×°ĞĞ¶¯Ö´ĞĞËùĞèµÄËùÓĞ²ÎÊı
+/// æ“ä½œå‚æ•° - å°è£…è¡ŒåŠ¨æ‰§è¡Œæ‰€éœ€çš„æ‰€æœ‰å‚æ•°
 /// </summary>
 [System.Serializable]
 public class BaseActionParameter
 {
-    public BaseAction baseAction;          // ÒªÖ´ĞĞµÄ»ù´¡ĞĞ¶¯
-    public GridPosition targetGridPosition; // Ä¿±êÍø¸ñÎ»ÖÃ
-    public GridPosition unitFinalPosition;  // ĞĞ¶¯ºóµ¥Î»µÄ×îÖÕÎ»ÖÃ
-    public int executeTurn;             // Ö´ĞĞÂÖ´Î£¨1=µÚ1ÂÖÖ´ĞĞ£¬2=µÚ2ÂÖÖ´ĞĞ...£©
+    public BaseAction baseAction;          // è¦æ‰§è¡Œçš„åŸºç¡€è¡ŒåŠ¨
+    public GridPosition targetGridPosition; // ç›®æ ‡ç½‘æ ¼ä½ç½®
+    public GridPosition unitFinalPosition;  // è¡ŒåŠ¨åå•ä½çš„æœ€ç»ˆä½ç½®
+    public int executeTurn;             // æ‰§è¡Œè½®æ¬¡ï¼ˆ1=ç¬¬1è½®æ‰§è¡Œï¼Œ2=ç¬¬2è½®æ‰§è¡Œ...ï¼‰
 
-    // Ìí¼Ó¹¹Ôìº¯ÊıÒÔ±ãÓÚ´´½¨
-    public BaseActionParameter(BaseAction action, GridPosition targetPos, GridPosition finalPos, int order)
+    // æ·»åŠ æ„é€ å‡½æ•°ä»¥ä¾¿äºåˆ›å»º
+    public BaseActionParameter(BaseAction action, GridPosition targetPos, GridPosition finalPos, int executeTurn)
     {
         baseAction = action;
         targetGridPosition = targetPos;
         unitFinalPosition = finalPos;
-        executeTurn = order;
-    }
-
-    // ÓÃÓÚµ÷ÊÔÊä³ö
-    public override string ToString()
-    {
-        return $"{baseAction.GetActionName()} (Ë³Ğò:{executeTurn}) Ä¿±ê:{targetGridPosition}";
+        this.executeTurn = executeTurn;
     }
 }

@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class BaseActionParameterObjUI : MonoBehaviour
+public class BaseActionParameterUI : MonoBehaviour
 {
     [SerializeField] private Button actionDetailsButton;
     [SerializeField] private Button cancelButton;
@@ -58,8 +58,6 @@ public class BaseActionParameterObjUI : MonoBehaviour
         else if(executeTurn >= 10)
         {
             orderBackButton.interactable = false; //如果行动位置大于等于10则不能向后调整
-        }
-
-        
+        }        
     }
 }

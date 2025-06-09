@@ -105,7 +105,8 @@ public class ActionQueue
         int completedCount = 0;
         foreach (BaseActionParameter action in actions)
         {
-            action.baseAction.TakeAction(action.targetGridPosition, () => {
+            action.baseAction.TakeAction(action.targetGridPosition, () =>
+            {
                 completedCount++;
                 if (completedCount == actions.Count)
                 {
@@ -123,8 +124,18 @@ public class ActionQueue
     /// </summary>
     /// <param name="index">动作位置</param>
     /// <param name="executeTurn">执行顺序</param>
-    public void ActionExecuteTurnSet(int index,int executeTurn)
+    public void ActionExecuteTurnSet(int index, int executeTurn)
     {
         pendingActions[index].executeTurn = executeTurn;
+    }
+
+    /// <summary>
+    /// 返回最后一个动作的执行顺序，如果没有动作则返回0
+    /// </summary>
+    public int EndActionExecuteTurnGet()
+    {
+        return pendingActions.Count > 0
+            ? pendingActions.Last().executeTurn
+            : -1;
     }
 }

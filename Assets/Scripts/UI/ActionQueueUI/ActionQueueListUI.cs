@@ -9,38 +9,54 @@ public class ActionQueueListUI : MonoBehaviour
     [SerializeField] private Transform actionQueueScrollView;
     [SerializeField] private Transform actionQueueList;
     [SerializeField] private TextMeshProUGUI unitName;
-    [SerializeField] private BaseActionParameterObjUI baseActionParameterPre;
-
+    [SerializeField] private BaseActionParameterUI baseActionParameterPre;
+    [SerializeField] private Transform placeholderTransform; //占位符对象
     private Unit unit;
 
     public void SetUp(Unit unit)
     {
         this.unit = unit;
+        ActionQueue actionQueue = unit.GetActionQueue();
         UpdateVisual();
     }
 
     private void UpdateVisual()
     {
         unitName.text = unit.name;
-
-        //生成选中单位的行为队列UI
-
         //销毁队列中的按钮
         foreach (Transform baseActionButton in actionQueueList)
         {
             Destroy(baseActionButton.gameObject);
         }
 
+        //生成选中单位的行为队列UI
         ActionQueue selectedUnitActionQueue = unit.GetActionQueue();
         List<BaseActionParameter> baseActionParameters = selectedUnitActionQueue.GetActions();
 
         for (int index = 0; index < baseActionParameters.Count; index++)
         {
-            int currentIndex = index;
+            BaseActionParameter lastBaseActionParameter = index > 0 ? baseActionParameters[index - 1] : null;
             BaseActionParameter baseActionParameter = baseActionParameters[index];
-            Sprite baseActionIcon = ScriptiptableSOManager.Instance.GetActionIcon(baseActionParameter.baseAction);
-            BaseActionParameterObjUI baseActionUI = Instantiate(baseActionParameterPre, actionQueueList);
 
+            if (baseActionParameter.executeTurn > index)
+            {
+                //如果当前动作的执行回合数大于当前索引，则需要在队列中添加占位符
+                int executeTurnDifference = index > 0 ?
+                    (baseActionParameter.executeTurn - lastBaseActionParameter.executeTurn - 1) //计算当前动作与上一个动作之间的占位符数量
+                    : 
+                    (baseActionParameter.executeTurn - index);
+
+                for (int placeholderIndex = 0; placeholderIndex < executeTurnDifference; placeholderIndex++)
+                {
+                    //在队列中添加占位符
+                    Instantiate(placeholderTransform, actionQueueList);
+                }
+            }
+
+            Sprite baseActionIcon = ScriptiptableSOManager.Instance.GetActionIcon(baseActionParameter.baseAction);
+            BaseActionParameterUI baseActionUI = Instantiate(baseActionParameterPre, actionQueueList);
+
+            int currentIndex = index;// 保持当前索引的副本，避免闭包问题
             baseActionUI.SetUp
                 (
                     baseActionIcon,
@@ -68,6 +84,5 @@ public class ActionQueueListUI : MonoBehaviour
         {
             actionQueueScrollView.GetComponent<ScrollRect>().horizontalNormalizedPosition = 1; // 0=最右，1=最左
         }
-
     }
 }

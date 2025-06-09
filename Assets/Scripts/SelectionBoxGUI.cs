@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// 使用GUI绘制鼠标选择框的组件
@@ -40,6 +41,12 @@ public class SelectionBoxGUI : MonoBehaviour
     ///之后把鼠标操作的代码移动到MouseWorld
     private void Update()
     {
+        //判断鼠标是否在UI上
+        if (EventSystem.current.IsPointerOverGameObject())
+        {
+            return;
+        }
+
         if (InputManager.Instance.IsMouseButtonDownThisFrame())
         {
             startScreenPos = InputManager.Instance.GetMouseScreenPosition();

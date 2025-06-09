@@ -17,7 +17,7 @@ public class ActionQueueUI : MonoBehaviour
     private void UpdateVisual()
     {
         //销毁所有队列
-        foreach (Transform ActionQueueListView in transform)
+        foreach (Transform ActionQueueListView in transform.Find("ActionQueueGrid"))
         {
             Destroy(ActionQueueListView.gameObject);
         }
@@ -36,7 +36,7 @@ public class ActionQueueUI : MonoBehaviour
     private void GenerateActionQueue(Unit unit)
     {
         //生成选中单位的行为队列UI
-        Transform actionQueueListTransform = Instantiate(ActionQueueScrollView, transform);
+        Transform actionQueueListTransform = Instantiate(ActionQueueScrollView, transform.Find("ActionQueueGrid"));
         ActionQueueListUI actionQueueListUI = actionQueueListTransform.GetComponent<ActionQueueListUI>();
         actionQueueListUI.SetUp(unit);
     }

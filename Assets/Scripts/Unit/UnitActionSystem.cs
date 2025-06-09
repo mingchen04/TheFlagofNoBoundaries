@@ -16,7 +16,6 @@ public class UnitActionSystem : MonoBehaviour
     private List<Unit> selectedUnits; //选中的单位
     private BaseAction selectedAction;
     private bool isBusy;
-    private int endExecutionOrder = 0; // 添加执行顺序管理
     private bool isExecutingGlobalActions = false;
 
     private void Awake()
@@ -92,18 +91,11 @@ public class UnitActionSystem : MonoBehaviour
             return false;
         }
 
-        BaseActionSO.ActionTags actionTags = ScriptiptableSOManager.Instance.GetActionTags(selectedAction);
         GridPosition unitForecastPosition = selectedUnits[0].GetGridPosition();
-        int actionExecutionOrder = selectedUnits[0].GetActionQueue().GetActions().Count;
+        int actionExecutionOrder = selectedUnits[0].GetActionQueue().EndActionExecuteTurnGet() + 1;
 
         //添加行动至队列
         selectedUnits[0].AddOrderedAction(selectedAction, mouseGridPosition, actionExecutionOrder);
-
-        //更新最后执行顺序
-        if (actionExecutionOrder > endExecutionOrder)
-        {
-            endExecutionOrder++;
-        }
 
         OnActionAddQueue?.Invoke(this, EventArgs.Empty); //触发行动点更新
         return true;
@@ -248,7 +240,6 @@ public class UnitActionSystem : MonoBehaviour
         }
 
         isExecutingGlobalActions = false;
-        endExecutionOrder = 0;
         ClearBusy();
     }
 
