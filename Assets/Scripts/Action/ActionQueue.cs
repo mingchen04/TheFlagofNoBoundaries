@@ -117,4 +117,14 @@ public class ActionQueue
             });
         }
     }
+
+    /// <summary>
+    /// 设置指定行动的执行顺序
+    /// </summary>
+    /// <param name="index">动作位置</param>
+    /// <param name="executeTurn">执行顺序</param>
+    public void ActionExecuteTurnSet(int index,int executeTurn)
+    {
+        pendingActions[index].executeTurn = executeTurn;
+    }
 }

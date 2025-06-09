@@ -895,7 +895,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff2b3f5a9639adb45878cbd8bab286cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animator: {fileID: 5568860908685737426}
+  unitAnimator: {fileID: 5568860908685737426}
   bulletProjectIlePrefab: {fileID: 1166665908043627063, guid: 883f4f78f92040a4fb32e510f75887c7,
     type: 3}
   shootPointTransform: {fileID: 944207148107139238}

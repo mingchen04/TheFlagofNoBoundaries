@@ -79,7 +79,7 @@ public class ActionQueueUI : MonoBehaviour
             Sprite baseActionIcon = ScriptiptableSOManager.Instance.GetActionIcon(baseActionParameter.baseAction);
             BaseActionParameterObjUI baseActionUI = Instantiate(baseActionParameterPre, actionQueueList);
 
-            baseActionUI.setUp
+            baseActionUI.SetUp
                 (
                     baseActionIcon,
                     () =>
@@ -87,7 +87,9 @@ public class ActionQueueUI : MonoBehaviour
                         unit.CancelAction(currentIndex, baseActionParameter.baseAction);
                         UpdateVisual();
                     },
-                    baseActionParameter.executeTurn
+                    baseActionParameter.executeTurn,
+                    index,
+                    selectedUnitActionQueue
                 );
         }
 

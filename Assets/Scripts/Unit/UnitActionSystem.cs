@@ -206,12 +206,13 @@ public class UnitActionSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// 当有新行动添加时调用
+    /// 执行所有队列
     /// </summary>
     public void ExecuteAllQueuedActions()
     {
         if (!isExecutingGlobalActions)
         {
+            AddSelectedUnit(UnitManager.Instance.GetFriendlyUnitList());
             StartCoroutine(ExecuteGlobalActionsCoroutine());
         }
     }
