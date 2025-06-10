@@ -113,6 +113,7 @@ public class SwordAction : BaseAction
         targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
         if (targetUnit == null)
         {
+            unit.CancelAction(this);
             ActionStart(onActionComplete);
             ActionComplete();
             return;

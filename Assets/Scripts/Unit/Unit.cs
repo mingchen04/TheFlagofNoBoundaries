@@ -152,6 +152,12 @@ public class Unit : MonoBehaviour
         OnAnyMoveActionUnitPositionChange?.Invoke(this, EventArgs.Empty);
     }
 
+    public void CancelAction(BaseAction cancelActions)
+    {
+        physicalSystem.CancelActionReturnPosint(new List<BaseAction> { cancelActions });
+        OnAnyMoveActionUnitPositionChange?.Invoke(this, EventArgs.Empty);
+    }
+
     /// <summary>
     /// 添加带顺序的行动
     /// </summary>

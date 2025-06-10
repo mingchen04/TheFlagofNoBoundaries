@@ -100,7 +100,7 @@ public class ShootAction : BaseAction
 
     public override string GetActionName()
     {
-        return "Éä»÷";
+        return "å°„å‡»";
     }
 
     public override List<GridPosition> GetValidActionGridPositionList()
@@ -125,7 +125,7 @@ public class ShootAction : BaseAction
         {
             if (!levelGrid.IsValidGridPosition(testGridPosition))
             {
-                //Íø¸ñÎ»ÖÃ²»ºÏ·¨Ìø¹ı
+                //ç½‘æ ¼ä½ç½®ä¸åˆæ³•è·³è¿‡
                 continue;
             }
 
@@ -138,11 +138,11 @@ public class ShootAction : BaseAction
             Vector3 unitWorldPosition = levelGrid.GetWorldPosition(unitGridPosition);
             Vector3 shootDir = (targetUnit.GetWorldPosition() - unitWorldPosition).normalized;
 
-            //·¢ÉäÉäÏß¼ì²âÍ¾ÖĞÓĞÎŞÕÏ°­Îï
-            if (Physics.Raycast(unitShoulderPos, //ÉäÏß¿ªÊ¼Î»ÖÃ
-                shootDir, //ÉäÏß·½Ïò
-                Vector3.Distance(unitWorldPosition, targetUnit.GetWorldPosition()), //ÉäÏß¾àÀë
-                obstaclesLayerMask)) //ÉäÏßÃüÖĞÍ¼²ã
+            //å‘å°„å°„çº¿æ£€æµ‹é€”ä¸­æœ‰æ— éšœç¢ç‰©
+            if (Physics.Raycast(unitShoulderPos, //å°„çº¿å¼€å§‹ä½ç½®
+                shootDir, //å°„çº¿æ–¹å‘
+                Vector3.Distance(unitWorldPosition, targetUnit.GetWorldPosition()), //å°„çº¿è·ç¦»
+                obstaclesLayerMask)) //å°„çº¿å‘½ä¸­å›¾å±‚
             {
                 continue;
             }
@@ -158,6 +158,8 @@ public class ShootAction : BaseAction
         targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
         if (targetUnit == null)
         {
+            unit.SetForecast(true); //å¦‚æœç›®æ ‡å•ä½ä¸å­˜åœ¨åˆ™å¼€å¯é¢„æµ‹
+            unit.CancelAction(this); //å–æ¶ˆè¡ŒåŠ¨
             ActionStart(onActionComplete);
             ActionComplete();
             return;
