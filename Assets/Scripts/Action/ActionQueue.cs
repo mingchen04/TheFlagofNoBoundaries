@@ -130,7 +130,7 @@ public class ActionQueue
     }
 
     /// <summary>
-    /// 返回最后一个动作的执行顺序，如果没有动作则返回0
+    /// 返回最后一个动作的执行顺序，如果没有动作则返回-1
     /// </summary>
     public int EndActionExecuteTurnGet()
     {

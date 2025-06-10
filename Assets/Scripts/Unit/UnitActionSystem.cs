@@ -84,21 +84,24 @@ public class UnitActionSystem : MonoBehaviour
             return false;
         }
 
-        //开启预测
-        selectedUnits[0].SetForecast(true);
-        if (!selectedUnits[0].TrySpendActionPointsToTakeAction(selectedAction))
+        bool anyActionAdded = false;
+        foreach (Unit unit in selectedUnits)
         {
-            return false;
+            unit.SetForecast(true);
+            if (unit.TrySpendActionPointsToTakeAction(selectedAction))
+            {
+                int actionExecutionOrder = unit.GetActionQueue().EndActionExecuteTurnGet() + 1;
+                unit.AddOrderedAction(selectedAction, mouseGridPosition, actionExecutionOrder);
+                anyActionAdded = true;
+            }
         }
 
-        GridPosition unitForecastPosition = selectedUnits[0].GetGridPosition();
-        int actionExecutionOrder = selectedUnits[0].GetActionQueue().EndActionExecuteTurnGet() + 1;
-
-        //添加行动至队列
-        selectedUnits[0].AddOrderedAction(selectedAction, mouseGridPosition, actionExecutionOrder);
-
-        OnActionAddQueue?.Invoke(this, EventArgs.Empty); //触发行动点更新
-        return true;
+        if (anyActionAdded)
+        {
+            OnActionAddQueue?.Invoke(this, EventArgs.Empty);
+            return true;
+        }
+        return false;
     }
 
     private bool TryHandleUnitSelection(GridPosition mouseGridPosition)

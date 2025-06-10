@@ -6,11 +6,12 @@ public class PhysicalSystem : MonoBehaviour
 {
     //体力系统
     public static event EventHandler OnAnyActionPointsChanged;
+    public event EventHandler OnActionPointsChanged;
 
     private Unit unit;
     [SerializeField] private int actionPoints = 5; //初始行动点数
     private int actionPointMax;
-    
+
     //预测点数
     private int forecastActionPoints;
 
@@ -36,6 +37,7 @@ public class PhysicalSystem : MonoBehaviour
             actionPoints = actionPointMax;
             forecastActionPoints = actionPoints;
             OnAnyActionPointsChanged?.Invoke(this, EventArgs.Empty);
+            OnActionPointsChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 
@@ -82,6 +84,7 @@ public class PhysicalSystem : MonoBehaviour
         }
 
         OnAnyActionPointsChanged?.Invoke(this, EventArgs.Empty);
+        OnActionPointsChanged?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>
@@ -111,5 +114,11 @@ public class PhysicalSystem : MonoBehaviour
         }
 
         OnAnyActionPointsChanged?.Invoke(this, EventArgs.Empty);
+        OnActionPointsChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    public float GetPhysicalPointsNormalized()
+    {
+        return (float)actionPoints / actionPointMax;
     }
 }

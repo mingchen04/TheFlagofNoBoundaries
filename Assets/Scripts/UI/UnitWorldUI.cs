@@ -1,66 +1,90 @@
-using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class UnitWorldUI : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI actionPointsText;
     [SerializeField] private Unit unit;
     [SerializeField] private Image healthBarImage;
-    [SerializeField] private HealthSystem healthSystem;
+    [SerializeField] private Image physicalBarImage;
+    [SerializeField] private HealthSystem healthSystem;// 生命系统
+    [SerializeField] private PhysicalSystem physicalSystem;// 体力系统
 
-    private float oldfillAmount;
-    private float healthAnimationTimeMax = 0.3f;
-    private float healthAnimationTime;
+    private float healthOldfillAmount; // 记录上一次生命值的填充量
+    private bool isHealthChange;
+
+    private float physicalOldfillAmount; // 记录上一次体力值的填充量
+    private bool isPhysicalChange;
+
+    private float animationTimeMax = 0.3f;
+    private float animationTimer;
 
     private void Awake()
     {
-        healthAnimationTime = healthAnimationTimeMax;
+        animationTimer = animationTimeMax;
     }
 
     private void Start()
     {
-        PhysicalSystem.OnAnyActionPointsChanged += Unit_OnAnyActionPointsChanged;
+        physicalSystem.OnActionPointsChanged += PhysicalSystem_OnActionPointsChanged;
         healthSystem.OnDamage += HealthSystem_OnDamage;
 
-        UpdateActionPointsText();
+        UpdateActionPointsBar();
         UpdateHealthBar();
     }
 
     private void Update()
     {
-        if (healthAnimationTime < healthAnimationTimeMax)
+        if (animationTimer < animationTimeMax)
         {
-            healthAnimationTime += Time.deltaTime;
-            UpdateHealthBar();
+            animationTimer += Time.deltaTime;
+            if (isHealthChange)
+            {
+                UpdateHealthBar();
+            }
+            if (isPhysicalChange)
+            {
+                UpdateActionPointsBar();
+            }
         }
         else
         {
-            healthAnimationTime = healthAnimationTimeMax;
+            isHealthChange = false;
+            isPhysicalChange = false;
+            animationTimer = animationTimeMax;
         }
     }
 
     private void HealthSystem_OnDamage(object sender, System.EventArgs e)
     {
-        oldfillAmount = healthBarImage.fillAmount;
-        healthAnimationTime = 0f;
+        isHealthChange = true;
+        healthOldfillAmount = healthBarImage.fillAmount;
+        animationTimer = 0f;
         UpdateHealthBar();
     }
 
-    private void Unit_OnAnyActionPointsChanged(object sender, System.EventArgs e)
+    private void PhysicalSystem_OnActionPointsChanged(object sender, System.EventArgs e)
     {
-        UpdateActionPointsText();
+        isPhysicalChange = true;
+        physicalOldfillAmount = physicalBarImage.fillAmount;
+        animationTimer = 0f;
+        UpdateActionPointsBar();
     }
 
-    private void UpdateActionPointsText()
+    private void UpdateActionPointsBar()
     {
-        actionPointsText.text = unit.GetActionPoints().ToString();
+        float amountLerp = physicalOldfillAmount - physicalSystem.GetPhysicalPointsNormalized();
+        physicalBarImage.fillAmount =
+            physicalOldfillAmount // 当前体力值
+            -
+            (amountLerp * Mathf.Clamp01(animationTimer / animationTimeMax));
     }
 
     private void UpdateHealthBar()
     {
-        float amountLerp = oldfillAmount - healthSystem.GetHealthNormalized();
-        healthBarImage.fillAmount = oldfillAmount - (amountLerp * Mathf.Clamp01(healthAnimationTime / healthAnimationTimeMax));
+        float amountLerp = healthOldfillAmount - healthSystem.GetHealthNormalized();// 计算生命值变化量
+        healthBarImage.fillAmount =
+            healthOldfillAmount // 当前生命值
+            -
+            (amountLerp * Mathf.Clamp01(animationTimer / animationTimeMax));// 线性插值计算当前生命值
     }
 }
