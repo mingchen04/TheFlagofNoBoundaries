@@ -70,7 +70,6 @@ public class Unit : MonoBehaviour
         }
         return null;
     }
-
     public ActionQueue GetActionQueue() { return actionQueue; }
 
     public BaseAction[] GetBaseActionArray()
@@ -202,4 +201,18 @@ public class Unit : MonoBehaviour
     {
         return actionQueue.GetCurrentExecutionOrder();
     }
+
+
+    public BaseAction GetBaseActionOfType(BaseAction selBaseAction) 
+    {
+        foreach (BaseAction baseAction in baseActionArray)
+        {
+            if (baseAction.GetType() == selBaseAction.GetType())
+            {
+                return baseAction;
+            }
+        }
+        return null;
+    }
+
 }

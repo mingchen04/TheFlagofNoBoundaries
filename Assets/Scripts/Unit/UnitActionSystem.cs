@@ -91,8 +91,12 @@ public class UnitActionSystem : MonoBehaviour
             if (unit.TrySpendActionPointsToTakeAction(selectedAction))
             {
                 int actionExecutionOrder = unit.GetActionQueue().EndActionExecuteTurnGet() + 1;
-                unit.AddOrderedAction(selectedAction, mouseGridPosition, actionExecutionOrder);
-                anyActionAdded = true;
+                BaseAction currentUnitAction = unit.GetBaseActionOfType(selectedAction);
+                if (currentUnitAction != null)
+                {
+                    unit.AddOrderedAction(currentUnitAction, mouseGridPosition, actionExecutionOrder);
+                    anyActionAdded = true;
+                }
             }
         }
 
@@ -126,7 +130,7 @@ public class UnitActionSystem : MonoBehaviour
                 return true;
             }
         }
-
+        //点击地板时清除选中单位
         ClearSelectedUnits();
         return false;
     }
