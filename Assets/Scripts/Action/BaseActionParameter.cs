@@ -4,10 +4,22 @@
 [System.Serializable]
 public class BaseActionParameter
 {
-    public BaseAction baseAction;          // 要执行的基础行动
-    public GridPosition targetGridPosition; // 目标网格位置
-    public GridPosition unitFinalPosition;  // 行动后单位的最终位置
-    public int executeTurn;             // 执行轮次（1=第1轮执行，2=第2轮执行...）
+    /// <summary>
+    /// 要执行的基础行动  
+    /// </summary>
+    public BaseAction baseAction;
+    /// <summary>
+    /// 目标网格位置
+    /// </summary>
+    public GridPosition targetGridPosition;
+    /// <summary>
+    /// 行动后单位的最终位置
+    /// </summary>
+    public GridPosition unitFinalPosition;
+    /// <summary>
+    /// 执行轮次（1=第1轮执行，2=第2轮执行...）
+    /// </summary>
+    public int executeTurn; 
 
     // 添加构造函数以便于创建
     public BaseActionParameter(BaseAction action, GridPosition targetPos, GridPosition finalPos, int executeTurn)

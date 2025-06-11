@@ -171,7 +171,7 @@ public class ShootAction : BaseAction
         canShootBullet = true;
 
         ActionStart(onActionComplete);
-        ActionPointConsumption();
+        unit.TrySpendActionPointsToTakeAction(this);
     }
 
     public Unit GetTargetUnit()

@@ -7,7 +7,7 @@ public class ActionQueueUI : MonoBehaviour
 
     private void Start()
     {
-        UnitActionSystem.Instance.OnActionAddQueue += UnitActionSystem_OnActionAddQueue;
+        ActionQueue.OnAnyActionAddQueue += ActionQueue_OnAnyActionAddQueue;
         UnitActionSystem.Instance.OnSelectedUnitChanged += UnitActionSystem_OnSelectedUnitChanged;
         ActionQueue.OnAnyActionCompleted += ActionQueue_OnAnyActionCompleted;
 
@@ -51,7 +51,7 @@ public class ActionQueueUI : MonoBehaviour
         UpdateVisual();
     }
 
-    private void UnitActionSystem_OnActionAddQueue(object sender, System.EventArgs e)
+    private void ActionQueue_OnAnyActionAddQueue(object sender, System.EventArgs e)
     {
         UpdateVisual();
     }

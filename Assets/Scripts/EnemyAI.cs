@@ -55,7 +55,7 @@ public class EnemyAI : MonoBehaviour
                     }
                     else
                     {
-                        // 敌方单位无法继续行动
+                        // 鏁屾柟鍗曚綅鏃犳硶缁х画琛屽姩
                         TurnSystem.Instance.NextTurn();
                     }
                 }
@@ -91,9 +91,9 @@ public class EnemyAI : MonoBehaviour
 
         foreach (BaseAction baseAction in enemyUnit.GetBaseActionArray())
         {
-            if (!enemyUnit.CanspendActionPointsToTakeAction(baseAction))
+            if (!enemyUnit.CanspendActionPointsToTakeAction(baseAction.GetActionPointsCost()))
             {
-                //敌人行动点数不够
+                //鏁屼汉琛屽姩鐐规暟涓嶅
                 continue;
             }
 
@@ -106,7 +106,7 @@ public class EnemyAI : MonoBehaviour
             {
                 EnemyAIAction testEnemyAIAction = baseAction.GetBestEnemyAIAction();
 
-                //根据优先值选择行动
+                //鏍规嵁浼樺厛鍊奸�夋嫨琛屽姩
                 if (testEnemyAIAction != null && testEnemyAIAction.actionValue > bestEnemyAIAction.actionValue)
                 {
                     bestEnemyAIAction = testEnemyAIAction;
@@ -115,7 +115,7 @@ public class EnemyAI : MonoBehaviour
             }
         }
 
-        if (bestEnemyAIAction != null && enemyUnit.TrySpendActionPointsToTakeAction(bestBaseAction))
+        if (bestEnemyAIAction != null && enemyUnit.TrySpendActionPointsToTakeAction(bestBaseAction,null))
         {
             bestBaseAction.TakeAction(bestEnemyAIAction.gridPosition, onEnemyAIActionComplete);
             return true;

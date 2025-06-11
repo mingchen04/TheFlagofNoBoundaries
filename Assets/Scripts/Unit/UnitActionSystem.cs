@@ -11,7 +11,6 @@ public class UnitActionSystem : MonoBehaviour
     public event EventHandler OnSelectedUnitChanged;
     public event EventHandler OnSelectActionChanged;
     public event EventHandler<bool> OnBusyChanged;
-    public event EventHandler OnActionAddQueue;
 
     private List<Unit> selectedUnits; //选中的单位
     private BaseAction selectedAction;
@@ -84,27 +83,15 @@ public class UnitActionSystem : MonoBehaviour
             return false;
         }
 
-        bool anyActionAdded = false;
         foreach (Unit unit in selectedUnits)
         {
-            unit.SetForecast(true);
-            if (unit.TrySpendActionPointsToTakeAction(selectedAction))
-            {
-                int actionExecutionOrder = unit.GetActionQueue().EndActionExecuteTurnGet() + 1;
-                BaseAction currentUnitAction = unit.GetBaseActionOfType(selectedAction);
-                if (currentUnitAction != null)
-                {
-                    unit.AddOrderedAction(currentUnitAction, mouseGridPosition, actionExecutionOrder);
-                    anyActionAdded = true;
-                }
-            }
-        }
-
-        if (anyActionAdded)
-        {
-            OnActionAddQueue?.Invoke(this, EventArgs.Empty);
+            int actionExecutionOrder = unit.GetActionQueue().EndActionExecuteTurnGet() + 1;
+            BaseAction currentUnitAction = unit.GetBaseActionOfType(selectedAction); //获取当前单位的同一类型的行动
+            if (currentUnitAction == null) continue;
+            unit.AddOrderedAction(currentUnitAction, mouseGridPosition, actionExecutionOrder);
             return true;
         }
+
         return false;
     }
 
@@ -276,4 +263,5 @@ public class UnitActionSystem : MonoBehaviour
             });
         }
     }
+
 }

@@ -113,6 +113,7 @@ public class SwordAction : BaseAction
         targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
         if (targetUnit == null)
         {
+            unit.SetForecast(true); //如果目标单位不存在则开启预测
             unit.CancelAction(this);
             ActionStart(onActionComplete);
             ActionComplete();
@@ -120,7 +121,7 @@ public class SwordAction : BaseAction
         }
 
         ActionStart(onActionComplete);
-        ActionPointConsumption();
+        unit.TrySpendActionPointsToTakeAction(this);
         float swordBeforeHitTime = 0.7f;
         stateTimer = swordBeforeHitTime;
         state = State.SwingingSwordBeforeHit;

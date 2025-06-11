@@ -36,7 +36,7 @@ public class SpinAction : BaseAction
     public override void TakeAction(GridPosition gridPosition, Action onSpinComplete)
     {
         ActionStart(onSpinComplete);
-        ActionPointConsumption();
+        unit.TrySpendActionPointsToTakeAction(this);
         totalSpinAmount = 360f;
     }
 
@@ -53,12 +53,6 @@ public class SpinAction : BaseAction
         {
             unitGridPosition
         };
-
-    }
-
-    public override int GetActionPointsCost()
-    {
-        return 1;
     }
 
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)

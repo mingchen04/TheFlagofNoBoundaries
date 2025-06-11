@@ -63,7 +63,7 @@ public class InteractAction : BaseAction
         }
 
         ActionStart(onInteractComplete);
-        ActionPointConsumption();
+        unit.TrySpendActionPointsToTakeAction(this);
         interactable.Interact(OnInteractComplete);
     }
 

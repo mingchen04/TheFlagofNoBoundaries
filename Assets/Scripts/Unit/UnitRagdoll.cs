@@ -25,7 +25,6 @@ public class UnitRagdoll : MonoBehaviour
                 MatchAllChildTransorms(child, cloneChild);
             }
         }
-
     }
 
     /// <summary>

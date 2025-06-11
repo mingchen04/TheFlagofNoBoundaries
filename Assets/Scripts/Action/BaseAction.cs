@@ -37,16 +37,16 @@ public abstract class BaseAction : MonoBehaviour
     /// <returns>可选的GridPosition集合</returns>
     public abstract List<GridPosition> GetValidActionGridPositionList();
 
-    public virtual int GetActionPointsCost()
+    public virtual int GetActionPointsCost(BaseActionParameter baseActionParameter = null)
     {
-        return 1;
+        return 10;
     }
 
     protected void ActionStart(Action onActionComplete)
     {
         //关闭预测
         unit.SetForecast(false);
-        if (!unit.CanspendActionPointsToTakeAction(this))
+        if (!unit.CanspendActionPointsToTakeAction(GetActionPointsCost()))
         {
             Debug.Log("点数不足");
             return;
@@ -101,15 +101,5 @@ public abstract class BaseAction : MonoBehaviour
 
     public abstract EnemyAIAction GetEnemyAIAction(GridPosition gridPosition);
 
-    /// <summary>
-    /// 消耗点数
-    /// </summary>
-    protected void ActionPointConsumption()
-    {
-        if (!unit.TrySpendActionPointsToTakeAction(this))
-        {
-            Debug.Log("行为执行失败,行动点数不足");
-        }
-    }
 }
 

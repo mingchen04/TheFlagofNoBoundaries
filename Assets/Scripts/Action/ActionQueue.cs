@@ -7,6 +7,7 @@ using System.Linq;
 /// </summary>
 public class ActionQueue
 {
+    public static event EventHandler OnAnyActionAddQueue;
     public static event EventHandler OnAnyActionCompleted; //行为结束触发视图更新
     private List<BaseActionParameter> pendingActions; //行为队列
     private GridPosition lastActionUnitPosition; //存储上一次行动的单位位置
@@ -19,6 +20,7 @@ public class ActionQueue
     public void AddAction(BaseActionParameter baseActionParameter)
     {
         pendingActions.Add(baseActionParameter);
+        OnAnyActionAddQueue?.Invoke(this, EventArgs.Empty);
     }
 
     //判断行为队列是否全部完成
@@ -47,23 +49,22 @@ public class ActionQueue
     /// <param name="actionsIndex">取消动作的位置</param>
     /// <param name="cancelAction">取消动作</param>
     /// <returns></returns>
-    public List<BaseAction> GetCancelActions(int actionsIndex, BaseAction cancelAction)
+    public List<BaseActionParameter> GetCancelActions(int actionsIndex, BaseAction cancelAction)
     {
 
-        List<BaseAction> cancelActions = new List<BaseAction>();
+        List<BaseActionParameter> cancelActions = new List<BaseActionParameter>();
         BaseActionSO.ActionTags actionTags = ScriptiptableSOManager.Instance.GetActionTags(cancelAction);
         if (actionTags.HasFlag(BaseActionSO.ActionTags.Move)) //包含位移则取消后续所有行动
         {
             cancelActions =
                 pendingActions
                 .Skip(actionsIndex) //表示从下标actionsIndex开始截取
-                .Select(actionParam => actionParam.baseAction) //返回baseAction组成新数组
                 .ToList();
             pendingActions.RemoveRange(actionsIndex, pendingActions.Count - actionsIndex);
         }
         else
         {
-            cancelActions.Add(pendingActions[actionsIndex].baseAction);
+            cancelActions.Add(pendingActions[actionsIndex]);
             pendingActions.RemoveRange(actionsIndex, 1);
         }
 

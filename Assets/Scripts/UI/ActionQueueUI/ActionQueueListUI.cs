@@ -10,7 +10,7 @@ public class ActionQueueListUI : MonoBehaviour
     [SerializeField] private Transform actionQueueList;
     [SerializeField] private TextMeshProUGUI unitName;
     [SerializeField] private BaseActionParameterUI baseActionParameterPre;
-    [SerializeField] private Transform placeholderTransform; //Õ¼Î»·û¶ÔÏó
+    [SerializeField] private Transform placeholderTransform; //å ä½ç¬¦å¯¹è±¡
     private Unit unit;
 
     public void SetUp(Unit unit)
@@ -23,13 +23,13 @@ public class ActionQueueListUI : MonoBehaviour
     private void UpdateVisual()
     {
         unitName.text = unit.name;
-        //Ïú»Ù¶ÓÁĞÖĞµÄ°´Å¥
+        //é”€æ¯é˜Ÿåˆ—ä¸­çš„æŒ‰é’®
         foreach (Transform baseActionButton in actionQueueList)
         {
             Destroy(baseActionButton.gameObject);
         }
 
-        //Éú³ÉÑ¡ÖĞµ¥Î»µÄĞĞÎª¶ÓÁĞUI
+        //ç”Ÿæˆé€‰ä¸­å•ä½çš„è¡Œä¸ºé˜Ÿåˆ—UI
         ActionQueue selectedUnitActionQueue = unit.GetActionQueue();
         List<BaseActionParameter> baseActionParameters = selectedUnitActionQueue.GetActions();
 
@@ -40,15 +40,15 @@ public class ActionQueueListUI : MonoBehaviour
 
             if (baseActionParameter.executeTurn > index)
             {
-                //Èç¹ûµ±Ç°¶¯×÷µÄÖ´ĞĞ»ØºÏÊı´óÓÚµ±Ç°Ë÷Òı£¬ÔòĞèÒªÔÚ¶ÓÁĞÖĞÌí¼ÓÕ¼Î»·û
+                //å¦‚æœå½“å‰åŠ¨ä½œçš„æ‰§è¡Œå›åˆæ•°å¤§äºå½“å‰ç´¢å¼•ï¼Œåˆ™éœ€è¦åœ¨é˜Ÿåˆ—ä¸­æ·»åŠ å ä½ç¬¦
                 int executeTurnDifference = index > 0 ?
-                    (baseActionParameter.executeTurn - lastBaseActionParameter.executeTurn - 1) //¼ÆËãµ±Ç°¶¯×÷ÓëÉÏÒ»¸ö¶¯×÷Ö®¼äµÄÕ¼Î»·ûÊıÁ¿
+                    (baseActionParameter.executeTurn - lastBaseActionParameter.executeTurn - 1) //è®¡ç®—å½“å‰åŠ¨ä½œä¸ä¸Šä¸€ä¸ªåŠ¨ä½œä¹‹é—´çš„å ä½ç¬¦æ•°é‡
                     : 
                     (baseActionParameter.executeTurn - index);
 
                 for (int placeholderIndex = 0; placeholderIndex < executeTurnDifference; placeholderIndex++)
                 {
-                    //ÔÚ¶ÓÁĞÖĞÌí¼ÓÕ¼Î»·û
+                    //åœ¨é˜Ÿåˆ—ä¸­æ·»åŠ å ä½ç¬¦
                     Instantiate(placeholderTransform, actionQueueList);
                 }
             }
@@ -56,7 +56,7 @@ public class ActionQueueListUI : MonoBehaviour
             Sprite baseActionIcon = ScriptiptableSOManager.Instance.GetActionIcon(baseActionParameter.baseAction);
             BaseActionParameterUI baseActionUI = Instantiate(baseActionParameterPre, actionQueueList);
 
-            int currentIndex = index;// ±£³Öµ±Ç°Ë÷ÒıµÄ¸±±¾£¬±ÜÃâ±Õ°üÎÊÌâ
+            int currentIndex = index;// ä¿æŒå½“å‰ç´¢å¼•çš„å‰¯æœ¬ï¼Œé¿å…é—­åŒ…é—®é¢˜
             baseActionUI.SetUp
                 (
                     baseActionIcon,
@@ -71,18 +71,18 @@ public class ActionQueueListUI : MonoBehaviour
                 );
         }
 
-        //Æô¶¯Ğ­³ÌµÈ´ıÁ½Ö¡¸üĞÂTransform´óĞ¡ÔÙ½øĞĞ¹ö¶¯ÖÁ×îÓÒ²àÏÔÊ¾×îĞÂ¶¯×÷
+        //å¯åŠ¨åç¨‹ç­‰å¾…ä¸¤å¸§æ›´æ–°Transformå¤§å°å†è¿›è¡Œæ»šåŠ¨è‡³æœ€å³ä¾§æ˜¾ç¤ºæœ€æ–°åŠ¨ä½œ
         StartCoroutine(DelayedScroll());
     }
 
     private IEnumerator DelayedScroll()
     {
-        // µÈ´ıÁ½Ö¡È·±£²¼¾Ö¸üĞÂ
-        yield return null; // µÚÒ»Ö¡£ºContentSizeFitter¼ÆËã
-        yield return null; // µÚ¶şÖ¡£ºScrollRectÓ¦ÓÃĞÂ³ß´ç
+        // ç­‰å¾…ä¸¤å¸§ç¡®ä¿å¸ƒå±€æ›´æ–°
+        yield return null; // ç¬¬ä¸€å¸§ï¼šContentSizeFitterè®¡ç®—
+        yield return null; // ç¬¬äºŒå¸§ï¼šScrollRectåº”ç”¨æ–°å°ºå¯¸
         if (actionQueueScrollView != null)
         {
-            actionQueueScrollView.GetComponent<ScrollRect>().horizontalNormalizedPosition = 1; // 0=×îÓÒ£¬1=×î×ó
+            actionQueueScrollView.GetComponent<ScrollRect>().horizontalNormalizedPosition = 1; // 0=æœ€å³ï¼Œ1=æœ€å·¦
         }
     }
 }

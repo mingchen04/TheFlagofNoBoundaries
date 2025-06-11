@@ -18,7 +18,7 @@ public class Unit : MonoBehaviour
 
     private BaseAction[] baseActionArray; //存储所有行动
     private ActionQueue actionQueue; //存储行动队列
-    private bool isForecast;
+    private bool isForecast; // 是否为预测模式
 
     private void Awake()
     {
@@ -121,14 +121,31 @@ public class Unit : MonoBehaviour
     /// <summary>
     /// 判断点数是否满足行动要求
     /// </summary>
-    public bool CanspendActionPointsToTakeAction(BaseAction baseAction)
+    public bool CanspendActionPointsToTakeAction(int baseActionPointsCost)
     {
-        return physicalSystem.CanspendActionPointsToTakeAction(baseAction);
+        return physicalSystem.CanspendActionPointsToTakeAction(baseActionPointsCost);
     }
 
-    public bool TrySpendActionPointsToTakeAction(BaseAction baseAction)
+    /// <summary>
+    /// 尝试为当前单位消耗行动点数以执行指定的行动。
+    /// </summary>
+    /// <param name="baseAction">要执行的基础行动（BaseAction）。</param>
+    /// <param name="actionParam">
+    /// （可选）行动参数对象（BaseActionParameter），
+    /// 用于在消耗点数时提供额外的行动上下文（如目标位置、路径长度等）。
+    /// 如果为 null，则仅根据 baseAction 的默认消耗逻辑进行处理。
+    /// </param>
+    /// <returns>
+    /// 如果单位当前拥有足够的行动点数并成功消耗，则返回 true；
+    /// 否则返回 false（如点数不足）。
+    /// </returns>
+    /// <remarks>
+    /// 该方法会调用 PhysicalSystem.TrySpendActionPointsToTakeAction 进行实际的点数消耗判断与扣除。
+    /// 支持根据不同的行动类型和参数动态计算消耗（如移动距离影响消耗等）。
+    /// </remarks>
+    public bool TrySpendActionPointsToTakeAction(BaseAction baseAction,BaseActionParameter actionParam = null)
     {
-        return physicalSystem.TrySpendActionPointsToTakeAction(baseAction);
+        return physicalSystem.TrySpendActionPointsToTakeAction(baseAction, actionParam);
     }
 
     public void SetForecast(bool forecast)
@@ -145,14 +162,14 @@ public class Unit : MonoBehaviour
     /// <param name="baseAction"></param>
     public void CancelAction(int actionsIndex, BaseAction baseAction)
     {
-        List<BaseAction> cancelActions = actionQueue.GetCancelActions(actionsIndex, baseAction);
+        List<BaseActionParameter> cancelActions = actionQueue.GetCancelActions(actionsIndex,baseAction);
         physicalSystem.CancelActionReturnPosint(cancelActions);
         OnAnyMoveActionUnitPositionChange?.Invoke(this, EventArgs.Empty);
     }
 
     public void CancelAction(BaseAction cancelActions)
     {
-        physicalSystem.CancelActionReturnPosint(new List<BaseAction> { cancelActions });
+        physicalSystem.CancelActionReturnPosint(cancelActions);
         OnAnyMoveActionUnitPositionChange?.Invoke(this, EventArgs.Empty);
     }
 
@@ -162,6 +179,7 @@ public class Unit : MonoBehaviour
     public void AddOrderedAction(BaseAction action, GridPosition targetPos, int executionOrder)
     {
         SetForecast(true);
+
         // 获取行动标签（需确保BaseAction有获取标签的方法）
         BaseActionSO.ActionTags actionTags = ScriptiptableSOManager.Instance.GetActionTags(action);
 
@@ -177,8 +195,7 @@ public class Unit : MonoBehaviour
         {
             // 非移动行动使用当前位置
             finalPos = GetGridPosition();
-        }
-
+        }        
         BaseActionParameter actionParam = new BaseActionParameter(
                  action,
                  targetPos,
@@ -186,6 +203,8 @@ public class Unit : MonoBehaviour
                  executionOrder
              );
 
+        // 检查行动是否有效
+        if (!TrySpendActionPointsToTakeAction(action,actionParam)) return;
         actionQueue.AddAction(actionParam);
 
         Debug.Log($"{gameObject.name} 添加行动: {action.GetActionName()} " +
@@ -213,4 +232,8 @@ public class Unit : MonoBehaviour
         return null;
     }
 
+    public bool IsForecast()
+    {
+        return isForecast;
+    }
 }

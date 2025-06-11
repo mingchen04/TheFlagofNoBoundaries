@@ -9,7 +9,7 @@ public class PhysicalSystem : MonoBehaviour
     public event EventHandler OnActionPointsChanged;
 
     private Unit unit;
-    [SerializeField] private int actionPoints = 5; //初始行动点数
+    [SerializeField] private int actionPoints = 100; //初始行动点数
     private int actionPointMax;
 
     //预测点数
@@ -44,11 +44,12 @@ public class PhysicalSystem : MonoBehaviour
     /// <summary>
     /// 尝试花费行动点数来采取行动
     /// </summary>
-    public bool TrySpendActionPointsToTakeAction(BaseAction baseAction)
+    public bool TrySpendActionPointsToTakeAction(BaseAction baseAction, BaseActionParameter actionParam)
     {
-        if (CanspendActionPointsToTakeAction(baseAction))
+        int baseActionPointsCost = baseAction.GetActionPointsCost(actionParam);//基础行动点数消耗
+        if (CanspendActionPointsToTakeAction(baseActionPointsCost))
         {
-            SpendActionPoints(baseAction.GetActionPointsCost());
+            SpendActionPoints(baseActionPointsCost);
             return true;
         }
         else
@@ -60,16 +61,9 @@ public class PhysicalSystem : MonoBehaviour
     /// <summary>
     /// 判断行动点数是否满足行动要求
     /// </summary>
-    public bool CanspendActionPointsToTakeAction(BaseAction baseAction)
+    public bool CanspendActionPointsToTakeAction(int baseActionPointsCost)
     {
-        if ((isForecast ? forecastActionPoints : actionPoints) >= baseAction.GetActionPointsCost())
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return (isForecast ? forecastActionPoints : actionPoints) >= baseActionPointsCost;
     }
 
     public void SpendActionPoints(int amount)
@@ -106,13 +100,20 @@ public class PhysicalSystem : MonoBehaviour
     }
 
     //取消动作返回行动点数
-    public void CancelActionReturnPosint(List<BaseAction> baseActions)
+    public void CancelActionReturnPosint(List<BaseActionParameter> baseActionPars)
     {
-        foreach (BaseAction baseAction in baseActions)
+        foreach (BaseActionParameter baseActionPar in baseActionPars)
         {
-            forecastActionPoints += baseAction.GetActionPointsCost();
+            forecastActionPoints += baseActionPar.baseAction.GetActionPointsCost(baseActionPar);
         }
 
+        OnAnyActionPointsChanged?.Invoke(this, EventArgs.Empty);
+        OnActionPointsChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    public void CancelActionReturnPosint(BaseAction baseAction)
+    {
+        forecastActionPoints += baseAction.GetActionPointsCost();
         OnAnyActionPointsChanged?.Invoke(this, EventArgs.Empty);
         OnActionPointsChanged?.Invoke(this, EventArgs.Empty);
     }

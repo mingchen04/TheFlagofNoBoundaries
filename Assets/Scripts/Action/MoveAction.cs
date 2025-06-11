@@ -13,6 +13,7 @@ public class MoveAction : BaseAction
 
     private List<Vector3> positionList;
     private int currentPositionIndex;
+    private int lastMoveGridCount = 1; // 记录本次移动的格数，默认为1
 
     public void Update()
     {
@@ -47,18 +48,20 @@ public class MoveAction : BaseAction
     public override void TakeAction(GridPosition gridPosition, Action actionCompleted)
     {
         ActionStart(actionCompleted);
-        ActionPointConsumption();
 
         currentPositionIndex = 0;
         positionList = new List<Vector3>();
-        //TakeAction使用Unit.GetGridPosition() 请确认ActionStart事件在之前发生才能获取实际坐标
-        List<GridPosition> gridPositionList = Pathfinding.Instance.FindPath(unit.GetGridPosition(), gridPosition, out int pathLength); //调用A*寻路
+        List<GridPosition> gridPositionList = Pathfinding.Instance.FindPath(unit.GetGridPosition(), gridPosition, out int pathLength);
+
+        // 记录本次移动的格数（路径点数-1，起点不算）
+        lastMoveGridCount = Mathf.Max(1, gridPositionList.Count - 1);
 
         foreach (GridPosition gridPositionItem in gridPositionList)
         {
             positionList.Add(LevelGrid.Instance.GetWorldPosition(gridPositionItem));
         }
 
+        unit.TrySpendActionPointsToTakeAction(this);
         OnStartMoving?.Invoke(this, EventArgs.Empty);
     }
 
@@ -131,5 +134,27 @@ public class MoveAction : BaseAction
             gridPosition = gridPosition,
             actionValue = targetCountAtGridPosition * 10,
         };
+    }
+
+    public override int GetActionPointsCost(BaseActionParameter baseActionParameter = null)
+    {
+        int moveCount = 0;
+        if (baseActionParameter == null) {
+            moveCount = lastMoveGridCount;
+        }
+        else
+        {
+            List<GridPosition> path = Pathfinding.Instance.FindPath(unit.GetGridPosition(), baseActionParameter.unitFinalPosition, out int pathLength);
+            moveCount = Mathf.Max(1, path.Count - 1);
+        }
+
+        float cost = 10f;
+        float total = 0f;
+        for (int i = 0; i < moveCount; i++)
+        {
+            total += cost;
+            cost *= 1.2f;
+        }
+        return Mathf.CeilToInt(total);
     }
 }
