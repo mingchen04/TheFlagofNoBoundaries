@@ -2,10 +2,11 @@ using UnityEngine;
 
 public class BulletProjectIle : MonoBehaviour
 {
-    [SerializeField] private TrailRenderer trailRenderer; //拖尾
-    [SerializeField] private ParticleSystem bulletHitVfx; //粒子特效
+    [SerializeField] private TrailRenderer trailRenderer; //鎷栧熬
+    [SerializeField] private ParticleSystem bulletHitVfx; //绮掑瓙鐗规晥
 
     private Vector3 targetPosition;
+
 
     private void Update()
     {
@@ -18,7 +19,7 @@ public class BulletProjectIle : MonoBehaviour
 
         if (distanceBeforeMoving < distanceAfterMoving)
         {
-            Instantiate(bulletHitVfx, targetPosition, Quaternion.identity); //生成粒子特效
+            Instantiate(bulletHitVfx, targetPosition, Quaternion.identity); //鐢熸垚绮掑瓙鐗规晥
             transform.position = targetPosition;
             trailRenderer.transform.parent = null;
             Destroy(gameObject);

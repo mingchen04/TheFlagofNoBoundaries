@@ -8,13 +8,13 @@ public class UnitRagdoll : MonoBehaviour
     {
         MatchAllChildTransorms(originalRootBone, ragdollRootBone);
 
-        Vector3 randomDir = new Vector3(Random.Range(-1f, +1f), 0, Random.Range(-1f, +1f)); //Ê¹²¼ÍŞÍŞ±»Õ¨·ÉµÄ·½ÏòËæ»ú
+        Vector3 randomDir = new Vector3(Random.Range(-1f, +1f), 0, Random.Range(-1f, +1f)); //ä½¿å¸ƒå¨ƒå¨ƒè¢«ç‚¸é£çš„æ–¹å‘éšæœº
         ApplyExplosionToragdoll(ragdollRootBone, 300f, transform.position + randomDir, 10f);
     }
 
     private void MatchAllChildTransorms(Transform root, Transform clone)
     {
-        //ÉèÖÃÍŞÍŞ¹Ç÷ÀÎ»ÖÃÓë±¾ÌåÏàÍ¬
+        //è®¾ç½®å¨ƒå¨ƒéª¨éª¼ä½ç½®ä¸æœ¬ä½“ç›¸åŒ
         foreach (Transform child in root)
         {
             Transform cloneChild = clone.Find(child.name);
@@ -29,17 +29,17 @@ public class UnitRagdoll : MonoBehaviour
     }
 
     /// <summary>
-    /// µİ¹éµØ¶Ô½ÇÉ«²¼ÍŞÍŞÏµÍ³µÄËùÓĞ¸ÕÌåÊ©¼Ó±¬Õ¨Á¦
+    /// é€’å½’åœ°å¯¹è§’è‰²å¸ƒå¨ƒå¨ƒç³»ç»Ÿçš„æ‰€æœ‰åˆšä½“æ–½åŠ çˆ†ç‚¸åŠ›
     /// </summary>
-    /// <param name="root">²¼ÍŞÍŞÏµÍ³µÄ¸ù½ÚµãTransform</param>
-    /// <param name="explosionForce">±¬Õ¨Á¦µÄÇ¿¶È</param>
-    /// <param name="explosionPosition">±¬Õ¨ÖĞĞÄµÄ3DÊÀ½ç×ø±êÎ»ÖÃ</param>
-    /// <param name="explosionRange">±¬Õ¨Á¦µÄ×÷ÓÃ·¶Î§°ë¾¶</param>
+    /// <param name="root">å¸ƒå¨ƒå¨ƒç³»ç»Ÿçš„æ ¹èŠ‚ç‚¹Transform</param>
+    /// <param name="explosionForce">çˆ†ç‚¸åŠ›çš„å¼ºåº¦</param>
+    /// <param name="explosionPosition">çˆ†ç‚¸ä¸­å¿ƒçš„3Dä¸–ç•Œåæ ‡ä½ç½®</param>
+    /// <param name="explosionRange">çˆ†ç‚¸åŠ›çš„ä½œç”¨èŒƒå›´åŠå¾„</param>
     /// <remarks>
-    /// ¸Ã·½·¨»á±éÀúrootÏÂµÄËùÓĞ×ÓÎïÌå£¬¶ÔÃ¿¸ö°üº¬RigidbodyµÄ×ÓÎïÌåÖ´ĞĞÒÔÏÂ²Ù×÷£º
-    /// 1. Ê¹ÓÃUnityµÄAddExplosionForce·½·¨Ê©¼Ó±¬Õ¨Á¦
-    /// 2. µİ¹é´¦ÀíËùÓĞ×ÓÎïÌå£¬È·±£Õû¸ö²¼ÍŞÍŞÏµÍ³¶¼ÄÜÊÜµ½±¬Õ¨Ó°Ïì
-    /// ×¢Òâ£º±¬Õ¨Á¦»áËæ¾àÀëË¥¼õ£¬Ë¥¼õÇúÏß×ñÑ­UnityÎïÀíÒıÇæµÄ±ê×¼¼ÆËã·½Ê½
+    /// è¯¥æ–¹æ³•ä¼šéå†rootä¸‹çš„æ‰€æœ‰å­ç‰©ä½“ï¼Œå¯¹æ¯ä¸ªåŒ…å«Rigidbodyçš„å­ç‰©ä½“æ‰§è¡Œä»¥ä¸‹æ“ä½œï¼š
+    /// 1. ä½¿ç”¨Unityçš„AddExplosionForceæ–¹æ³•æ–½åŠ çˆ†ç‚¸åŠ›
+    /// 2. é€’å½’å¤„ç†æ‰€æœ‰å­ç‰©ä½“ï¼Œç¡®ä¿æ•´ä¸ªå¸ƒå¨ƒå¨ƒç³»ç»Ÿéƒ½èƒ½å—åˆ°çˆ†ç‚¸å½±å“
+    /// æ³¨æ„ï¼šçˆ†ç‚¸åŠ›ä¼šéšè·ç¦»è¡°å‡ï¼Œè¡°å‡æ›²çº¿éµå¾ªUnityç‰©ç†å¼•æ“çš„æ ‡å‡†è®¡ç®—æ–¹å¼
     /// </remarks> 
     private void ApplyExplosionToragdoll(Transform root, float explosionForce, Vector3 explosionPosition, float explosionRange)
     {
@@ -47,7 +47,7 @@ public class UnitRagdoll : MonoBehaviour
         {
             if (child.TryGetComponent<Rigidbody>(out Rigidbody childRigidbody))
             {
-                //AddExplosionForce ¶Ô¸ÕÌåÊ©¼ÓÒ»¸ö±¬Õ¨Á¦
+                //AddExplosionForce å¯¹åˆšä½“æ–½åŠ ä¸€ä¸ªçˆ†ç‚¸åŠ›
                 childRigidbody.AddExplosionForce(explosionForce, explosionPosition, explosionRange);
                 ApplyExplosionToragdoll(child, explosionForce, explosionPosition, explosionRange);
             }

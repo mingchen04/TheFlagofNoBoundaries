@@ -137,7 +137,6 @@ public class Unit : MonoBehaviour
         physicalSystem.SetForecast(forecast);
     }
 
-
     public int GetPriority() => unitPriority;
 
     /// <summary>
@@ -201,7 +200,6 @@ public class Unit : MonoBehaviour
     {
         return actionQueue.GetCurrentExecutionOrder();
     }
-
 
     public BaseAction GetBaseActionOfType(BaseAction selBaseAction) 
     {
