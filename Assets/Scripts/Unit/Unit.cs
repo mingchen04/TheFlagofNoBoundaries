@@ -76,7 +76,7 @@ public class Unit : MonoBehaviour
     {
         return baseActionArray;
     }
-     
+
     public bool IsEnemy()
     {
         return isEnemy;
@@ -143,7 +143,7 @@ public class Unit : MonoBehaviour
     /// 该方法会调用 PhysicalSystem.TrySpendActionPointsToTakeAction 进行实际的点数消耗判断与扣除。
     /// 支持根据不同的行动类型和参数动态计算消耗（如移动距离影响消耗等）。
     /// </remarks>
-    public bool TrySpendActionPointsToTakeAction(BaseAction baseAction,BaseActionParameter actionParam = null)
+    public bool TrySpendActionPointsToTakeAction(BaseAction baseAction, BaseActionParameter actionParam = null)
     {
         return physicalSystem.TrySpendActionPointsToTakeAction(baseAction, actionParam);
     }
@@ -162,7 +162,7 @@ public class Unit : MonoBehaviour
     /// <param name="baseAction"></param>
     public void CancelAction(int actionsIndex, BaseAction baseAction)
     {
-        List<BaseActionParameter> cancelActions = actionQueue.GetCancelActions(actionsIndex,baseAction);
+        List<BaseActionParameter> cancelActions = actionQueue.GetCancelActions(actionsIndex, baseAction);
         physicalSystem.CancelActionReturnPosint(cancelActions);
         OnAnyMoveActionUnitPositionChange?.Invoke(this, EventArgs.Empty);
     }
@@ -189,13 +189,13 @@ public class Unit : MonoBehaviour
         if (isMove)
         {
             // 移动类行动使用目标位置
-            finalPos = targetPos;           
+            finalPos = targetPos;
         }
         else
         {
             // 非移动行动使用当前位置
             finalPos = GetGridPosition();
-        }        
+        }
         BaseActionParameter actionParam = new BaseActionParameter(
                  action,
                  targetPos,
@@ -204,12 +204,13 @@ public class Unit : MonoBehaviour
              );
 
         // 检查行动是否有效
-        if (!TrySpendActionPointsToTakeAction(action,actionParam)) return;
+        if (!TrySpendActionPointsToTakeAction(action, actionParam)) return;
+        
         actionQueue.AddAction(actionParam);
 
         Debug.Log($"{gameObject.name} 添加行动: {action.GetActionName()} " +
                  $"(顺序:{executionOrder}, 目标:{targetPos}, 终位:{finalPos})");
-        if(isMove) OnAnyMoveActionUnitPositionChange?.Invoke(this, EventArgs.Empty);
+        if (isMove) OnAnyMoveActionUnitPositionChange?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>
@@ -220,7 +221,7 @@ public class Unit : MonoBehaviour
         return actionQueue.GetCurrentExecutionOrder();
     }
 
-    public BaseAction GetBaseActionOfType(BaseAction selBaseAction) 
+    public BaseAction GetBaseActionOfType(BaseAction selBaseAction)
     {
         foreach (BaseAction baseAction in baseActionArray)
         {

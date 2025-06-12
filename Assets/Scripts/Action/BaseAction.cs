@@ -48,7 +48,6 @@ public abstract class BaseAction : MonoBehaviour
         unit.SetForecast(false);
         if (!unit.CanspendActionPointsToTakeAction(GetActionPointsCost()))
         {
-            Debug.Log("点数不足");
             return;
         }
 

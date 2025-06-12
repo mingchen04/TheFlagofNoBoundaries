@@ -9,8 +9,6 @@ public class MoveAction : BaseAction
     public event EventHandler OnStartMoving;
     public event EventHandler OnStopMoving;
 
-    [SerializeField] private int maxMoveDistance = 2;
-
     private List<Vector3> positionList;
     private int currentPositionIndex;
     private int lastMoveGridCount = 1; // 记录本次移动的格数，默认为1
@@ -21,6 +19,7 @@ public class MoveAction : BaseAction
         {
             return;
         }
+
         Vector3 targetPosition = positionList[currentPositionIndex];
 
         Vector3 moveDirection = (targetPosition - transform.position).normalized; //计算向量
@@ -37,6 +36,14 @@ public class MoveAction : BaseAction
             if (currentPositionIndex >= positionList.Count)
             {
                 OnStopMoving?.Invoke(this, EventArgs.Empty);
+
+                string str = "";
+                foreach(GridPosition gridPosition in positionList)
+                {
+                    str+=" : " + gridPosition + "\n";
+                }
+
+                Debug.Log(str);
                 ActionComplete();
             }
         }
@@ -47,8 +54,7 @@ public class MoveAction : BaseAction
 
     public override void TakeAction(GridPosition gridPosition, Action actionCompleted)
     {
-        ActionStart(actionCompleted);
-
+        unit.SetForecast(false);
         currentPositionIndex = 0;
         positionList = new List<Vector3>();
         List<GridPosition> gridPositionList = Pathfinding.Instance.FindPath(unit.GetGridPosition(), gridPosition, out int pathLength);
@@ -60,6 +66,7 @@ public class MoveAction : BaseAction
         {
             positionList.Add(LevelGrid.Instance.GetWorldPosition(gridPositionItem));
         }
+        ActionStart(actionCompleted);
 
         unit.TrySpendActionPointsToTakeAction(this);
         OnStartMoving?.Invoke(this, EventArgs.Empty);
@@ -67,8 +74,11 @@ public class MoveAction : BaseAction
 
     public override List<GridPosition> GetValidActionGridPositionList()
     {
-        List<GridPosition> validActionGridPositionList = new List<GridPosition>();
+        List<GridPosition> validActionGridPositionList = new();
         GridPosition unitGridPosition = unit.GetGridPosition();
+        int maxMoveDistance = GetMaxMoveDistance(); //获取最大移动距离
+        if (maxMoveDistance == 0) return validActionGridPositionList;
+
         for (int x = -maxMoveDistance; x <= maxMoveDistance; x++)
         {
             for (int z = -maxMoveDistance; z <= maxMoveDistance; z++)
@@ -136,25 +146,59 @@ public class MoveAction : BaseAction
         };
     }
 
+    /// <summary>
+    /// 获取行动点数消耗
+    /// </summary>
     public override int GetActionPointsCost(BaseActionParameter baseActionParameter = null)
     {
-        int moveCount = 0;
-        if (baseActionParameter == null) {
-            moveCount = lastMoveGridCount;
-        }
-        else
+        if (baseActionParameter != null)
         {
             List<GridPosition> path = Pathfinding.Instance.FindPath(unit.GetGridPosition(), baseActionParameter.unitFinalPosition, out int pathLength);
-            moveCount = Mathf.Max(1, path.Count - 1);
+            lastMoveGridCount = Mathf.Max(1, path.Count - 1);
         }
 
-        float cost = 10f;
-        float total = 0f;
-        for (int i = 0; i < moveCount; i++)
+        return GetTotalMoveActionPoints(lastMoveGridCount);
+    }
+
+    /// <summary>
+    /// 计算总移动行动点数消耗
+    /// </summary>
+    private int GetTotalMoveActionPoints(int gridCount)
+    {
+        int total = 0;
+        for (int i = 1; i <= gridCount; i++)
         {
-            total += cost;
+            total += GetMoveGridActionPoint(i);
+        }
+        return total;
+    }
+
+    /// <summary>
+    /// 获取当前移动格数的行动点数
+    /// </summary>
+    /// <param name="gridIndex">第几格（从1开始）</param>
+    /// <returns>第一格 10 第二格 12 第三格 14.4 第四格 17.28 </returns>
+    private int GetMoveGridActionPoint(int gridIndex)
+    {
+        float cost = 10f;
+        for (int i = 1; i < gridIndex; i++)
+        {
             cost *= 1.2f;
         }
-        return Mathf.CeilToInt(total);
+        return Mathf.CeilToInt(cost);
+    }
+
+    /// <summary>
+    /// 根据体力获取最大移动距离
+    /// </summary>
+    /// <returns>可移动的最大格数</returns>
+    private int GetMaxMoveDistance()
+    {
+        int maxMoveDistance = 0;
+        while (unit.CanspendActionPointsToTakeAction(GetTotalMoveActionPoints(maxMoveDistance)))
+        {
+            maxMoveDistance++;
+        }
+        return maxMoveDistance > 0 ? --maxMoveDistance : 0;
     }
 }
