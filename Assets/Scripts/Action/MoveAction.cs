@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class MoveAction : BaseAction
@@ -38,12 +39,11 @@ public class MoveAction : BaseAction
                 OnStopMoving?.Invoke(this, EventArgs.Empty);
 
                 string str = "";
-                foreach(GridPosition gridPosition in positionList)
+                foreach (GridPosition gridPosition in positionList)
                 {
-                    str+=" : " + gridPosition + "\n";
+                    str += " : " + gridPosition + "\n";
                 }
 
-                Debug.Log(str);
                 ActionComplete();
             }
         }
@@ -61,11 +61,8 @@ public class MoveAction : BaseAction
 
         // 记录本次移动的格数（路径点数-1，起点不算）
         lastMoveGridCount = Mathf.Max(1, gridPositionList.Count - 1);
+        positionList = gridPositionList.Select(gridPosition => (Vector3)gridPosition).ToList();
 
-        foreach (GridPosition gridPositionItem in gridPositionList)
-        {
-            positionList.Add(LevelGrid.Instance.GetWorldPosition(gridPositionItem));
-        }
         ActionStart(actionCompleted);
 
         unit.TrySpendActionPointsToTakeAction(this);

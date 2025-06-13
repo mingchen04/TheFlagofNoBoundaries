@@ -101,4 +101,3 @@ public abstract class BaseAction : MonoBehaviour
     public abstract EnemyAIAction GetEnemyAIAction(GridPosition gridPosition);
 
 }
-
