@@ -10,7 +10,8 @@ public class MoveAction : BaseAction
     public event EventHandler OnStartMoving;
     public event EventHandler OnStopMoving;
 
-    private List<Vector3> positionList;
+    private List<Vector3> targetPosition; // 路径点
+    private List<Vector3> positionList; //完整路径
     private int currentPositionIndex;
     private int lastMoveGridCount = 1; // 记录本次移动的格数，默认为1
 
@@ -37,13 +38,6 @@ public class MoveAction : BaseAction
             if (currentPositionIndex >= positionList.Count)
             {
                 OnStopMoving?.Invoke(this, EventArgs.Empty);
-
-                string str = "";
-                foreach (GridPosition gridPosition in positionList)
-                {
-                    str += " : " + gridPosition + "\n";
-                }
-
                 ActionComplete();
             }
         }
@@ -122,7 +116,6 @@ public class MoveAction : BaseAction
             }
         }
         return validActionGridPositionList;
-
     }
 
     public override string GetActionName()
@@ -158,7 +151,7 @@ public class MoveAction : BaseAction
     }
 
     /// <summary>
-    /// 计算总移动行动点数消耗
+    /// 根据移动格数获取总的行动点数
     /// </summary>
     private int GetTotalMoveActionPoints(int gridCount)
     {
@@ -198,4 +191,10 @@ public class MoveAction : BaseAction
         }
         return maxMoveDistance > 0 ? --maxMoveDistance : 0;
     }
+
+    public void AddTargetPosition(GridPosition gridPosition)
+    {
+        targetPosition.Add((Vector3)gridPosition);
+    }
+
 }

@@ -183,30 +183,38 @@ public class Unit : MonoBehaviour
         // 获取行动标签（需确保BaseAction有获取标签的方法）
         BaseActionSO.ActionTags actionTags = ScriptiptableSOManager.Instance.GetActionTags(action);
 
-        // 确定最终位置
-        GridPosition finalPos = new GridPosition();
         bool isMove = actionTags.HasFlag(BaseActionSO.ActionTags.Move);
-        if (isMove)
-        {
-            // 移动类行动使用目标位置
-            finalPos = targetPos;
-        }
-        else
-        {
-            // 非移动行动使用当前位置
-            finalPos = GetGridPosition();
-        }
-        BaseActionParameter actionParam = new BaseActionParameter(
+        // 如果是移动行动，则最终位置为目标格子，否则为当前格子
+        GridPosition finalPos = isMove ? targetPos : GetGridPosition();
+
+        BaseActionParameter actionParam = new(
                  action,
                  targetPos,
                  finalPos, // 修正后的位置逻辑
                  executionOrder
              );
 
-        // 检查行动是否有效
+        // 检查行动是否有效 有效则消耗预测行动点数
         if (!TrySpendActionPointsToTakeAction(action, actionParam)) return;
-        
-        actionQueue.AddAction(actionParam);
+
+
+        if (isMove)
+        {
+            //添加路径点
+            MoveAction moveAction = GetAction<MoveAction>();
+            moveAction.AddTargetPosition(targetPos);
+        }
+
+        if (!UnitActionSystem.Instance.IsDeployAction() && isMove)
+        {
+            // 如果不是部署行动，则添加到行动队列
+            actionQueue.AddAction(actionParam);
+            UnitActionSystem.Instance.DeployActionStart();//开始部署行动
+        }
+        else
+        {
+            actionQueue.UpdateBaseActionParameter(actionParam); // 更新当前部署行动的参数
+        }
 
         Debug.Log($"{gameObject.name} 添加行动: {action.GetActionName()} " +
                  $"(顺序:{executionOrder}, 目标:{targetPos}, 终位:{finalPos})");

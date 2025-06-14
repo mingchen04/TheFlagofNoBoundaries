@@ -14,6 +14,7 @@ public class UnitActionSystem : MonoBehaviour
 
     private List<Unit> selectedUnits; //选中的单位
     private BaseAction selectedAction;
+    private bool isDeployAction; //是否部署行动
     private bool isBusy;
     private bool isExecutingGlobalActions = false;
 
@@ -36,22 +37,11 @@ public class UnitActionSystem : MonoBehaviour
 
     private void SelectionBoxGUI_OnClick(object sender, EventArgs e)
     {
-        if (isBusy)
-        {
-            return;
-        }
-
+        if (isBusy) return;
         //判断是否是玩家回合
-        if (!TurnSystem.Instance.IsPlayerTrun())
-        {
-            return;
-        }
-
+        if (!TurnSystem.Instance.IsPlayerTrun()) return;
         //检测鼠标指针是否在ui上
-        if (EventSystem.current.IsPointerOverGameObject())
-        {
-            return;
-        }
+        if (EventSystem.current.IsPointerOverGameObject()) return;
 
         GridPosition mouseGridPosition = LevelGrid.Instance.GetGridPosition(MouseWorld.GetPosition());
 
@@ -68,20 +58,9 @@ public class UnitActionSystem : MonoBehaviour
 
     private bool TryHandleSelectedAction(GridPosition mouseGridPosition)
     {
-        if (selectedUnits.Count == 0)
-        {
-            return false;
-        }
-
-        if (!LevelGrid.Instance.IsValidGridPosition(mouseGridPosition))
-        {
-            return false;
-        }
-
-        if (!selectedAction.IsValidActionGridPosition(mouseGridPosition))
-        {
-            return false;
-        }
+        if (selectedUnits.Count == 0) return false;
+        if (!LevelGrid.Instance.IsValidGridPosition(mouseGridPosition)) return false;
+        if (!selectedAction.IsValidActionGridPosition(mouseGridPosition)) return false;
 
         foreach (Unit unit in selectedUnits)
         {
@@ -264,4 +243,27 @@ public class UnitActionSystem : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 判断是否在部署行动中
+    /// </summary>
+    public bool IsDeployAction()
+    {
+        return isDeployAction;
+    }
+
+    /// <summary>
+    /// 开始行动部署
+    /// </summary>
+    public void DeployActionStart()
+    {
+        isDeployAction = true;
+    }
+
+    /// <summary>
+    /// 行动部署结束
+    /// </summary>
+    public void DeployActionEnd()
+    {
+        isDeployAction = false;
+    }
 }

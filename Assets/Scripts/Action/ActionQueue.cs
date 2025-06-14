@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 
 /// <summary>
 /// 存储和操作单位的行为队列
@@ -138,5 +139,11 @@ public class ActionQueue
         return pendingActions.Count > 0
             ? pendingActions.Last().executeTurn
             : -1;
+    }
+
+    public void UpdateBaseActionParameter(BaseActionParameter baseActionParameter)
+    {
+        pendingActions[^1] = baseActionParameter; //更新当前动作的参数
+        OnAnyActionAddQueue?.Invoke(this, EventArgs.Empty);
     }
 }
