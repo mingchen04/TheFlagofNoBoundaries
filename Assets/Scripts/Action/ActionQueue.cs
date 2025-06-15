@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
+using UnityEngine;
 
 /// <summary>
 /// 存储和操作单位的行为队列
@@ -107,7 +107,7 @@ public class ActionQueue
         int completedCount = 0;
         foreach (BaseActionParameter action in actions)
         {
-            action.baseAction.TakeAction(action.targetGridPosition, () =>
+            action.baseAction.TakeAction(action.targetPositionList, () =>
             {
                 completedCount++;
                 if (completedCount == actions.Count)
@@ -145,5 +145,24 @@ public class ActionQueue
     {
         pendingActions[^1] = baseActionParameter; //更新当前动作的参数
         OnAnyActionAddQueue?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>
+    /// 拷贝最后一个动作的参数
+    /// </summary>
+    /// <returns>最后一个动作的参数</returns>
+    public BaseActionParameter CopyLastActionParameter()
+    {
+        BaseActionParameter last = pendingActions.Last();
+        // 深拷贝 targetPositionList，避免引用同一个列表
+        List<GridPosition> newTargetList = new List<GridPosition>(last.targetPositionList);
+
+        BaseActionParameter copyBaseActionParameter = new BaseActionParameter(
+            last.baseAction,
+            newTargetList,
+            last.unitFinalPosition,
+            last.executeTurn
+        );
+        return copyBaseActionParameter;
     }
 }

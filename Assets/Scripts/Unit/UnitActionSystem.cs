@@ -65,9 +65,10 @@ public class UnitActionSystem : MonoBehaviour
         foreach (Unit unit in selectedUnits)
         {
             int actionExecutionOrder = unit.GetActionQueue().EndActionExecuteTurnGet() + 1;
+            if (isDeployAction) actionExecutionOrder = unit.GetActionQueue().EndActionExecuteTurnGet();
             BaseAction currentUnitAction = unit.GetBaseActionOfType(selectedAction); //获取当前单位的同一类型的行动
             if (currentUnitAction == null) continue;
-            unit.AddOrderedAction(currentUnitAction, mouseGridPosition, actionExecutionOrder);
+            unit.HandleOrderedAction(currentUnitAction, mouseGridPosition, actionExecutionOrder);
             return true;
         }
 
@@ -76,19 +77,12 @@ public class UnitActionSystem : MonoBehaviour
 
     private bool TryHandleUnitSelection(GridPosition mouseGridPosition)
     {
+        DeployActionEnd(); //结束部署行动状态
         if (MouseWorld.TryGetUnit(out Unit unit))
         {
-            if (unit.IsEnemy())
-            {
-                //Clicked on anEnemy
-                return false;
-            }
-
-            if (unit == IsUnitSelected(unit))
-            {
-                //选择相同的角色不触发事件
-                return false;
-            }
+            if (unit.IsEnemy()) return false;
+            //选择相同的角色不触发事件
+            if (unit == IsUnitSelected(unit)) return false;
             else
             {
                 ClearSelectedUnits();

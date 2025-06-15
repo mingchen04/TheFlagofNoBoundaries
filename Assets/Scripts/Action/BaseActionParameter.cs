@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 /// <summary>
 /// 操作参数 - 封装行动执行所需的所有参数
 /// </summary>
@@ -9,9 +11,9 @@ public class BaseActionParameter
     /// </summary>
     public BaseAction baseAction;
     /// <summary>
-    /// 目标网格位置
-    /// </summary>
-    public GridPosition targetGridPosition;
+    /// 存储目标位置的列表 部分行动可能需要多个目标位置
+    /// </summary> 
+    public List<GridPosition> targetPositionList;
     /// <summary>
     /// 行动后单位的最终位置
     /// </summary>
@@ -19,13 +21,15 @@ public class BaseActionParameter
     /// <summary>
     /// 执行轮次（1=第1轮执行，2=第2轮执行...）
     /// </summary>
-    public int executeTurn; 
+    public int executeTurn;
+
+    
 
     // 添加构造函数以便于创建
-    public BaseActionParameter(BaseAction action, GridPosition targetPos, GridPosition finalPos, int executeTurn)
+    public BaseActionParameter(BaseAction action, List<GridPosition> targetPos, GridPosition finalPos, int executeTurn)
     {
         baseAction = action;
-        targetGridPosition = targetPos;
+        targetPositionList = targetPos;
         unitFinalPosition = finalPos;
         this.executeTurn = executeTurn;
     }

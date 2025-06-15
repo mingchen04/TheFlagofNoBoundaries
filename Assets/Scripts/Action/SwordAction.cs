@@ -108,9 +108,9 @@ public class SwordAction : BaseAction
         return validActionGridPositionList;
     }
 
-    public override void TakeAction(GridPosition gridPosition, Action onActionComplete)
+    public override void TakeAction(List<GridPosition> gridPositions, Action actionCompleted)
     {
-        targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
+        targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPositions[0]);
         if (targetUnit == null)
         {
             unit.SetForecast(true); //如果目标单位不存在则开启预测

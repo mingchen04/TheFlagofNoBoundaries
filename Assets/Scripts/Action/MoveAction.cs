@@ -10,10 +10,14 @@ public class MoveAction : BaseAction
     public event EventHandler OnStartMoving;
     public event EventHandler OnStopMoving;
 
-    private List<Vector3> targetPosition; // 路径点
     private List<Vector3> positionList; //完整路径
     private int currentPositionIndex;
     private int lastMoveGridCount = 1; // 记录本次移动的格数，默认为1
+
+    protected override void Awake()
+    {
+        base.Awake();
+    }
 
     public void Update()
     {
@@ -34,7 +38,9 @@ public class MoveAction : BaseAction
         }
         else
         {
+            unit.TrySpendActionPointsToTakeAction(GetMoveGridActionPoint(currentPositionIndex));//花费行动点数
             currentPositionIndex++;
+            
             if (currentPositionIndex >= positionList.Count)
             {
                 OnStopMoving?.Invoke(this, EventArgs.Empty);
@@ -46,20 +52,18 @@ public class MoveAction : BaseAction
         transform.forward = Vector3.Slerp(transform.forward, moveDirection, Time.deltaTime * rotateSpeed);
     }
 
-    public override void TakeAction(GridPosition gridPosition, Action actionCompleted)
+    public override void TakeAction(List<GridPosition> gridPositions, Action actionCompleted)
     {
         unit.SetForecast(false);
         currentPositionIndex = 0;
         positionList = new List<Vector3>();
-        List<GridPosition> gridPositionList = Pathfinding.Instance.FindPath(unit.GetGridPosition(), gridPosition, out int pathLength);
+        List<GridPosition> gridPositionList = GetPathForTargetPositions(gridPositions);
 
         // 记录本次移动的格数（路径点数-1，起点不算）
         lastMoveGridCount = Mathf.Max(1, gridPositionList.Count - 1);
         positionList = gridPositionList.Select(gridPosition => (Vector3)gridPosition).ToList();
 
         ActionStart(actionCompleted);
-
-        unit.TrySpendActionPointsToTakeAction(this);
         OnStartMoving?.Invoke(this, EventArgs.Empty);
     }
 
@@ -141,17 +145,42 @@ public class MoveAction : BaseAction
     /// </summary>
     public override int GetActionPointsCost(BaseActionParameter baseActionParameter = null)
     {
-        if (baseActionParameter != null)
-        {
-            List<GridPosition> path = Pathfinding.Instance.FindPath(unit.GetGridPosition(), baseActionParameter.unitFinalPosition, out int pathLength);
-            lastMoveGridCount = Mathf.Max(1, path.Count - 1);
-        }
-
-        return GetTotalMoveActionPoints(lastMoveGridCount);
+        if (baseActionParameter == null) return 0;
+        positionList = GetPathForTargetPositions(baseActionParameter.targetPositionList).Select(pos => (Vector3)pos).ToList();
+        return GetTotalMoveActionPoints(positionList.Count - 1); //不包含起点
     }
 
     /// <summary>
-    /// 根据移动格数获取总的行动点数
+    /// 根据路径点获取行动路径
+    /// </summary>
+    /// <param name="targetPositions">路径点列表</param>
+    /// <param name="pathCount">路径长度</param>
+    private List<GridPosition> GetPathForTargetPositions(List<GridPosition> targetPositions)
+    {
+        List<GridPosition> path = new List<GridPosition>();
+        for (int targetIndex = 0; targetIndex < targetPositions.Count; targetIndex++)
+        {
+            GridPosition startGridPosition;
+            GridPosition endGridPosition;
+            if (targetIndex == 0)
+            {
+                startGridPosition = unit.transform.position;
+                endGridPosition = targetPositions[targetIndex];
+            }
+            else
+            {
+                startGridPosition = targetPositions[targetIndex - 1];
+                endGridPosition = targetPositions[targetIndex];
+            }
+
+            path.AddRange(Pathfinding.Instance.FindPath(startGridPosition, endGridPosition, out int pathCountPoint));
+        }
+        
+        return path.Distinct().ToList();
+    }
+
+    /// <summary>
+    /// 根据移动格数长度获取总的行动点数
     /// </summary>
     private int GetTotalMoveActionPoints(int gridCount)
     {
@@ -170,6 +199,8 @@ public class MoveAction : BaseAction
     /// <returns>第一格 10 第二格 12 第三格 14.4 第四格 17.28 </returns>
     private int GetMoveGridActionPoint(int gridIndex)
     {
+        if(gridIndex==0) return 0; //如果是0格则不需要行动点
+
         float cost = 10f;
         for (int i = 1; i < gridIndex; i++)
         {
@@ -190,11 +221,6 @@ public class MoveAction : BaseAction
             maxMoveDistance++;
         }
         return maxMoveDistance > 0 ? --maxMoveDistance : 0;
-    }
-
-    public void AddTargetPosition(GridPosition gridPosition)
-    {
-        targetPosition.Add((Vector3)gridPosition);
     }
 
 }

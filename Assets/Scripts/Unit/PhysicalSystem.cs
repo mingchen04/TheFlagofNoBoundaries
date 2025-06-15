@@ -99,7 +99,10 @@ public class PhysicalSystem : MonoBehaviour
         return forecastActionPoints;
     }
 
-    //取消动作返回行动点数
+    /// <summary>
+    /// 取消动作返回行动点数
+    /// </summary>
+    /// <param name="baseActionPars"></param>
     public void CancelActionReturnPosint(List<BaseActionParameter> baseActionPars)
     {
         foreach (BaseActionParameter baseActionPar in baseActionPars)

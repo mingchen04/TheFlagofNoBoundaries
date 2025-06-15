@@ -33,9 +33,9 @@ public class SpinAction : BaseAction
 
     }
 
-    public override void TakeAction(GridPosition gridPosition, Action onSpinComplete)
+    public override void TakeAction(List<GridPosition> gridPositions, Action actionCompleted)
     {
-        ActionStart(onSpinComplete);
+        ActionStart(actionCompleted);
         unit.TrySpendActionPointsToTakeAction(this);
         totalSpinAmount = 360f;
     }

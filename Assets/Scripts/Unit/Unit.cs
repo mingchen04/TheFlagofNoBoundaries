@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Unit : MonoBehaviour
@@ -148,6 +149,11 @@ public class Unit : MonoBehaviour
         return physicalSystem.TrySpendActionPointsToTakeAction(baseAction, actionParam);
     }
 
+    public void TrySpendActionPointsToTakeAction(int actionPoint)
+    {
+        physicalSystem.SpendActionPoints(actionPoint);
+    }
+
     public void SetForecast(bool forecast)
     {
         this.isForecast = forecast;
@@ -176,7 +182,7 @@ public class Unit : MonoBehaviour
     /// <summary>
     /// 添加带顺序的行动
     /// </summary>
-    public void AddOrderedAction(BaseAction action, GridPosition targetPos, int executionOrder)
+    public void HandleOrderedAction(BaseAction action, GridPosition targetPos, int executionOrder)
     {
         SetForecast(true);
 
@@ -186,38 +192,42 @@ public class Unit : MonoBehaviour
         bool isMove = actionTags.HasFlag(BaseActionSO.ActionTags.Move);
         // 如果是移动行动，则最终位置为目标格子，否则为当前格子
         GridPosition finalPos = isMove ? targetPos : GetGridPosition();
+        BaseActionParameter actionParam;
 
-        BaseActionParameter actionParam = new(
-                 action,
-                 targetPos,
-                 finalPos, // 修正后的位置逻辑
-                 executionOrder
-             );
-
-        // 检查行动是否有效 有效则消耗预测行动点数
-        if (!TrySpendActionPointsToTakeAction(action, actionParam)) return;
-
-
-        if (isMove)
+        bool isDeployAction = UnitActionSystem.Instance.IsDeployAction(); // 检查是否为部署行动
+        if (isDeployAction)
         {
-            //添加路径点
-            MoveAction moveAction = GetAction<MoveAction>();
-            moveAction.AddTargetPosition(targetPos);
-        }
-
-        if (!UnitActionSystem.Instance.IsDeployAction() && isMove)
-        {
-            // 如果不是部署行动，则添加到行动队列
-            actionQueue.AddAction(actionParam);
-            UnitActionSystem.Instance.DeployActionStart();//开始部署行动
+            actionParam = GetActionQueue().CopyLastActionParameter();
+            actionParam.targetPositionList.Add(targetPos); // 更新目标点
+            if (isMove) actionParam.unitFinalPosition = targetPos;// 更新最终位置为目标位置
         }
         else
         {
+            actionParam = new(
+                    action,
+                    new List<GridPosition> { targetPos },
+                    finalPos, // 修正后的位置逻辑
+                    executionOrder
+                );
+        }
+
+        if (!TrySpendActionPointsToTakeAction(action, actionParam)) return;
+
+        if (!isDeployAction)
+        {
+            actionQueue.AddAction(actionParam); // 如果不是部署行动，则添加到行动队列
+            if (isMove) UnitActionSystem.Instance.DeployActionStart(); // 开始部署行动
+        }
+        else
+        {
+            physicalSystem.CancelActionReturnPosint(new List<BaseActionParameter> { GetActionQueue().CopyLastActionParameter() });
             actionQueue.UpdateBaseActionParameter(actionParam); // 更新当前部署行动的参数
         }
 
-        Debug.Log($"{gameObject.name} 添加行动: {action.GetActionName()} " +
-                 $"(顺序:{executionOrder}, 目标:{targetPos}, 终位:{finalPos})");
+
+        Debug.Log($"{gameObject.name} ${(isDeployAction ? "更新" : "添加")}行动: {action.GetActionName()} " +
+                    $"(顺序:{executionOrder}, 目标:{targetPos}, 终位:{finalPos})");
+
         if (isMove) OnAnyMoveActionUnitPositionChange?.Invoke(this, EventArgs.Empty);
     }
 

@@ -54,15 +54,16 @@ public class InteractAction : BaseAction
         return validActionGridPositionList;
     }
 
-    public override void TakeAction(GridPosition gridPosition, Action onInteractComplete)
+    public override void TakeAction(List<GridPosition> gridPositions, Action actionCompleted)
+
     {
-        IInteractable interactable = LevelGrid.Instance.GetInteractableAtGridPosition(gridPosition);
+        IInteractable interactable = LevelGrid.Instance.GetInteractableAtGridPosition(gridPositions[0]);
         if (interactable == null)
         {
             return;
         }
 
-        ActionStart(onInteractComplete);
+        ActionStart(actionCompleted);
         unit.TrySpendActionPointsToTakeAction(this);
         interactable.Interact(OnInteractComplete);
     }

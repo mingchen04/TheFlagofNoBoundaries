@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyAI : MonoBehaviour
@@ -115,9 +116,9 @@ public class EnemyAI : MonoBehaviour
             }
         }
 
-        if (bestEnemyAIAction != null && enemyUnit.TrySpendActionPointsToTakeAction(bestBaseAction,null))
+        if (bestEnemyAIAction != null && enemyUnit.TrySpendActionPointsToTakeAction(bestBaseAction, null))
         {
-            bestBaseAction.TakeAction(bestEnemyAIAction.gridPosition, onEnemyAIActionComplete);
+            bestBaseAction.TakeAction(new List<GridPosition> { bestEnemyAIAction.gridPosition }, onEnemyAIActionComplete);
             return true;
         }
         else

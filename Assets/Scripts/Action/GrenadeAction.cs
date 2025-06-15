@@ -45,13 +45,14 @@ public class GrenadeAction : BaseAction
         return validActionGridPositionList;
     }
 
-    public override void TakeAction(GridPosition gridPosition, Action onActionComplete)
+    public override void TakeAction(List<GridPosition> gridPositions, Action actionCompleted)
+
     {
-        ActionStart(onActionComplete);
+        ActionStart(actionCompleted);
         unit.TrySpendActionPointsToTakeAction(this);
         Transform grenadeProjectileTransform = Instantiate(grenadeProjectilePrefab, unit.GetWorldPosition(), Quaternion.identity);
         GrenadeProjectile grenadeProjectile = grenadeProjectileTransform.GetComponent<GrenadeProjectile>();
-        grenadeProjectile.Setup(gridPosition, OnGrenadeBehaviourComplete);  
+        grenadeProjectile.Setup(gridPositions[0], OnGrenadeBehaviourComplete);
     }
 
     private void OnGrenadeBehaviourComplete()
