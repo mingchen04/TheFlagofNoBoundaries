@@ -15,7 +15,7 @@ public class Unit : MonoBehaviour
 
     private GridPosition gridPosition; //网格位置
     private HealthSystem healthSystem; //生命
-    private PhysicalSystem physicalSystem; //体力
+    private SrengthSystem strengthSystem; //体力
 
     private BaseAction[] baseActionArray; //存储所有行动
     private ActionQueue actionQueue; //存储行动队列
@@ -25,7 +25,7 @@ public class Unit : MonoBehaviour
     {
         isForecast = true;
         actionQueue = new ActionQueue();
-        physicalSystem = GetComponent<PhysicalSystem>();
+        strengthSystem = GetComponent<SrengthSystem>();
         baseActionArray = GetComponents<BaseAction>();
         healthSystem = GetComponent<HealthSystem>();
     }
@@ -107,7 +107,7 @@ public class Unit : MonoBehaviour
 
     public int GetActionPoints()
     {
-        return physicalSystem.GetActionPoints();
+        return strengthSystem.GetActionPoints();
     }
 
     /// <summary>
@@ -116,7 +116,7 @@ public class Unit : MonoBehaviour
     /// <returns>实际点数和预计点数的差</returns>
     public int GetReductionPoints()
     {
-        return physicalSystem.GetActionPoints() - physicalSystem.GetForecastActions();
+        return strengthSystem.GetActionPoints() - strengthSystem.GetForecastActions();
     }
 
     /// <summary>
@@ -124,7 +124,7 @@ public class Unit : MonoBehaviour
     /// </summary>
     public bool CanspendActionPointsToTakeAction(int baseActionPointsCost)
     {
-        return physicalSystem.CanspendActionPointsToTakeAction(baseActionPointsCost);
+        return strengthSystem.CanspendActionPointsToTakeAction(baseActionPointsCost);
     }
 
     /// <summary>
@@ -141,23 +141,23 @@ public class Unit : MonoBehaviour
     /// 否则返回 false（如点数不足）。
     /// </returns>
     /// <remarks>
-    /// 该方法会调用 PhysicalSystem.TrySpendActionPointsToTakeAction 进行实际的点数消耗判断与扣除。
+    /// 该方法会调用 StrengthSystem.TrySpendActionPointsToTakeAction 进行实际的点数消耗判断与扣除。
     /// 支持根据不同的行动类型和参数动态计算消耗（如移动距离影响消耗等）。
     /// </remarks>
     public bool TrySpendActionPointsToTakeAction(BaseAction baseAction, BaseActionParameter actionParam = null)
     {
-        return physicalSystem.TrySpendActionPointsToTakeAction(baseAction, actionParam);
+        return strengthSystem.TrySpendActionPointsToTakeAction(baseAction, actionParam);
     }
 
     public void TrySpendActionPointsToTakeAction(int actionPoint)
     {
-        physicalSystem.SpendActionPoints(actionPoint);
+        strengthSystem.SpendActionPoints(actionPoint);
     }
 
     public void SetForecast(bool forecast)
     {
         this.isForecast = forecast;
-        physicalSystem.SetForecast(forecast);
+        strengthSystem.SetForecast(forecast);
     }
 
     public int GetPriority() => unitPriority;
@@ -169,13 +169,13 @@ public class Unit : MonoBehaviour
     public void CancelAction(int actionsIndex, BaseAction baseAction)
     {
         List<BaseActionParameter> cancelActions = actionQueue.GetCancelActions(actionsIndex, baseAction);
-        physicalSystem.CancelActionReturnPosint(cancelActions);
+        strengthSystem.CancelActionReturnPosint(cancelActions);
         OnAnyMoveActionUnitPositionChange?.Invoke(this, EventArgs.Empty);
     }
 
     public void CancelAction(BaseAction cancelActions)
     {
-        physicalSystem.CancelActionReturnPosint(cancelActions);
+        strengthSystem.CancelActionReturnPosint(cancelActions);
         OnAnyMoveActionUnitPositionChange?.Invoke(this, EventArgs.Empty);
     }
 
@@ -220,7 +220,7 @@ public class Unit : MonoBehaviour
         }
         else
         {
-            physicalSystem.CancelActionReturnPosint(new List<BaseActionParameter> { GetActionQueue().CopyLastActionParameter() });
+            strengthSystem.CancelActionReturnPosint(new List<BaseActionParameter> { GetActionQueue().CopyLastActionParameter() });
             actionQueue.UpdateBaseActionParameter(actionParam); // 更新当前部署行动的参数
         }
 

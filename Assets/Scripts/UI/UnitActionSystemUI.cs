@@ -24,7 +24,7 @@ public class UnitActionSystemUI : MonoBehaviour
         //无法确定脚本执行顺序可能导致数据与视图不同步
         //方法一 调整项目脚本执行顺序 方法二 设置特定监听事件 OnAnyActionPointsChanged
         //TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged; 
-        PhysicalSystem.OnAnyActionPointsChanged += Unit_OnAnyActionPointsChanged;
+        SrengthSystem.OnAnyActionPointsChanged += Unit_OnAnyActionPointsChanged;
 
         CreateUnitActionbuttons();
         UpdateSelectedVisual();

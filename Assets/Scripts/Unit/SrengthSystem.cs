@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PhysicalSystem : MonoBehaviour
+public class SrengthSystem : MonoBehaviour
 {
     //体力系统
     public static event EventHandler OnAnyActionPointsChanged;
@@ -121,7 +121,7 @@ public class PhysicalSystem : MonoBehaviour
         OnActionPointsChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    public float GetPhysicalPointsNormalized()
+    public float GetStrengthPointsNormalized()
     {
         return (float)actionPoints / actionPointMax;
     }

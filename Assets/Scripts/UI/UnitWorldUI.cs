@@ -5,29 +5,29 @@ public class UnitWorldUI : MonoBehaviour
 {
     [SerializeField] private Unit unit;
     [SerializeField] private Image healthBarImage;
-    [SerializeField] private Image physicalBarImage;
+    [SerializeField] private Image strengthBarImage;
     [SerializeField] private HealthSystem healthSystem;
-    [SerializeField] private PhysicalSystem physicalSystem;
+    [SerializeField] private SrengthSystem strengthSystem;
 
     private float healthOldfillAmount;
     private bool isHealthChange;
 
-    private float physicalOldfillAmount;
-    private bool isPhysicalChange;
+    private float strengthOldfillAmount;
+    private bool isStrengthChange;
 
     private const float animationTimeMax = 0.3f;
     private float animationTimer = animationTimeMax;
 
     private void Start()
     {
-        if (physicalSystem != null)
-            physicalSystem.OnActionPointsChanged += PhysicalSystem_OnActionPointsChanged;
+        if (strengthSystem != null)
+            strengthSystem.OnActionPointsChanged += StrengthSystem_OnActionPointsChanged;
         if (healthSystem != null)
             healthSystem.OnDamage += HealthSystem_OnDamage;
 
         // 初始化填充值，避免第一次动画异常
         healthOldfillAmount = healthSystem != null ? healthSystem.GetHealthNormalized() : 1f;
-        physicalOldfillAmount = physicalSystem != null ? physicalSystem.GetPhysicalPointsNormalized() : 1f;
+        strengthOldfillAmount = strengthSystem != null ? strengthSystem.GetStrengthPointsNormalized() : 1f;
 
         UpdateHealthBarImmediate();
         UpdateActionPointsBarImmediate();
@@ -35,8 +35,8 @@ public class UnitWorldUI : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (physicalSystem != null)
-            physicalSystem.OnActionPointsChanged -= PhysicalSystem_OnActionPointsChanged;
+        if (strengthSystem != null)
+            strengthSystem.OnActionPointsChanged -= StrengthSystem_OnActionPointsChanged;
         if (healthSystem != null)
             healthSystem.OnDamage -= HealthSystem_OnDamage;
     }
@@ -60,17 +60,17 @@ public class UnitWorldUI : MonoBehaviour
             needUpdate = true;
         }
 
-        if (isPhysicalChange)
+        if (isStrengthChange)
         {
             animationTimer += Time.deltaTime;
             float t = Mathf.Clamp01(animationTimer / animationTimeMax);
-            float target = physicalSystem != null ? physicalSystem.GetPhysicalPointsNormalized() : 1f;
-            physicalBarImage.fillAmount = Mathf.Lerp(physicalOldfillAmount, target, t);
+            float target = strengthSystem != null ? strengthSystem.GetStrengthPointsNormalized() : 1f;
+            strengthBarImage.fillAmount = Mathf.Lerp(strengthOldfillAmount, target, t);
 
             if (t >= 1f)
             {
-                isPhysicalChange = false;
-                physicalOldfillAmount = target;
+                isStrengthChange = false;
+                strengthOldfillAmount = target;
             }
             needUpdate = true;
         }
@@ -89,18 +89,18 @@ public class UnitWorldUI : MonoBehaviour
         animationTimer = 0f;
     }
 
-    private void PhysicalSystem_OnActionPointsChanged(object sender, System.EventArgs e)
+    private void StrengthSystem_OnActionPointsChanged(object sender, System.EventArgs e)
     {
-        if (physicalSystem == null || physicalBarImage == null) return;
-        isPhysicalChange = true;
-        physicalOldfillAmount = physicalBarImage.fillAmount;
+        if (strengthSystem == null || strengthBarImage == null) return;
+        isStrengthChange = true;
+        strengthOldfillAmount = strengthBarImage.fillAmount;
         animationTimer = 0f;
     }
 
     private void UpdateActionPointsBarImmediate()
     {
-        if (physicalSystem != null && physicalBarImage != null)
-            physicalBarImage.fillAmount = physicalSystem.GetPhysicalPointsNormalized();
+        if (strengthSystem != null && strengthBarImage != null)
+            strengthBarImage.fillAmount = strengthSystem.GetStrengthPointsNormalized();
     }
 
     private void UpdateHealthBarImmediate()
