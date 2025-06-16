@@ -17,12 +17,11 @@ public class ScreenShake : MonoBehaviour
         }
         Instance = this;
 
-        cinemachineImpulseSource = GetComponent<CinemachineImpulseSource>(); //ÉãÏñ»úÕğ¶¯
+        cinemachineImpulseSource = GetComponent<CinemachineImpulseSource>(); //æ‘„åƒæœºéœ‡åŠ¨
     }
-
 
     public void Shake(float intensity = 1f)
     {
-        cinemachineImpulseSource.GenerateImpulse(intensity); //Éú³ÉÂö³å
+        cinemachineImpulseSource.GenerateImpulse(intensity); //ç”Ÿæˆè„‰å†²
     }
 }   

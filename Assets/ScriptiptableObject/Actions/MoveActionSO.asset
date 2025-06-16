@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: MoveActionSO
   m_EditorClassIdentifier: 
   baseActionIcon: {fileID: 21300000, guid: 385227dcb192d36429c547f87ceacfdd, type: 3}
-  actionTags: 1
+  actionTags: 9

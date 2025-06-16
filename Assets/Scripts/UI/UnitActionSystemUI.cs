@@ -2,12 +2,15 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UnitActionSystemUI : MonoBehaviour
 {
     [SerializeField] private Transform actionButtonContainerTransform;
     [SerializeField] private Transform actionButtonPrefab;
     [SerializeField] private TextMeshProUGUI actionPointsText;
+    [SerializeField] private Button deployActionEndButton;
+
     private List<ActionButtonUI> actionButtonUILIst;
 
     private void Awake()
@@ -17,13 +20,12 @@ public class UnitActionSystemUI : MonoBehaviour
 
     private void Start()
     {
+        deployActionEndButton.onClick.AddListener(UnitActionSystem.Instance.DeployActionEnd);
+
         UnitActionSystem.Instance.OnSelectedUnitChanged += UnitActionSystem_OnSelectedUnitChanged;
         UnitActionSystem.Instance.OnSelectActionChanged += UnitActionSystem_OnSelectActionChanged;
-        //UnitActionSystem.Instance.OnActionStarted += UnitActionSystem_OnActionStarted;
-
         //无法确定脚本执行顺序可能导致数据与视图不同步
         //方法一 调整项目脚本执行顺序 方法二 设置特定监听事件 OnAnyActionPointsChanged
-        //TurnSystem.Instance.OnTurnChanged += TurnSystem_OnTurnChanged; 
         SrengthSystem.OnAnyActionPointsChanged += Unit_OnAnyActionPointsChanged;
 
         CreateUnitActionbuttons();

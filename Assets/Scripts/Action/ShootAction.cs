@@ -87,13 +87,11 @@ public class ShootAction : BaseAction
                 stateTimer = shootingStateTime;
                 break;
             case State.Shooting:
-
                 state = State.Cooloff;
                 float coolOffStateTime = 0.5f;
                 stateTimer = coolOffStateTime;
                 break;
             case State.Cooloff:
-                Debug.Log($"{unit} 射击完成，目标: {targetUnit}");
                 ActionComplete();
                 break;
         }

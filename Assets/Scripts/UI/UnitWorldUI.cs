@@ -9,14 +9,15 @@ public class UnitWorldUI : MonoBehaviour
     [SerializeField] private HealthSystem healthSystem;
     [SerializeField] private SrengthSystem strengthSystem;
 
-    private float healthOldfillAmount;
-    private bool isHealthChange;
+    private float healthAnimFrom;
+    private float healthAnimTo;
+    private float healthAnimTimer;
 
-    private float strengthOldfillAmount;
-    private bool isStrengthChange;
+    private float strengthAnimFrom;
+    private float strengthAnimTo;
+    private float strengthAnimTimer;
 
     private const float animationTimeMax = 0.3f;
-    private float animationTimer = animationTimeMax;
 
     private void Start()
     {
@@ -25,12 +26,16 @@ public class UnitWorldUI : MonoBehaviour
         if (healthSystem != null)
             healthSystem.OnDamage += HealthSystem_OnDamage;
 
-        // 初始化填充值，避免第一次动画异常
-        healthOldfillAmount = healthSystem != null ? healthSystem.GetHealthNormalized() : 1f;
-        strengthOldfillAmount = strengthSystem != null ? strengthSystem.GetStrengthPointsNormalized() : 1f;
+        // 初始化填充值
+        float healthNorm = healthSystem != null ? healthSystem.GetHealthNormalized() : 1f;
+        float strengthNorm = strengthSystem != null ? strengthSystem.GetStrengthPointsNormalized() : 1f;
 
-        UpdateHealthBarImmediate();
-        UpdateActionPointsBarImmediate();
+        healthBarImage.fillAmount = healthNorm;
+        strengthBarImage.fillAmount = strengthNorm;
+
+        healthAnimFrom = healthAnimTo = healthNorm;
+        strengthAnimFrom = strengthAnimTo = strengthNorm;
+        healthAnimTimer = strengthAnimTimer = animationTimeMax;
     }
 
     private void OnDestroy()
@@ -43,69 +48,46 @@ public class UnitWorldUI : MonoBehaviour
 
     private void Update()
     {
-        bool needUpdate = false;
+        bool animating = false;
 
-        if (isHealthChange)
+        // 血量动画
+        if (healthAnimTimer < animationTimeMax)
         {
-            animationTimer += Time.deltaTime;
-            float t = Mathf.Clamp01(animationTimer / animationTimeMax);
-            float target = healthSystem != null ? healthSystem.GetHealthNormalized() : 1f;
-            healthBarImage.fillAmount = Mathf.Lerp(healthOldfillAmount, target, t);
-
-            if (t >= 1f)
-            {
-                isHealthChange = false;
-                healthOldfillAmount = target;
-            }
-            needUpdate = true;
+            healthAnimTimer += Time.deltaTime;
+            float t = Mathf.Clamp01(healthAnimTimer / animationTimeMax);
+            healthBarImage.fillAmount = Mathf.Lerp(healthAnimFrom, healthAnimTo, t);
+            animating = true;
         }
 
-        if (isStrengthChange)
+        // 体力动画
+        if (strengthAnimTimer < animationTimeMax)
         {
-            animationTimer += Time.deltaTime;
-            float t = Mathf.Clamp01(animationTimer / animationTimeMax);
-            float target = strengthSystem != null ? strengthSystem.GetStrengthPointsNormalized() : 1f;
-            strengthBarImage.fillAmount = Mathf.Lerp(strengthOldfillAmount, target, t);
-
-            if (t >= 1f)
-            {
-                isStrengthChange = false;
-                strengthOldfillAmount = target;
-            }
-            needUpdate = true;
+            strengthAnimTimer += Time.deltaTime;
+            float t = Mathf.Clamp01(strengthAnimTimer / animationTimeMax);
+            strengthBarImage.fillAmount = Mathf.Lerp(strengthAnimFrom, strengthAnimTo, t);
+            animating = true;
         }
 
-        if (!needUpdate)
+        // 避免多余的Update
+        if (!animating)
         {
-            animationTimer = animationTimeMax;
+            healthAnimTimer = strengthAnimTimer = animationTimeMax;
         }
     }
 
     private void HealthSystem_OnDamage(object sender, System.EventArgs e)
     {
         if (healthSystem == null || healthBarImage == null) return;
-        isHealthChange = true;
-        healthOldfillAmount = healthBarImage.fillAmount;
-        animationTimer = 0f;
+        healthAnimFrom = healthBarImage.fillAmount;
+        healthAnimTo = healthSystem.GetHealthNormalized();
+        healthAnimTimer = 0f;
     }
 
     private void StrengthSystem_OnActionPointsChanged(object sender, System.EventArgs e)
     {
         if (strengthSystem == null || strengthBarImage == null) return;
-        isStrengthChange = true;
-        strengthOldfillAmount = strengthBarImage.fillAmount;
-        animationTimer = 0f;
-    }
-
-    private void UpdateActionPointsBarImmediate()
-    {
-        if (strengthSystem != null && strengthBarImage != null)
-            strengthBarImage.fillAmount = strengthSystem.GetStrengthPointsNormalized();
-    }
-
-    private void UpdateHealthBarImmediate()
-    {
-        if (healthSystem != null && healthBarImage != null)
-            healthBarImage.fillAmount = healthSystem.GetHealthNormalized();
+        strengthAnimFrom = strengthBarImage.fillAmount;
+        strengthAnimTo = strengthSystem.GetStrengthPointsNormalized();
+        strengthAnimTimer = 0f;
     }
 }

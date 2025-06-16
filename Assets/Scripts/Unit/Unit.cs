@@ -168,7 +168,6 @@ public class Unit : MonoBehaviour
     public void SetForecast(bool forecast)
     {
         this.isForecast = forecast;
-        strengthSystem.SetForecast(forecast);
     }
 
     public int GetPriority() => unitPriority;
@@ -276,7 +275,6 @@ public class Unit : MonoBehaviour
     {
         return isForecast;
     }
-
 
     private void UnitActionSystem_OnBusyChanged(object sender, bool isBusy)
     {

@@ -25,7 +25,6 @@ public abstract class BaseAction : MonoBehaviour
 
     public abstract void TakeAction(List<GridPosition> gridPositions, Action onActionComplete);
 
-
     public virtual bool IsValidActionGridPosition(GridPosition gridPosition)
     {
         List<GridPosition> validActionGridPositionList = GetValidActionGridPositionList();
@@ -89,7 +88,7 @@ public abstract class BaseAction : MonoBehaviour
             });
 
             System.Random rng = new System.Random();
-            int randomIndex = rng.Next(eqEnemyAIActionList.Count());
+            int randomIndex = rng.Next(eqEnemyAIActionList.Count);
             return eqEnemyAIActionList.ElementAt(randomIndex);
         }
         else
@@ -100,5 +99,4 @@ public abstract class BaseAction : MonoBehaviour
     }
 
     public abstract EnemyAIAction GetEnemyAIAction(GridPosition gridPosition);
-
 }

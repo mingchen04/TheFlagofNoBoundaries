@@ -15,9 +15,6 @@ public class SrengthSystem : MonoBehaviour
     //预测点数
     private int forecastActionPoints;
 
-    //是否预测
-    private bool isForecast;
-
     private void Awake()
     {
         actionPointMax = actionPoints;
@@ -64,13 +61,13 @@ public class SrengthSystem : MonoBehaviour
     public bool CanspendActionPointsToTakeAction(int baseActionPointsCost)
     {
         //如果是预测则使用预测点数，否则使用实际点数
-        int isActionPoints = isForecast ? forecastActionPoints : actionPoints;
+        int isActionPoints = unit.IsForecast() ? forecastActionPoints : actionPoints;
         return isActionPoints >= baseActionPointsCost;
     }
 
     public void SpendActionPoints(int amount)
     {
-        if (isForecast)
+        if (unit.IsForecast())
         {
             forecastActionPoints -= amount;
         }
@@ -83,13 +80,6 @@ public class SrengthSystem : MonoBehaviour
         OnActionPointsChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    /// <summary>
-    /// 设置队列时使用预测点数 执行行动使用实际点数
-    /// </summary>
-    public void SetForecast(bool isForecast)
-    {
-        this.isForecast = isForecast;
-    }
 
     public int GetActionPoints()
     {
