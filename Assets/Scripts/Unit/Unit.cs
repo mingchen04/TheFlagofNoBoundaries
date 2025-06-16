@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class Unit : MonoBehaviour
@@ -17,14 +16,14 @@ public class Unit : MonoBehaviour
     private HealthSystem healthSystem; //生命
     private SrengthSystem strengthSystem; //体力
 
-    private BaseAction[] baseActionArray; //存储所有行动
-    private ActionQueue actionQueue; //存储行动队列
+    private BaseAction[] baseActionArray; // 存储所有行动
+    private ActionQueue actionQueue; // 存储行动队列
     private bool isForecast; // 是否为预测模式
 
     private void Awake()
     {
         isForecast = true;
-        actionQueue = new ActionQueue();
+        actionQueue = GetComponent<ActionQueue>();
         strengthSystem = GetComponent<SrengthSystem>();
         baseActionArray = GetComponents<BaseAction>();
         healthSystem = GetComponent<HealthSystem>();
@@ -168,6 +167,7 @@ public class Unit : MonoBehaviour
     /// <param name="baseAction"></param>
     public void CancelAction(int actionsIndex, BaseAction baseAction)
     {
+        UnitActionSystem.Instance.DeployActionEnd();
         List<BaseActionParameter> cancelActions = actionQueue.GetCancelActions(actionsIndex, baseAction);
         strengthSystem.CancelActionReturnPosint(cancelActions);
         OnAnyMoveActionUnitPositionChange?.Invoke(this, EventArgs.Empty);
@@ -175,6 +175,7 @@ public class Unit : MonoBehaviour
 
     public void CancelAction(BaseAction cancelActions)
     {
+        UnitActionSystem.Instance.DeployActionEnd();
         strengthSystem.CancelActionReturnPosint(cancelActions);
         OnAnyMoveActionUnitPositionChange?.Invoke(this, EventArgs.Empty);
     }
@@ -185,48 +186,42 @@ public class Unit : MonoBehaviour
     public void HandleOrderedAction(BaseAction action, GridPosition targetPos, int executionOrder)
     {
         SetForecast(true);
-
-        // 获取行动标签（需确保BaseAction有获取标签的方法）
         BaseActionSO.ActionTags actionTags = ScriptiptableSOManager.Instance.GetActionTags(action);
-
         bool isMove = actionTags.HasFlag(BaseActionSO.ActionTags.Move);
-        // 如果是移动行动，则最终位置为目标格子，否则为当前格子
-        GridPosition finalPos = isMove ? targetPos : GetGridPosition();
+        GridPosition finalPos = isMove ? targetPos : GetGridPosition(); //行动结束时的最终位置
+
+        bool isDeployAction = UnitActionSystem.Instance.IsDeployAction();
         BaseActionParameter actionParam;
 
-        bool isDeployAction = UnitActionSystem.Instance.IsDeployAction(); // 检查是否为部署行动
         if (isDeployAction)
         {
-            actionParam = GetActionQueue().CopyLastActionParameter();
-            actionParam.targetPositionList.Add(targetPos); // 更新目标点
-            if (isMove) actionParam.unitFinalPosition = targetPos;// 更新最终位置为目标位置
+            // 1. 复制上一次参数
+            BaseActionParameter lastParam = GetActionQueue().CopyLastActionParameter();
+
+            // 3. 构造新参数
+            actionParam = lastParam;
+            if(actionParam.targetPositionList.Count == 0) actionParam.targetPositionList.Add(GetGridPosition());
+            actionParam.targetPositionList.Add(targetPos);
+            actionParam.unitFinalPosition = finalPos;
+
+            actionQueue.UpdateBaseActionParameter(actionParam);
         }
         else
         {
-            actionParam = new(
-                    action,
-                    new List<GridPosition> { targetPos },
-                    finalPos, // 修正后的位置逻辑
-                    executionOrder
-                );
+            actionParam = new BaseActionParameter(
+                action,
+                new List<GridPosition> { GetGridPosition(), targetPos },
+                finalPos,
+                executionOrder
+            );
+
+            if (!TrySpendActionPointsToTakeAction(action, actionParam)) return;
+
+            actionQueue.AddAction(actionParam);
+            if (isMove) UnitActionSystem.Instance.DeployActionStart();
         }
 
-        if (!TrySpendActionPointsToTakeAction(action, actionParam)) return;
-
-        if (!isDeployAction)
-        {
-            actionQueue.AddAction(actionParam); // 如果不是部署行动，则添加到行动队列
-            if (isMove) UnitActionSystem.Instance.DeployActionStart(); // 开始部署行动
-        }
-        else
-        {
-            strengthSystem.CancelActionReturnPosint(new List<BaseActionParameter> { GetActionQueue().CopyLastActionParameter() });
-            actionQueue.UpdateBaseActionParameter(actionParam); // 更新当前部署行动的参数
-        }
-
-
-        Debug.Log($"{gameObject.name} ${(isDeployAction ? "更新" : "添加")}行动: {action.GetActionName()} " +
-                    $"(顺序:{executionOrder}, 目标:{targetPos}, 终位:{finalPos})");
+        Debug.Log($"{gameObject.name} {(isDeployAction ? "更新" : "添加")}行动: {action.GetActionName()} (顺序:{executionOrder}, 目标:{targetPos}, 终位:{finalPos})");
 
         if (isMove) OnAnyMoveActionUnitPositionChange?.Invoke(this, EventArgs.Empty);
     }

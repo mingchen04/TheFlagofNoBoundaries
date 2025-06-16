@@ -63,7 +63,9 @@ public class SrengthSystem : MonoBehaviour
     /// </summary>
     public bool CanspendActionPointsToTakeAction(int baseActionPointsCost)
     {
-        return (isForecast ? forecastActionPoints : actionPoints) >= baseActionPointsCost;
+        //如果是预测则使用预测点数，否则使用实际点数
+        int isActionPoints = isForecast ? forecastActionPoints : actionPoints;
+        return isActionPoints >= baseActionPointsCost;
     }
 
     public void SpendActionPoints(int amount)

@@ -175,6 +175,7 @@ public class UnitActionSystem : MonoBehaviour
     {
         if (!isExecutingGlobalActions)
         {
+            DeployActionEnd(); // 确保结束部署行动状态
             ClearSelectedUnits(false);
             AddSelectedUnit(UnitManager.Instance.GetFriendlyUnitList());
             StartCoroutine(ExecuteGlobalActionsCoroutine());
@@ -250,6 +251,7 @@ public class UnitActionSystem : MonoBehaviour
     /// </summary>
     public void DeployActionStart()
     {
+        Debug.Log("开始部署");
         isDeployAction = true;
     }
 
@@ -258,6 +260,7 @@ public class UnitActionSystem : MonoBehaviour
     /// </summary>
     public void DeployActionEnd()
     {
+        Debug.Log("结束部署");
         isDeployAction = false;
     }
 }

@@ -33,4 +33,10 @@ public class BaseActionParameter
         unitFinalPosition = finalPos;
         this.executeTurn = executeTurn;
     }
+
+    public int GetActionPoint()
+    {
+        // 获取基础行动的行动点消耗
+        return baseAction.GetActionPointsCost(this);
+    }
 }

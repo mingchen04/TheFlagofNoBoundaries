@@ -119,9 +119,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unit: {fileID: 2034662736231050189}
   healthBarImage: {fileID: 6874853016015707381}
-  physicalBarImage: {fileID: 8637548461924404782}
+  strengthBarImage: {fileID: 8637548461924404782}
   healthSystem: {fileID: -1834504458823042407}
-  physicalSystem: {fileID: 7602184059769150796}
+  strengthSystem: {fileID: 7602184059769150796}
 --- !u!114 &1438821361886756363
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -798,6 +798,7 @@ GameObject:
   - component: {fileID: 7602184059769150796}
   - component: {fileID: -1834504458823042407}
   - component: {fileID: 5315356020833175202}
+  - component: {fileID: 7102653662322834477}
   m_Layer: 3
   m_Name: Unit
   m_TagString: Untagged
@@ -869,7 +870,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d363d20ae7ce3a64b92ed1a50528495f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxMoveDistance: 4
 --- !u!114 &-2894542637019877412
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -995,6 +995,18 @@ MonoBehaviour:
   unitRagdollPrefabs: {fileID: 3919550748142699886, guid: a10af8cec5e32304a8cd525de15b15b3,
     type: 3}
   originalRootBone: {fileID: 5480168798866180304}
+--- !u!114 &7102653662322834477
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8362551573780112002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd4b3a4616eeccf4c93d70745852eb02, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8653960665509808306
 GameObject:
   m_ObjectHideFlags: 0

@@ -6,12 +6,17 @@ using UnityEngine;
 /// <summary>
 /// 存储和操作单位的行为队列
 /// </summary>
-public class ActionQueue
+public class ActionQueue : MonoBehaviour
 {
     public static event EventHandler OnAnyActionAddQueue;
     public static event EventHandler OnAnyActionCompleted; //行为结束触发视图更新
     private List<BaseActionParameter> pendingActions; //行为队列
     private GridPosition lastActionUnitPosition; //存储上一次行动的单位位置
+    private Unit unit; //当前单位
+    private void Awake()
+    {
+        unit = GetComponent<Unit>();
+    }
 
     public ActionQueue()
     {
@@ -143,6 +148,16 @@ public class ActionQueue
 
     public void UpdateBaseActionParameter(BaseActionParameter baseActionParameter)
     {
+        int lastActionParActPoint = CopyLastActionParameter().GetActionPoint();
+        int actPoint = baseActionParameter.GetActionPoint() - lastActionParActPoint; //更新动作所增加的消耗行动点
+
+        if (!unit.CanspendActionPointsToTakeAction(actPoint)) //检查是否可以消耗行动点
+        {
+            Debug.LogWarning("行动点不足，无法执行该动作。");
+            return;
+        }
+
+        unit.TrySpendActionPointsToTakeAction(actPoint);
         pendingActions[^1] = baseActionParameter; //更新当前动作的参数
         OnAnyActionAddQueue?.Invoke(this, EventArgs.Empty);
     }
@@ -164,5 +179,15 @@ public class ActionQueue
             last.executeTurn
         );
         return copyBaseActionParameter;
+    }
+
+    /// <summary>
+    /// 检查最后一个动作的参数是否包含指定目标位置
+    /// </summary>
+    public bool IsLastActionParameterTargetPosition(GridPosition targetPosition)
+    {
+        if (pendingActions.Count == 0) return false;
+        BaseActionParameter lastAction = pendingActions.Last();
+        return lastAction.targetPositionList.Contains(targetPosition);
     }
 }
