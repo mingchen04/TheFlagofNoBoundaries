@@ -8,19 +8,20 @@ public abstract class BaseActionSO : ScriptableObject
     public enum ActionTags
     {
         None = 0,
-        Move = 1 << 0, //ÐÐ¶¯´øÓÐÎ»ÒÆ
-        Damage = 1 << 1, //ÐÐ¶¯´øÓÐÉËº¦
-        Aoe = 1 << 2, //ÐÐ¶¯ÓÐ·¶Î§Ð§¹û
+        Move = 1 << 0, //è¡ŒåŠ¨å¸¦æœ‰ä½ç§»
+        Damage = 1 << 1, //è¡ŒåŠ¨å¸¦æœ‰ä¼¤å®³
+        Aoe = 1 << 2, //è¡ŒåŠ¨æœ‰èŒƒå›´æ•ˆæžœ
+        Deploy = 1 << 3, //è¡ŒåŠ¨æ˜¯éƒ¨ç½²è¡ŒåŠ¨
     }
 
-    // Ìí¼Ó±êÇ©
+    // æ·»åŠ æ ‡ç­¾
     //actionTags |= ActionTags.Move;
-    // ÒÆ³ý±êÇ©
+    // ç§»é™¤æ ‡ç­¾
     //actionTags &= ~ActionTags.Move;
 
-    // ¼ì²éÊÇ·ñÓÐ´Ë±êÇ©
+    // æ£€æŸ¥æ˜¯å¦æœ‰æ­¤æ ‡ç­¾
     //bool = (actionTags & ActionTags.Move) == ActionTags.Move;
-    // FlagsÀ©Õ¹·½·¨¸ü¼ò½à
+    // Flagsæ‰©å±•æ–¹æ³•æ›´ç®€æ´
     //bool = actionTags.HasFlag(ActionTags.Move);
 
     public abstract System.Type ActionType { get; }

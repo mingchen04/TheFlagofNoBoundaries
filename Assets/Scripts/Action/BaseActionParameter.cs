@@ -24,7 +24,6 @@ public class BaseActionParameter
     public int executeTurn;
 
     
-
     // 添加构造函数以便于创建
     public BaseActionParameter(BaseAction action, List<GridPosition> targetPos, GridPosition finalPos, int executeTurn)
     {

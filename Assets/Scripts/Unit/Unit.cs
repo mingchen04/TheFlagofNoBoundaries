@@ -19,6 +19,7 @@ public class Unit : MonoBehaviour
     private BaseAction[] baseActionArray; // 存储所有行动
     private ActionQueue actionQueue; // 存储行动队列
     private bool isForecast; // 是否为预测模式
+    private bool isBusy; // 是否忙碌
 
     private void Awake()
     {
@@ -36,6 +37,7 @@ public class Unit : MonoBehaviour
         gridPosition = LevelGrid.Instance.GetGridPosition(transform.position);
         LevelGrid.Instance.AddUnitAtGridPosition(gridPosition, this);
 
+        UnitActionSystem.Instance.OnBusyChanged += UnitActionSystem_OnBusyChanged;
         healthSystem.OnDie += HealthSystem_OnDie;
         OnAnyUnitSpawned?.Invoke(this, EventArgs.Empty);
     }
@@ -49,6 +51,8 @@ public class Unit : MonoBehaviour
 
     private void Update()
     {
+        if (!isBusy) return; //如果忙碌则不更新位置
+
         GridPosition newGridPosition = LevelGrid.Instance.GetGridPosition(transform.position);
         if (newGridPosition != gridPosition)
         {
@@ -57,6 +61,14 @@ public class Unit : MonoBehaviour
             gridPosition = newGridPosition;
             LevelGrid.Instance.UnitMovedGridPosition(this, oldGridPosition, newGridPosition);
         }
+    }
+
+    private void OnDestroy()
+    {
+        if (healthSystem != null)
+            healthSystem.OnDie -= HealthSystem_OnDie;
+        if (UnitActionSystem.Instance != null)
+            UnitActionSystem.Instance.OnBusyChanged -= UnitActionSystem_OnBusyChanged;
     }
 
     public T GetAction<T>() where T : BaseAction
@@ -188,19 +200,35 @@ public class Unit : MonoBehaviour
         SetForecast(true);
         BaseActionSO.ActionTags actionTags = ScriptiptableSOManager.Instance.GetActionTags(action);
         bool isMove = actionTags.HasFlag(BaseActionSO.ActionTags.Move);
-        GridPosition finalPos = isMove ? targetPos : GetGridPosition(); //行动结束时的最终位置
+        bool isDeploy = actionTags.HasFlag(BaseActionSO.ActionTags.Deploy); //是否为部署行动
 
         bool isDeployAction = UnitActionSystem.Instance.IsDeployAction();
+
         BaseActionParameter actionParam;
+        GridPosition finalPos;
+        List<GridPosition> targetPositionList;
+
+        if (isMove)
+        {
+            finalPos = targetPos;
+            targetPositionList = new List<GridPosition> { GetGridPosition(), targetPos };
+        }
+        else
+        {
+            finalPos = GetGridPosition(); //非移动行动最终位置为当前网格位置
+            targetPositionList = new List<GridPosition> { targetPos };
+        }
 
         if (isDeployAction)
         {
-            // 1. 复制上一次参数
+            // 复制上一次参数
             BaseActionParameter lastParam = GetActionQueue().CopyLastActionParameter();
-
-            // 3. 构造新参数
             actionParam = lastParam;
-            if(actionParam.targetPositionList.Count == 0) actionParam.targetPositionList.Add(GetGridPosition());
+            if (actionParam.targetPositionList.Count == 0 && isMove)
+            {
+                actionParam.targetPositionList = targetPositionList;
+            }
+
             actionParam.targetPositionList.Add(targetPos);
             actionParam.unitFinalPosition = finalPos;
 
@@ -210,19 +238,17 @@ public class Unit : MonoBehaviour
         {
             actionParam = new BaseActionParameter(
                 action,
-                new List<GridPosition> { GetGridPosition(), targetPos },
+                targetPositionList,
                 finalPos,
                 executionOrder
             );
 
             if (!TrySpendActionPointsToTakeAction(action, actionParam)) return;
-
             actionQueue.AddAction(actionParam);
-            if (isMove) UnitActionSystem.Instance.DeployActionStart();
+            if (isDeploy) UnitActionSystem.Instance.DeployActionStart();
         }
 
         Debug.Log($"{gameObject.name} {(isDeployAction ? "更新" : "添加")}行动: {action.GetActionName()} (顺序:{executionOrder}, 目标:{targetPos}, 终位:{finalPos})");
-
         if (isMove) OnAnyMoveActionUnitPositionChange?.Invoke(this, EventArgs.Empty);
     }
 
@@ -249,5 +275,11 @@ public class Unit : MonoBehaviour
     public bool IsForecast()
     {
         return isForecast;
+    }
+
+
+    private void UnitActionSystem_OnBusyChanged(object sender, bool isBusy)
+    {
+        this.isBusy = isBusy;
     }
 }

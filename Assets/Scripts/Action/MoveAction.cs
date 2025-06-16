@@ -8,8 +8,8 @@ public class MoveAction : BaseAction
     public event EventHandler OnStartMoving;
     public event EventHandler OnStopMoving;
 
-    private List<Vector3> positionList; //完整路径
-    private int currentPositionIndex;
+    private List<Vector3> movePathWorldPositions;
+    private int currentPathIndex;
 
     protected override void Awake()
     {
@@ -20,10 +20,10 @@ public class MoveAction : BaseAction
     {
         if (!isActive) return;
 
-        Vector3 targetPosition = positionList[currentPositionIndex];
+        Vector3 targetPosition = movePathWorldPositions[currentPathIndex];
         Vector3 moveDirection = (targetPosition - transform.position).normalized;
 
-        float stoppingDistance = .1f;
+        float stoppingDistance = 0.1f;
         if (Vector3.Distance(transform.position, targetPosition) > stoppingDistance)
         {
             float moveSpeed = 4f;
@@ -31,10 +31,9 @@ public class MoveAction : BaseAction
         }
         else
         {
-            unit.TrySpendActionPointsToTakeAction(GetMoveGridActionPoint(currentPositionIndex));
-            currentPositionIndex++;
-
-            if (currentPositionIndex >= positionList.Count)
+            currentPathIndex++;
+            unit.TrySpendActionPointsToTakeAction(GetMoveStepActionPointCost(currentPathIndex));
+            if (currentPathIndex >= movePathWorldPositions.Count)
             {
                 OnStopMoving?.Invoke(this, EventArgs.Empty);
                 ActionComplete();
@@ -48,11 +47,9 @@ public class MoveAction : BaseAction
     public override void TakeAction(List<GridPosition> gridPositions, Action actionCompleted)
     {
         unit.SetForecast(false);
-        currentPositionIndex = 0;
-        positionList = new List<Vector3>();
-        List<GridPosition> path = GetPathForTargetPositions(gridPositions);
-
-        positionList = path.Select(gridPosition => (Vector3)gridPosition).ToList();
+        currentPathIndex = 0;
+        var path = BuildMovePathFromTargets(gridPositions);
+        movePathWorldPositions = path.Select(pos => (Vector3)pos).ToList();
 
         ActionStart(actionCompleted);
         OnStartMoving?.Invoke(this, EventArgs.Empty);
@@ -60,69 +57,62 @@ public class MoveAction : BaseAction
 
     public override List<GridPosition> GetValidActionGridPositionList()
     {
-        List<GridPosition> validActionGridPositionList = new();
+        List<GridPosition> validTargets = new();
         GridPosition unitGridPosition = unit.GetGridPosition();
 
-        int maxMoveDistance = GetMaxMoveDistance();
-        if (maxMoveDistance == 0) return validActionGridPositionList;
+        int maxSteps = GetMaxMoveStepsByActionPoints();
+        if (maxSteps == 0) return validTargets;
 
-        for (int x = -maxMoveDistance; x <= maxMoveDistance; x++)
+        for (int x = -maxSteps; x <= maxSteps; x++)
         {
-            for (int z = -maxMoveDistance; z <= maxMoveDistance; z++)
+            for (int z = -maxSteps; z <= maxSteps; z++)
             {
-                GridPosition offsetGridPosition = new GridPosition(x, z);
-                GridPosition testGridPosition = unitGridPosition + offsetGridPosition;
+                GridPosition offset = new GridPosition(x, z);
+                GridPosition testPos = unitGridPosition + offset;
 
-                if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition)) continue;
-                if (unitGridPosition == testGridPosition) continue;
-                if (LevelGrid.Instance.HasAnyUnitOnGridPosition(testGridPosition)) continue;
-                if (!Pathfinding.Instance.IsWalkableGridPosition(testGridPosition)) continue;
-                if (!Pathfinding.Instance.HasPath(unit.GetGridPosition(), testGridPosition)) continue;
-                if (unit.GetActionQueue().IsLastActionParameterTargetPosition(testGridPosition)) continue;
+                if (!LevelGrid.Instance.IsValidGridPosition(testPos)) continue;
+                if (unitGridPosition == testPos) continue;
+                if (LevelGrid.Instance.HasAnyUnitOnGridPosition(testPos)) continue;
+                if (!Pathfinding.Instance.IsWalkableGridPosition(testPos)) continue;
+                if (!Pathfinding.Instance.HasPath(unit.GetGridPosition(), testPos)) continue;
+                if (unit.GetActionQueue().IsLastActionParameterTargetPosition(testPos)) continue;
 
                 int pathfindingDistanceMultiplier = 10;
-                if (Pathfinding.Instance.GetPathLength(unit.GetGridPosition(), testGridPosition)
-                    > maxMoveDistance * pathfindingDistanceMultiplier)
+                if (Pathfinding.Instance.GetPathLength(unit.GetGridPosition(), testPos) > maxSteps * pathfindingDistanceMultiplier)
                 {
                     continue;
                 }
 
-                validActionGridPositionList.Add(testGridPosition);
+                validTargets.Add(testPos);
             }
         }
-        return validActionGridPositionList;
+        return validTargets;
     }
 
-    public override string GetActionName()
-    {
-        return "移动";
-    }
+    public override string GetActionName() => "移动";
 
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {
-        int targetCountAtGridPosition = unit.GetAction<ShootAction>().GetTargetCountAtPosition(gridPosition);
+        int targetCount = unit.GetAction<ShootAction>().GetTargetCountAtPosition(gridPosition);
         return new EnemyAIAction
         {
             gridPosition = gridPosition,
-            actionValue = targetCountAtGridPosition * 10,
+            actionValue = targetCount * 10,
         };
     }
 
-    /// <summary>
-    /// 获取行动点数消耗（基于实际路径格数）
-    /// </summary>
     public override int GetActionPointsCost(BaseActionParameter baseActionParameter = null)
     {
         if (baseActionParameter == null) return 0;
-        var path = GetPathForTargetPositions(baseActionParameter.targetPositionList);
-        int moveGrids = path.Count;
-        return GetTotalMoveActionPoints(moveGrids);
+        var path = BuildMovePathFromTargets(baseActionParameter.targetPositionList);
+        int moveSteps = path.Count;
+        return CalculateTotalMoveActionPoints(moveSteps);
     }
 
     /// <summary>
-    /// 根据目标点列表获取完整路径（不包含第一个起点）
+    /// 根据目标点列表构建完整路径（不含起点重复）
     /// </summary>
-    public List<GridPosition> GetPathForTargetPositions(List<GridPosition> targetPositions)
+    private List<GridPosition> BuildMovePathFromTargets(List<GridPosition> targetPositions)
     {
         List<GridPosition> path = new List<GridPosition>();
         if (targetPositions == null || targetPositions.Count < 2) return path;
@@ -131,37 +121,36 @@ public class MoveAction : BaseAction
         {
             GridPosition start = targetPositions[i - 1];
             GridPosition end = targetPositions[i];
-            List<GridPosition> segment = Pathfinding.Instance.FindPath(start, end, out int pathCount);
+            var segment = Pathfinding.Instance.FindPath(start, end, out int _);
             if (segment.Count > 1)
             {
-                // 跳过第一个点（起点），避免重复
-                path.AddRange(segment.Skip(1));
+                path.AddRange(segment.Skip(1)); // 跳过起点
             }
         }
         return path;
     }
 
     /// <summary>
-    /// 获取总的行动点数（每一格都递增）
+    /// 计算总行动点消耗
     /// </summary>
-    private int GetTotalMoveActionPoints(int moveGrids, int startCount = 0)
+    private int CalculateTotalMoveActionPoints(int moveSteps, int alreadyPlannedSteps = 0)
     {
         int total = 0;
-        for (int i = 1; i <= moveGrids; i++)
+        for (int i = 1; i <= moveSteps; i++)
         {
-            total += GetMoveGridActionPoint(startCount + i);
+            total += GetMoveStepActionPointCost(alreadyPlannedSteps + i);
         }
         return total;
     }
 
     /// <summary>
-    /// 获取当前移动格数的行动点数
+    /// 获取第N格的行动点消耗
     /// </summary>
-    private static int GetMoveGridActionPoint(int gridIndex)
+    private static int GetMoveStepActionPointCost(int stepIndex)
     {
-        if (gridIndex == 0) return 0;
+        if (stepIndex == 0) return 0;
         float cost = 10f;
-        for (int i = 1; i < gridIndex; i++)
+        for (int i = 1; i < stepIndex; i++)
         {
             cost *= 1.2f;
         }
@@ -169,26 +158,28 @@ public class MoveAction : BaseAction
     }
 
     /// <summary>
-    /// 获取最大可移动格数（连续部署时自动递增）
+    /// 根据体力值获取最大可移动步数
     /// </summary>
-    private int GetMaxMoveDistance()
+    private int GetMaxMoveStepsByActionPoints()
     {
-        int maxMoveDistance = 0;
-        int startCount = 0;
+        int maxSteps = 0;
+        int alreadyPlannedSteps = 0;
+
         if (UnitActionSystem.Instance.IsDeployAction())
         {
             var actions = unit.GetActionQueue().GetActions();
             if (actions.Count > 0)
             {
                 var lastParam = actions.Last();
-                var path = GetPathForTargetPositions(lastParam.targetPositionList);
-                startCount = path.Count;
+                var path = BuildMovePathFromTargets(lastParam.targetPositionList);
+                alreadyPlannedSteps = path.Count;
             }
         }
-        while (unit.CanspendActionPointsToTakeAction(GetTotalMoveActionPoints(maxMoveDistance, startCount)))
+
+        while (unit.CanspendActionPointsToTakeAction(CalculateTotalMoveActionPoints(maxSteps, alreadyPlannedSteps)))
         {
-            maxMoveDistance++;
+            maxSteps++;
         }
-        return maxMoveDistance > 0 ? maxMoveDistance - 1 : 0;
+        return maxSteps > 0 ? maxSteps - 1 : 0;
     }
 }

@@ -119,7 +119,6 @@ public class ActionQueue : MonoBehaviour
                 {
                     pendingActions.RemoveAll(a => a.executeTurn == order);
                     OnAnyActionCompleted?.Invoke(this, EventArgs.Empty);
-
                     onComplete?.Invoke();
                 }
             });

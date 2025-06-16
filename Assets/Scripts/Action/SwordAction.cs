@@ -115,12 +115,12 @@ public class SwordAction : BaseAction
         {
             unit.SetForecast(true); //如果目标单位不存在则开启预测
             unit.CancelAction(this);
-            ActionStart(onActionComplete);
+            ActionStart(actionCompleted);
             ActionComplete();
             return;
         }
 
-        ActionStart(onActionComplete);
+        ActionStart(actionCompleted);
         unit.TrySpendActionPointsToTakeAction(this);
         float swordBeforeHitTime = 0.7f;
         stateTimer = swordBeforeHitTime;

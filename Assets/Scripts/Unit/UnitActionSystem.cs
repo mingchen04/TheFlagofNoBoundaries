@@ -97,6 +97,7 @@ public class UnitActionSystem : MonoBehaviour
 
     public void SetSelectedAction(BaseAction baseAction)
     {
+        DeployActionEnd();
         selectedAction = baseAction;
         OnSelectActionChanged?.Invoke(this, EventArgs.Empty);
     }
@@ -130,7 +131,7 @@ public class UnitActionSystem : MonoBehaviour
             this.selectedUnits.Add(unit);
         }
 
-        if (selectedUnits.Count > 0) SetSelectedAction(selectedUnits[0].GetAction<MoveAction>());
+        if (selectedUnits.Count > 0) SetSelectedAction(selectedUnits[0].GetAction<MoveAction>());        
         OnSelectedUnitChanged?.Invoke(this, EventArgs.Empty);
     }
 
@@ -251,7 +252,6 @@ public class UnitActionSystem : MonoBehaviour
     /// </summary>
     public void DeployActionStart()
     {
-        Debug.Log("开始部署");
         isDeployAction = true;
     }
 
@@ -260,7 +260,6 @@ public class UnitActionSystem : MonoBehaviour
     /// </summary>
     public void DeployActionEnd()
     {
-        Debug.Log("结束部署");
         isDeployAction = false;
     }
 }

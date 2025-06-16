@@ -93,6 +93,7 @@ public class ShootAction : BaseAction
                 stateTimer = coolOffStateTime;
                 break;
             case State.Cooloff:
+                Debug.Log($"{unit} 射击完成，目标: {targetUnit}");
                 ActionComplete();
                 break;
         }
@@ -160,7 +161,7 @@ public class ShootAction : BaseAction
         {
             unit.SetForecast(true); //如果目标单位不存在则开启预测
             unit.CancelAction(this); //取消行动
-            ActionStart(onActionComplete);
+            ActionStart(actionCompleted);
             ActionComplete();
             return;
         }
@@ -170,7 +171,7 @@ public class ShootAction : BaseAction
         stateTimer = aimingStateTime;
         canShootBullet = true;
 
-        ActionStart(onActionComplete);
+        ActionStart(actionCompleted);
         unit.TrySpendActionPointsToTakeAction(this);
     }
 
