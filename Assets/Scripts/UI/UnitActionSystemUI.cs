@@ -21,7 +21,9 @@ public class UnitActionSystemUI : MonoBehaviour
     private void Start()
     {
         deployActionEndButton.onClick.AddListener(UnitActionSystem.Instance.DeployActionEnd);
+        deployActionEndButton.gameObject.SetActive(false);
 
+        UnitActionSystem.Instance.OnDeselectActionChanged += UnitActionSystem_OnDeselectActionChanged;
         UnitActionSystem.Instance.OnSelectedUnitChanged += UnitActionSystem_OnSelectedUnitChanged;
         UnitActionSystem.Instance.OnSelectActionChanged += UnitActionSystem_OnSelectActionChanged;
         //无法确定脚本执行顺序可能导致数据与视图不同步
@@ -31,6 +33,19 @@ public class UnitActionSystemUI : MonoBehaviour
         CreateUnitActionbuttons();
         UpdateSelectedVisual();
         UpdateActionPoints();
+    }
+
+    private void OnDestroy()
+    {
+        UnitActionSystem.Instance.OnDeselectActionChanged -= UnitActionSystem_OnDeselectActionChanged;
+        UnitActionSystem.Instance.OnSelectedUnitChanged -= UnitActionSystem_OnSelectedUnitChanged;
+        UnitActionSystem.Instance.OnSelectActionChanged -= UnitActionSystem_OnSelectActionChanged;
+        SrengthSystem.OnAnyActionPointsChanged -= Unit_OnAnyActionPointsChanged;
+    }
+
+    private void UnitActionSystem_OnDeselectActionChanged(object sender, bool e)
+    {
+        deployActionEndButton.gameObject.SetActive(e);
     }
 
     private void Unit_OnAnyActionPointsChanged(object sender, EventArgs e)

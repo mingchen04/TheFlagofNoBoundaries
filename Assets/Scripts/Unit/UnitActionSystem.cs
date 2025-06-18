@@ -11,6 +11,7 @@ public class UnitActionSystem : MonoBehaviour
     public event EventHandler OnSelectedUnitChanged;
     public event EventHandler OnSelectActionChanged;
     public event EventHandler<bool> OnBusyChanged;
+    public event EventHandler<bool> OnDeselectActionChanged;
 
     private List<Unit> selectedUnits; //选中的单位
     private BaseAction selectedAction;
@@ -62,17 +63,33 @@ public class UnitActionSystem : MonoBehaviour
         if (!LevelGrid.Instance.IsValidGridPosition(mouseGridPosition)) return false;
         if (!selectedAction.IsValidActionGridPosition(mouseGridPosition)) return false;
 
+        bool isAction = false;
+
         foreach (Unit unit in selectedUnits)
         {
+            isDeployAction = false; //重置部署行动状态
+            if (unit.GetDeselectAction()) isDeployAction = true;
             int actionExecutionOrder = unit.GetActionQueue().EndActionExecuteTurnGet() + 1;
-            if (isDeployAction) actionExecutionOrder = unit.GetActionQueue().EndActionExecuteTurnGet();
+            if (isDeployAction)
+            {
+                actionExecutionOrder = unit.GetActionQueue().EndActionExecuteTurnGet();
+            }
+            else
+            {
+                actionExecutionOrder = unit.GetActionQueue().EndActionExecuteTurnGet() + 1;
+            }
+
             BaseAction currentUnitAction = unit.GetBaseActionOfType(selectedAction); //获取当前单位的同一类型的行动
+
+            if (!currentUnitAction.IsValidActionGridPosition(mouseGridPosition)) continue;
             if (currentUnitAction == null) continue;
             unit.HandleOrderedAction(currentUnitAction, mouseGridPosition, actionExecutionOrder);
-            return true;
+            isAction = true;
         }
 
-        return false;
+        if (isDeployAction) OnDeselectActionChanged?.Invoke(this, isDeployAction);
+
+        return isAction;
     }
 
     private bool TryHandleUnitSelection(GridPosition mouseGridPosition)
@@ -131,7 +148,7 @@ public class UnitActionSystem : MonoBehaviour
             this.selectedUnits.Add(unit);
         }
 
-        if (selectedUnits.Count > 0) SetSelectedAction(selectedUnits[0].GetAction<MoveAction>());        
+        if (selectedUnits.Count > 0) SetSelectedAction(selectedUnits[0].GetAction<MoveAction>());
         OnSelectedUnitChanged?.Invoke(this, EventArgs.Empty);
     }
 
@@ -248,18 +265,16 @@ public class UnitActionSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// 开始行动部署
-    /// </summary>
-    public void DeployActionStart()
-    {
-        isDeployAction = true;
-    }
-
-    /// <summary>
     /// 行动部署结束
     /// </summary>
     public void DeployActionEnd()
     {
         isDeployAction = false;
+        foreach (Unit unit in selectedUnits)
+        {
+            unit.SetDeselectAction(isDeployAction);
+        }
+
+        OnDeselectActionChanged?.Invoke(this, isDeployAction);
     }
 }

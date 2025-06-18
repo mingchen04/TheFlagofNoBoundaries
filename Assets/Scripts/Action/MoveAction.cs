@@ -167,11 +167,11 @@ public class MoveAction : BaseAction
 
         if (UnitActionSystem.Instance.IsDeployAction())
         {
-            var actions = unit.GetActionQueue().GetActions();
+            List<BaseActionParameter> actions = unit.GetActionQueue().GetActions();
             if (actions.Count > 0)
             {
-                var lastParam = actions.Last();
-                var path = BuildMovePathFromTargets(lastParam.targetPositionList);
+                BaseActionParameter lastParam = actions.Last();
+                List<GridPosition> path = BuildMovePathFromTargets(lastParam.targetPositionList);
                 alreadyPlannedSteps = path.Count;
             }
         }

@@ -20,6 +20,7 @@ public class Unit : MonoBehaviour
     private ActionQueue actionQueue; // 存储行动队列
     private bool isForecast; // 是否为预测模式
     private bool isBusy; // 是否忙碌
+    private bool isDeployAction; //是否部署行动
 
     private void Awake()
     {
@@ -197,11 +198,10 @@ public class Unit : MonoBehaviour
     public void HandleOrderedAction(BaseAction action, GridPosition targetPos, int executionOrder)
     {
         SetForecast(true);
+
         BaseActionSO.ActionTags actionTags = ScriptiptableSOManager.Instance.GetActionTags(action);
         bool isMove = actionTags.HasFlag(BaseActionSO.ActionTags.Move);
         bool isDeploy = actionTags.HasFlag(BaseActionSO.ActionTags.Deploy); //是否为部署行动
-
-        bool isDeployAction = UnitActionSystem.Instance.IsDeployAction();
 
         BaseActionParameter actionParam;
         GridPosition finalPos;
@@ -244,7 +244,7 @@ public class Unit : MonoBehaviour
 
             if (!TrySpendActionPointsToTakeAction(action, actionParam)) return;
             actionQueue.AddAction(actionParam);
-            if (isDeploy) UnitActionSystem.Instance.DeployActionStart();
+            if (isDeploy) SetDeselectAction(true);
         }
 
         Debug.Log($"{gameObject.name} {(isDeployAction ? "更新" : "添加")}行动: {action.GetActionName()} (顺序:{executionOrder}, 目标:{targetPos}, 终位:{finalPos})");
@@ -279,5 +279,21 @@ public class Unit : MonoBehaviour
     private void UnitActionSystem_OnBusyChanged(object sender, bool isBusy)
     {
         this.isBusy = isBusy;
+    }
+
+    /// <summary>
+    /// 获取部署状态
+    /// </summary>
+    public bool GetDeselectAction()
+    {
+        return isDeployAction;
+    }
+
+    /// <summary>
+    /// 行动部署设置
+    /// </summary>
+    public void SetDeselectAction(bool isDeployAction)
+    {
+        this.isDeployAction = isDeployAction;
     }
 }
