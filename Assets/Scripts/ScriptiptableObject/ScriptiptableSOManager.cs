@@ -21,7 +21,7 @@ public class ScriptiptableSOManager : MonoBehaviour
         return GetBaseActionSO(baseAction).baseActionIcon;
     }
 
-    public BaseActionSO.ActionTags GetActionTags(BaseAction baseAction)
+    public ActionTags GetActionTags(BaseAction baseAction)
     {
         return GetBaseActionSO(baseAction).actionTags;
     }

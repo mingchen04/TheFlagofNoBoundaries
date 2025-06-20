@@ -162,15 +162,17 @@ public class MoveAction : BaseAction
     /// </summary>
     private int GetMaxMoveStepsByActionPoints()
     {
+        
         int maxSteps = 0;
         int alreadyPlannedSteps = 0;
 
-        if (UnitActionSystem.Instance.IsDeployAction())
+        if (unit.GetDeselectAction())
         {
             List<BaseActionParameter> actions = unit.GetActionQueue().GetActions();
             if (actions.Count > 0)
             {
-                BaseActionParameter lastParam = actions.Last();
+                BaseActionParameter lastParam = unit.GetActionQueue().CopyLastActionParameter();
+                
                 List<GridPosition> path = BuildMovePathFromTargets(lastParam.targetPositionList);
                 alreadyPlannedSteps = path.Count;
             }

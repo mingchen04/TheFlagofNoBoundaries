@@ -1,19 +1,18 @@
 using System;
 using UnityEngine;
 
+[Flags]
+public enum ActionTags
+{
+    None = 0,
+    Move = 1 << 0, //行动带有位移
+    Damage = 1 << 1, //行动带有伤害
+    Aoe = 1 << 2, //行动有范围效果
+    Deploy = 1 << 3, //行动是部署行动
+}
+
 public abstract class BaseActionSO : ScriptableObject
 {
-
-    [Flags]
-    public enum ActionTags
-    {
-        None = 0,
-        Move = 1 << 0, //行动带有位移
-        Damage = 1 << 1, //行动带有伤害
-        Aoe = 1 << 2, //行动有范围效果
-        Deploy = 1 << 3, //行动是部署行动
-    }
-
     // 添加标签
     //actionTags |= ActionTags.Move;
     // 移除标签

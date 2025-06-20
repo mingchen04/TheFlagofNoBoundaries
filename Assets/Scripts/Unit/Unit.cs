@@ -168,7 +168,7 @@ public class Unit : MonoBehaviour
 
     public void SetForecast(bool forecast)
     {
-        this.isForecast = forecast;
+        isForecast = forecast;
     }
 
     public int GetPriority() => unitPriority;
@@ -199,9 +199,9 @@ public class Unit : MonoBehaviour
     {
         SetForecast(true);
 
-        BaseActionSO.ActionTags actionTags = ScriptiptableSOManager.Instance.GetActionTags(action);
-        bool isMove = actionTags.HasFlag(BaseActionSO.ActionTags.Move);
-        bool isDeploy = actionTags.HasFlag(BaseActionSO.ActionTags.Deploy); //是否为部署行动
+        ActionTags actionTags = ScriptiptableSOManager.Instance.GetActionTags(action);
+        bool isMove = actionTags.HasFlag(ActionTags.Move);
+        bool isDeploy = actionTags.HasFlag(ActionTags.Deploy); //是否为部署行动
 
         BaseActionParameter actionParam;
         GridPosition finalPos;
@@ -246,7 +246,6 @@ public class Unit : MonoBehaviour
             actionQueue.AddAction(actionParam);
             if (isDeploy) SetDeselectAction(true);
         }
-
         Debug.Log($"{gameObject.name} {(isDeployAction ? "更新" : "添加")}行动: {action.GetActionName()} (顺序:{executionOrder}, 目标:{targetPos}, 终位:{finalPos})");
         if (isMove) OnAnyMoveActionUnitPositionChange?.Invoke(this, EventArgs.Empty);
     }

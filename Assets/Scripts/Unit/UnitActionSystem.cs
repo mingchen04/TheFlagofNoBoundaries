@@ -64,10 +64,10 @@ public class UnitActionSystem : MonoBehaviour
         if (!selectedAction.IsValidActionGridPosition(mouseGridPosition)) return false;
 
         bool isAction = false;
+        isDeployAction = false; //重置部署行动状态
 
         foreach (Unit unit in selectedUnits)
         {
-            isDeployAction = false; //重置部署行动状态
             if (unit.GetDeselectAction()) isDeployAction = true;
             int actionExecutionOrder = unit.GetActionQueue().EndActionExecuteTurnGet() + 1;
             if (isDeployAction)
@@ -253,15 +253,8 @@ public class UnitActionSystem : MonoBehaviour
                     onComplete?.Invoke();// 所有单位完成后触发回调
                 }
             });
+            
         }
-    }
-
-    /// <summary>
-    /// 判断是否在部署行动中
-    /// </summary>
-    public bool IsDeployAction()
-    {
-        return isDeployAction;
     }
 
     /// <summary>

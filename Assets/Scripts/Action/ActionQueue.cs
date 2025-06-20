@@ -59,8 +59,8 @@ public class ActionQueue : MonoBehaviour
     {
 
         List<BaseActionParameter> cancelActions = new List<BaseActionParameter>();
-        BaseActionSO.ActionTags actionTags = ScriptiptableSOManager.Instance.GetActionTags(cancelAction);
-        if (actionTags.HasFlag(BaseActionSO.ActionTags.Move)) //包含位移则取消后续所有行动
+        ActionTags actionTags = ScriptiptableSOManager.Instance.GetActionTags(cancelAction);
+        if (actionTags.HasFlag(ActionTags.Move)) //包含位移则取消后续所有行动
         {
             cancelActions =
                 pendingActions
