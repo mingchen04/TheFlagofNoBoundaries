@@ -89,7 +89,6 @@ public class LevelGrid : MonoBehaviour
     public void SetInteractableAtGridPosition(GridPosition gridPosition, IInteractable interactable)
     {
         gridSystem.GetGridObject(gridPosition).SetInteractable(interactable);
-        
     }
 
     /// <summary>
@@ -133,6 +132,26 @@ public class LevelGrid : MonoBehaviour
         }
 
         return results;
+    }
+
+    public void DamageUnitForGridPosition(List<GridPosition> gridPositions,int damageInt)
+    {
+        foreach (GridPosition gridPosition in gridPositions)
+        {
+            Unit unit = GetUnitAtGridPosition(gridPosition);
+            if (unit != null)
+            {
+                unit.Damage(damageInt);
+            }
+        }
+    }
+    public void DamageUnitForGridPosition(GridPosition gridPosition, int damageInt)
+    {
+        Unit unit = GetUnitAtGridPosition(gridPosition);
+        if (unit != null)
+        {
+            unit.Damage(damageInt);
+        }
     }
 
 }

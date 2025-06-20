@@ -60,7 +60,7 @@ public class UnitAnimator : MonoBehaviour
         Transform BulletProjectIle = Instantiate(bulletProjectIlePrefab, shootPointTransform.position, Quaternion.identity);
         BulletProjectIle bulletProjectIle = BulletProjectIle.GetComponent<BulletProjectIle>();
 
-        Vector3 targetUnitShootAtPosition= e.targetUnit.GetWorldPosition();
+        Vector3 targetUnitShootAtPosition= e.targetUnitPosition;
         targetUnitShootAtPosition.y = shootPointTransform.position.y;
 
         bulletProjectIle.Setup(targetUnitShootAtPosition);
