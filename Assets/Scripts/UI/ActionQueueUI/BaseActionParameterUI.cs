@@ -49,15 +49,15 @@ public class BaseActionParameterUI : MonoBehaviour
     private void SetExecute(int executeTurn, ActionQueue actionQueue, int actionIndex)
     {
         actionQueue.ActionExecuteTurnSet(actionIndex, executeTurn);
-        textActionIndex.text = (executeTurn+1).ToString();
+        textActionIndex.text = (executeTurn + 1).ToString();
 
         if (executeTurn == 0)
         {
             orderForwardButton.interactable = false; //如果行动位置为0则不能向前调整
         }
-        else if(executeTurn >= 10)
+        else if (executeTurn >= 10)
         {
             orderBackButton.interactable = false; //如果行动位置大于等于10则不能向后调整
-        }        
+        }
     }
 }
