@@ -18,7 +18,7 @@ public class SwordAction : BaseAction
 
     private State state;
     private float stateTimer;
-    private Unit targetUnit;
+    private GridPosition targetUnitPosition;
 
     private void Update()
     {
@@ -33,7 +33,7 @@ public class SwordAction : BaseAction
         {
             case State.SwingingSwordBeforeHit:
                 float rotateSpeed = 10f;
-                Vector3 aimDir = (targetUnit.GetWorldPosition() - transform.position).normalized;
+                Vector3 aimDir = ((Vector3)targetUnitPosition - transform.position).normalized;
                 transform.forward = Vector3.Slerp(transform.forward, aimDir, rotateSpeed * Time.deltaTime);
                 break;
             case State.SwingingSwordAfterHit:
@@ -54,7 +54,7 @@ public class SwordAction : BaseAction
                 state = State.SwingingSwordAfterHit;
                 float afterHitStateTime = 0.8f;
                 stateTimer = afterHitStateTime;
-                targetUnit.Damage(90);
+                LevelGrid.Instance.DamageUnitForGridPosition(targetUnitPosition , 90);
                 OnAnySwordHit?.Invoke(this, EventArgs.Empty);
                 break;
             case State.SwingingSwordAfterHit:
@@ -110,16 +110,7 @@ public class SwordAction : BaseAction
 
     public override void TakeAction(List<GridPosition> gridPositions, Action actionCompleted)
     {
-        targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPositions[0]);
-        if (targetUnit == null)
-        {
-            unit.SetForecast(true); //如果目标单位不存在则开启预测
-            unit.CancelAction(this);
-            ActionStart(actionCompleted);
-            ActionComplete();
-            return;
-        }
-
+        targetUnitPosition = gridPositions[0];
         ActionStart(actionCompleted);
         unit.TrySpendActionPointsToTakeAction(this);
         float swordBeforeHitTime = 0.7f;
