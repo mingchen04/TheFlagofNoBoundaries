@@ -799,6 +799,7 @@ GameObject:
   - component: {fileID: -1834504458823042407}
   - component: {fileID: 5315356020833175202}
   - component: {fileID: 7102653662322834477}
+  - component: {fileID: 4394302509620297805}
   m_Layer: 3
   m_Name: Unit
   m_TagString: Untagged
@@ -1007,6 +1008,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd4b3a4616eeccf4c93d70745852eb02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4394302509620297805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8362551573780112002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc40ee1416f7b414aaaf7c4628794d31, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  landMineTransformPrefab: {fileID: 8440213086168840181, guid: 44619a820d27e2143bb9011774cb34c9,
+    type: 3}
 --- !u!1 &8653960665509808306
 GameObject:
   m_ObjectHideFlags: 0

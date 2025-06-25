@@ -35,7 +35,7 @@ public class DestructibleCrate : MonoBehaviour
         {
             if (child.TryGetComponent<Rigidbody>(out Rigidbody childRigidbody))
             {
-                //AddExplosionForce 对刚体施加一个爆炸力
+                //AddExplosionForce 瀵瑰垰浣撴柦鍔犱竴涓垎鐐稿姏
                 childRigidbody.AddExplosionForce(explosionForce, explosionPosition, explosionRange);
                 ApplyExplosionToragdoll(child, explosionForce, explosionPosition, explosionRange);
             }

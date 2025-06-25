@@ -29,7 +29,7 @@ public class InteractAction : BaseAction
 
     public override List<GridPosition> GetValidActionGridPositionList()
     {
-        List<GridPosition> validActionGridPositionList = new List<GridPosition>();
+        List<GridPosition> validActionGridPositionList = new();
         GridPosition unitGridPosition = unit.GetGridPosition();
 
         foreach (GridPosition testGridPosition in LevelGrid.Instance.GenerateHexArea(unitGridPosition, maxInteractDistance))

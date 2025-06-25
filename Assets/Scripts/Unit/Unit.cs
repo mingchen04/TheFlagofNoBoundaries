@@ -7,7 +7,7 @@ public class Unit : MonoBehaviour
     public static event EventHandler OnAnyUnitSpawned;
     public static event EventHandler OnAnyUnitDead;
     //单位移动
-    public static event EventHandler OnAnyMoveActionUnitPositionChange;
+    public static event EventHandler OnAnyUnitPositionChanged;
 
     [SerializeField] private bool isEnemy; //是否为敌人
     private int unitPriority; // 单位执行优先级
@@ -52,7 +52,7 @@ public class Unit : MonoBehaviour
 
     private void Update()
     {
-        if (!isBusy) return; //如果忙碌则不更新位置
+        if (!isBusy) return; //如果不忙碌则不更新位置
 
         GridPosition newGridPosition = LevelGrid.Instance.GetGridPosition(transform.position);
         if (newGridPosition != gridPosition)
@@ -182,14 +182,14 @@ public class Unit : MonoBehaviour
         UnitActionSystem.Instance.DeployActionEnd();
         List<BaseActionParameter> cancelActions = actionQueue.GetCancelActions(actionsIndex, baseAction);
         strengthSystem.CancelActionReturnPosint(cancelActions);
-        OnAnyMoveActionUnitPositionChange?.Invoke(this, EventArgs.Empty);
+        OnAnyUnitPositionChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public void CancelAction(BaseAction cancelActions)
     {
         UnitActionSystem.Instance.DeployActionEnd();
         strengthSystem.CancelActionReturnPosint(cancelActions);
-        OnAnyMoveActionUnitPositionChange?.Invoke(this, EventArgs.Empty);
+        OnAnyUnitPositionChanged?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>
@@ -247,7 +247,7 @@ public class Unit : MonoBehaviour
             if (isDeploy) SetDeselectAction(true);
         }
         Debug.Log($"{gameObject.name} {(isDeployAction ? "更新" : "添加")}行动: {action.GetActionName()} (顺序:{executionOrder}, 目标:{targetPos}, 终位:{finalPos})");
-        if (isMove) OnAnyMoveActionUnitPositionChange?.Invoke(this, EventArgs.Empty);
+        if (isMove) OnAnyUnitPositionChanged?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>

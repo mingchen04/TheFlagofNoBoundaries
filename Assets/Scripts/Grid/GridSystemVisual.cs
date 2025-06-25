@@ -61,7 +61,7 @@ public class GridSystemVisual : MonoBehaviour
         UnitActionSystem.Instance.OnSelectActionChanged += UnitActionSystem_OnSelectActionChanged;
         LevelGrid.Instance.OnAnyUnitMoveGridPosition += LevelGrid_OnAnyUnitMoveGridPosition;
         BaseAction.OnAnyActionCompleted += BaseAction_OnAnyActionCompleted;
-        Unit.OnAnyMoveActionUnitPositionChange += Unit_OnMoveActionUnitPositionChange;
+        Unit.OnAnyUnitPositionChanged += Unit_OnMoveActionUnitPositionChange;
         UpdateGridVisual();
     }
 
@@ -152,6 +152,9 @@ public class GridSystemVisual : MonoBehaviour
                 break;
             case GrenadeAction grenadeAction:
                 gridVisualType = GridVisualType.Yellow;
+                break;
+            case LandMineAction landMineAction:
+                gridVisualType = GridVisualType.Red;
                 break;
 
             case ShootAction shootAction:

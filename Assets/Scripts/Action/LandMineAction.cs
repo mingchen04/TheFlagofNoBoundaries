@@ -1,8 +1,32 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class LandMineAction : BaseAction
 {
+    [SerializeField] private Transform landMineTransformPrefab; // 地雷预制体
+    private int landMineDistance = 1;
+    private const float landMineTimeMax = 0.2f;//埋地雷使用时间
+    private float landMineTime = 0;
+
+    private void Update()
+    {
+        if(!isActive) return;
+        if (landMineTime > 0)
+        {
+            landMineTime -= Time.deltaTime;
+        }
+        else
+        {
+            ActionComplete();
+        }
+    }
+
+    protected override void Awake()
+    {
+        base.Awake();
+    }
+
     public override string GetActionName()
     {
         return "地雷";
@@ -19,23 +43,39 @@ public class LandMineAction : BaseAction
 
     public override List<GridPosition> GetValidActionGridPositionList()
     {
-        throw new NotImplementedException();
+        List<GridPosition> validActionGridPositionList = new List<GridPosition>();
+        GridPosition unitGridPosition = unit.GetGridPosition();
+
+        foreach (GridPosition testGridPosition in LevelGrid.Instance.GenerateHexArea(unitGridPosition, landMineDistance))
+        {
+            if(testGridPosition == unitGridPosition)
+            {
+                continue;
+            }
+
+            if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition))
+            {
+                //网格位置不合法跳过
+                continue;
+            }
+
+            if (LevelGrid.Instance.HasAnyUnitOnGridPosition(testGridPosition))
+            {
+                continue;
+            }
+
+            validActionGridPositionList.Add(testGridPosition);
+        }
+        return validActionGridPositionList;
     }
 
     public override void TakeAction(List<GridPosition> gridPositions, Action onActionComplete)
     {
-        throw new NotImplementedException();
+        ActionStart(onActionComplete);
+        unit.TrySpendActionPointsToTakeAction(this);
+        landMineTime = landMineTimeMax;
+        LandMine landMine = Instantiate(landMineTransformPrefab, (Vector3)gridPositions[0], Quaternion.identity).GetComponent<LandMine>();
+        landMine.Setup(gridPositions[0]);
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

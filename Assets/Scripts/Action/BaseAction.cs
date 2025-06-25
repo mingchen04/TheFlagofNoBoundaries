@@ -37,6 +37,10 @@ public abstract class BaseAction : MonoBehaviour
     /// <returns>可选的GridPosition集合</returns>
     public abstract List<GridPosition> GetValidActionGridPositionList();
 
+    /// <summary>
+    /// 获取消耗的体力点数
+    /// </summary>
+    /// <returns>消耗的体力点数</returns>
     public virtual int GetActionPointsCost(BaseActionParameter baseActionParameter = null)
     {
         return 10;

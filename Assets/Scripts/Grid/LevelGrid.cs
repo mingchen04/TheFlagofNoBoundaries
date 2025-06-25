@@ -92,7 +92,7 @@ public class LevelGrid : MonoBehaviour
     }
 
     /// <summary>
-    /// 生成以center为中心、半径为N的六边形区域所有坐标
+    /// 生成以center为中心、半径为radius的六边形区域所有坐标
     /// </summary>
     public List<GridPosition> GenerateHexArea(GridPosition center, int radius)
     {
@@ -134,15 +134,11 @@ public class LevelGrid : MonoBehaviour
         return results;
     }
 
-    public void DamageUnitForGridPosition(List<GridPosition> gridPositions,int damageInt)
+    public void DamageUnitForGridPosition(List<GridPosition> gridPositions, int damageInt)
     {
         foreach (GridPosition gridPosition in gridPositions)
         {
-            Unit unit = GetUnitAtGridPosition(gridPosition);
-            if (unit != null)
-            {
-                unit.Damage(damageInt);
-            }
+            DamageUnitForGridPosition(gridPosition, damageInt);
         }
     }
     public void DamageUnitForGridPosition(GridPosition gridPosition, int damageInt)
