@@ -11,7 +11,6 @@ public class ActionQueue : MonoBehaviour
     public static event EventHandler OnAnyActionAddQueue;
     public static event EventHandler OnAnyActionCompleted; //行为结束触发视图更新
     private List<BaseActionParameter> pendingActions; //行为队列
-    private GridPosition lastActionUnitPosition; //存储上一次行动的单位位置
     private Unit unit; //当前单位
     private void Awake()
     {
@@ -187,6 +186,9 @@ public class ActionQueue : MonoBehaviour
     {
         if (pendingActions.Count == 0) return false;
         BaseActionParameter lastAction = pendingActions.Last();
+        ActionTags actionTags = ScriptiptableSOManager.Instance.GetActionTags(lastAction.baseAction);
+        bool isMove = actionTags.HasFlag(ActionTags.Move); // 检查是否为移动行动
+        if (!isMove) return false; //非移动行动不检查目标位置
         return lastAction.targetPositionList.Contains(targetPosition);
     }
 }
