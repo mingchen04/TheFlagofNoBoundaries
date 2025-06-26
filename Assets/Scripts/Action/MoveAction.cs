@@ -44,6 +44,12 @@ public class MoveAction : BaseAction
         transform.forward = Vector3.Slerp(transform.forward, moveDirection, Time.deltaTime * rotateSpeed);
     }
 
+    public override void ActionStop()
+    {
+        OnStopMoving?.Invoke(this, EventArgs.Empty);
+        base.ActionStop();
+    }
+
     public override void TakeAction(List<GridPosition> gridPositions, Action actionCompleted)
     {
         unit.SetForecast(false);
@@ -162,7 +168,7 @@ public class MoveAction : BaseAction
     /// </summary>
     private int GetMaxMoveStepsByActionPoints()
     {
-        
+
         int maxSteps = 0;
         int alreadyPlannedSteps = 0;
 
@@ -172,7 +178,7 @@ public class MoveAction : BaseAction
             if (actions.Count > 0)
             {
                 BaseActionParameter lastParam = unit.GetActionQueue().CopyLastActionParameter();
-                
+
                 List<GridPosition> path = BuildMovePathFromTargets(lastParam.targetPositionList);
                 alreadyPlannedSteps = path.Count;
             }
@@ -184,4 +190,5 @@ public class MoveAction : BaseAction
         }
         return maxSteps > 0 ? maxSteps - 1 : 0;
     }
+
 }

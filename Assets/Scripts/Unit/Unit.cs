@@ -14,7 +14,7 @@ public class Unit : MonoBehaviour
 
     private GridPosition gridPosition; //网格位置
     private HealthSystem healthSystem; //生命
-    private SrengthSystem strengthSystem; //体力
+    private SrengthSystem srengthSystem; //体力
 
     private BaseAction[] baseActionArray; // 存储所有行动
     private ActionQueue actionQueue; // 存储行动队列
@@ -26,7 +26,7 @@ public class Unit : MonoBehaviour
     {
         isForecast = true;
         actionQueue = GetComponent<ActionQueue>();
-        strengthSystem = GetComponent<SrengthSystem>();
+        srengthSystem = GetComponent<SrengthSystem>();
         baseActionArray = GetComponents<BaseAction>();
         healthSystem = GetComponent<HealthSystem>();
     }
@@ -34,7 +34,6 @@ public class Unit : MonoBehaviour
     private void Start()
     {
         unitPriority = UnitManager.Instance.GetFriendlyUnitList().Count;
-
         gridPosition = LevelGrid.Instance.GetGridPosition(transform.position);
         LevelGrid.Instance.AddUnitAtGridPosition(gridPosition, this);
 
@@ -55,13 +54,11 @@ public class Unit : MonoBehaviour
         if (!isBusy) return; //如果不忙碌则不更新位置
 
         GridPosition newGridPosition = LevelGrid.Instance.GetGridPosition(transform.position);
-        if (newGridPosition != gridPosition)
-        {
-            //Unit Changed Grid Position
-            GridPosition oldGridPosition = gridPosition;
-            gridPosition = newGridPosition;
-            LevelGrid.Instance.UnitMovedGridPosition(this, oldGridPosition, newGridPosition);
-        }
+
+        //距离大于0.1暂时不更新位置
+        float stoppingDistance = 0.1f;
+        if (Vector3.Distance(newGridPosition, transform.position) > stoppingDistance) return;
+        SetUnitGridPosition(newGridPosition);
     }
 
     private void OnDestroy()
@@ -119,7 +116,7 @@ public class Unit : MonoBehaviour
 
     public int GetActionPoints()
     {
-        return strengthSystem.GetActionPoints();
+        return srengthSystem.GetActionPoints();
     }
 
     /// <summary>
@@ -128,7 +125,7 @@ public class Unit : MonoBehaviour
     /// <returns>实际点数和预计点数的差</returns>
     public int GetReductionPoints()
     {
-        return strengthSystem.GetActionPoints() - strengthSystem.GetForecastActions();
+        return srengthSystem.GetActionPoints() - srengthSystem.GetForecastActions();
     }
 
     /// <summary>
@@ -136,7 +133,7 @@ public class Unit : MonoBehaviour
     /// </summary>
     public bool CanspendActionPointsToTakeAction(int baseActionPointsCost)
     {
-        return strengthSystem.CanspendActionPointsToTakeAction(baseActionPointsCost);
+        return srengthSystem.CanspendActionPointsToTakeAction(baseActionPointsCost);
     }
 
     /// <summary>
@@ -158,12 +155,12 @@ public class Unit : MonoBehaviour
     /// </remarks>
     public bool TrySpendActionPointsToTakeAction(BaseAction baseAction, BaseActionParameter actionParam = null)
     {
-        return strengthSystem.TrySpendActionPointsToTakeAction(baseAction, actionParam);
+        return srengthSystem.TrySpendActionPointsToTakeAction(baseAction, actionParam);
     }
 
     public void TrySpendActionPointsToTakeAction(int actionPoint)
     {
-        strengthSystem.SpendActionPoints(actionPoint);
+        srengthSystem.SpendActionPoints(actionPoint);
     }
 
     public void SetForecast(bool forecast)
@@ -181,14 +178,14 @@ public class Unit : MonoBehaviour
     {
         UnitActionSystem.Instance.DeployActionEnd();
         List<BaseActionParameter> cancelActions = actionQueue.GetCancelActions(actionsIndex, baseAction);
-        strengthSystem.CancelActionReturnPosint(cancelActions);
+        srengthSystem.CancelActionReturnPosint(cancelActions);
         OnAnyUnitPositionChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public void CancelAction(BaseAction cancelActions)
     {
         UnitActionSystem.Instance.DeployActionEnd();
-        strengthSystem.CancelActionReturnPosint(cancelActions);
+        srengthSystem.CancelActionReturnPosint(cancelActions);
         OnAnyUnitPositionChanged?.Invoke(this, EventArgs.Empty);
     }
 
@@ -294,5 +291,25 @@ public class Unit : MonoBehaviour
     public void SetDeselectAction(bool isDeployAction)
     {
         this.isDeployAction = isDeployAction;
+    }
+
+    /// <summary>
+    /// 重新设置预测点数，常用于行动出现意外而停止，直接等于实际行动点数
+    /// </summary>
+    public void SetForecastActionPoints()
+    {
+        srengthSystem.SetForecastActionPoints();
+        GridPosition newGridPosition = LevelGrid.Instance.GetGridPosition(transform.position);
+        SetUnitGridPosition(newGridPosition);
+    }
+
+    private void SetUnitGridPosition(GridPosition newGridPosition)
+    {
+        if (newGridPosition == gridPosition) return;
+
+        //Unit Changed Grid Position
+        GridPosition oldGridPosition = gridPosition;
+        gridPosition = newGridPosition;
+        LevelGrid.Instance.UnitMovedGridPosition(this, oldGridPosition, newGridPosition);
     }
 }

@@ -35,9 +35,11 @@ public class LandMine : MonoBehaviour
         {
             if (!LevelGrid.Instance.IsValidGridPosition(currentGridPosition)) return; // 确保传入的网格位置是有效的
             unit = LevelGrid.Instance.GetUnitAtGridPosition(currentGridPosition);
+            
             if (unit != null)
             {
                 unit.Damage(90); // 对单位造成伤害
+                unit.GetActionQueue().ActionQueueStop(); // 停止单位的行动队列
             }
         }
         Destroy(gameObject); // 销毁地雷对象

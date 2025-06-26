@@ -117,4 +117,9 @@ public class SrengthSystem : MonoBehaviour
     {
         return (float)actionPoints / actionPointMax;
     }
+
+    public void SetForecastActionPoints()
+    {
+        forecastActionPoints = actionPoints;
+    }
 }

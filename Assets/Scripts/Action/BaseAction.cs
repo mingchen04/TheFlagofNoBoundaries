@@ -103,4 +103,12 @@ public abstract class BaseAction : MonoBehaviour
     }
 
     public abstract EnemyAIAction GetEnemyAIAction(GridPosition gridPosition);
+
+    /// <summary>
+    /// 停止当前行动
+    /// </summary>
+    public virtual void ActionStop()
+    {
+        ActionComplete();
+    }
 }

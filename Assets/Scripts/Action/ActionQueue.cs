@@ -114,7 +114,7 @@ public class ActionQueue : MonoBehaviour
             action.baseAction.TakeAction(action.targetPositionList, () =>
             {
                 completedCount++;
-                if (completedCount == actions.Count)
+                if (completedCount >= actions.Count)
                 {
                     pendingActions.RemoveAll(a => a.executeTurn == order);
                     OnAnyActionCompleted?.Invoke(this, EventArgs.Empty);
@@ -191,4 +191,15 @@ public class ActionQueue : MonoBehaviour
         if (!isMove) return false; //非移动行动不检查目标位置
         return lastAction.targetPositionList.Contains(targetPosition);
     }
+
+    /// <summary>
+    /// 停止执行行动队列中的所有行动
+    /// </summary>
+    public void ActionQueueStop()
+    {
+        pendingActions.Last().baseAction.ActionStop(); // 停止最后一个行动
+        pendingActions.Clear(); //取消所有队列的动作
+        unit.SetForecastActionPoints();
+    }
+
 }
