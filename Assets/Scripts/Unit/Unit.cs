@@ -18,13 +18,15 @@ public class Unit : MonoBehaviour
 
     private BaseAction[] baseActionArray; // 存储所有行动
     private ActionQueue actionQueue; // 存储行动队列
+    private List<BaseBuff> buffList; //buff栏
     private bool isForecast; // 是否为预测模式
     private bool isBusy; // 是否忙碌
     private bool isDeployAction; //是否部署行动
-
+    
     private void Awake()
     {
         isForecast = true;
+        buffList = new List<BaseBuff>();
         actionQueue = GetComponent<ActionQueue>();
         srengthSystem = GetComponent<SrengthSystem>();
         baseActionArray = GetComponents<BaseAction>();
@@ -312,4 +314,10 @@ public class Unit : MonoBehaviour
         gridPosition = newGridPosition;
         LevelGrid.Instance.UnitMovedGridPosition(this, oldGridPosition, newGridPosition);
     }
+
+    public void AddBuff(BaseBuff baseBuff)
+    {
+        buffList.Add(baseBuff);
+    }
+
 }
