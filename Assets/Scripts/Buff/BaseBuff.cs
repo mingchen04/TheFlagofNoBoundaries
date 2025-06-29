@@ -7,10 +7,16 @@ public abstract class BaseBuff
     protected int effectiveTime; //buff有效回合数
     protected Unit unit;
 
-    public virtual void UseBuff(Unit unit)
+    public BaseBuff(string buffName, Unit unit,int effectiveTime)
     {
+
+        this.buffName = buffName;
         this.unit = unit;
+        this.effectiveTime = effectiveTime; 
     }
+
+    public abstract void UseBuff();
+
 
     public string GetBuffName()
     {
