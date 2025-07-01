@@ -12,6 +12,11 @@ public class Unit : MonoBehaviour
     [SerializeField] private bool isEnemy; //是否为敌人
     private int unitPriority; // 单位执行优先级
 
+    [Header("基础属性")]
+    [SerializeField] private int baseAttack = 10; //攻击力
+    [SerializeField] private int baseDefense = 5; //防御力
+    [SerializeField] private int baseVisionRange = 5; //视野范围
+
     private GridPosition gridPosition; //网格位置
     private HealthSystem healthSystem; //生命
     private SrengthSystem srengthSystem; //体力

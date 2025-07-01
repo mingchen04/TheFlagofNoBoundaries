@@ -1,12 +1,36 @@
+using UnityEngine;
+
 public class AtkUpBuff : BaseBuff
 {
-    public AtkUpBuff(string buffName, Unit unit, int effectiveTime) : base(buffName, unit, effectiveTime)
+    [SerializeField] private int atkBonus; //攻击力加成
+
+    public AtkUpBuff(Unit unit, int bonus, int duration) : base("攻击力提升", unit, duration)
     {
+        atkBonus = bonus;
     }
 
-    public override void UseBuff()
+    public override int ModifyAttack(int atk)
+    {
+        return atk + 10;
+    }
+
+    public override void OnRemove()
+    {
+
+    }
+
+    public override void OnTurnStart()
+    {
+
+    }
+
+    public override void OnTurnEnd()
     {
         
-        
+        ReduceDuration();
+        if (GetEffectiveTime() <= 0)
+        {
+            OnRemove();
+        }
     }
 }
