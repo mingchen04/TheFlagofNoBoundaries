@@ -14,19 +14,8 @@ public class AtkUpBuff : BaseBuff
         return atk + 10;
     }
 
-    public override void OnRemove()
-    {
-
-    }
-
-    public override void OnTurnStart()
-    {
-
-    }
-
     public override void OnTurnEnd()
-    {
-        
+    {       
         ReduceDuration();
         if (GetEffectiveTime() <= 0)
         {

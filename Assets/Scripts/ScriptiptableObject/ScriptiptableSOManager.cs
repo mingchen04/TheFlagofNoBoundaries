@@ -1,9 +1,10 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ScriptiptableSOManager : MonoBehaviour
 {
     public static ScriptiptableSOManager Instance { get; private set; }
-    [SerializeField] private BaseActionListSO BaseActionListSO;
+    [SerializeField] private List<BaseActionSO> baseActionListSO;
 
     private void Awake()
     {
@@ -28,7 +29,7 @@ public class ScriptiptableSOManager : MonoBehaviour
 
     private BaseActionSO GetBaseActionSO(BaseAction baseAction)
     {
-        foreach (BaseActionSO baseActionSO in BaseActionListSO.actionListSO)
+        foreach (BaseActionSO baseActionSO in baseActionListSO)
         {
             if (baseActionSO.ActionType == baseAction.GetType())
             {

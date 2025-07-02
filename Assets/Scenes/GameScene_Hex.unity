@@ -5019,7 +5019,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9e93533839f2574cb7c42998d0d929a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BaseActionListSO: {fileID: 11400000, guid: 7d06e649b49ff4944a000dfa184c1416, type: 2}
+  baseActionListSO:
+  - {fileID: 11400000, guid: 1470a55218ca8614bb3256d6f533d6c4, type: 2}
+  - {fileID: 11400000, guid: e868594b94090534993c2e298aa47917, type: 2}
+  - {fileID: 11400000, guid: df11d6d048e07c14fa8c39548bcdfb6f, type: 2}
+  - {fileID: 11400000, guid: be500470645b4f84fac17bda7e3a5823, type: 2}
+  - {fileID: 11400000, guid: 8ca3140da1a1e814a9e1968dda0fc054, type: 2}
+  - {fileID: 11400000, guid: 47dee60f964ef4a459f7e8e1fff9912b, type: 2}
+  - {fileID: 11400000, guid: b9db3c0f7201bc14eb5db0ca451b888b, type: 2}
 --- !u!4 &1581849501
 Transform:
   m_ObjectHideFlags: 0

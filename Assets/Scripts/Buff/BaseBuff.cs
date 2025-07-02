@@ -16,23 +16,20 @@ public abstract class BaseBuff
         this.buffName = buffName;
         this.effectiveTime = effectiveTime;
         this.stackCount = 1;
-
     }
 
     /// <summary>
     /// 修改单位攻击力
     /// </summary>
     public virtual int ModifyAttack(int origin) => origin;
-
-
-    public virtual void OnAdd() { }
+    
     public virtual void OnRemove() { }
     public virtual void OnTurnStart() { }
     public virtual void OnTurnEnd() { }
 
     public string GetBuffName() => buffName;
     public int GetEffectiveTime() => effectiveTime;
-    public int GetStackCount() => stackCount;
+    public int GetStackCount() => stackCount; 
     public void AddStack(int count = 1) => stackCount += count;
     public void ReduceDuration() => effectiveTime--;
 }
