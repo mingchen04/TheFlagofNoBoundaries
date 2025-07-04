@@ -13,7 +13,7 @@ public class Unit : MonoBehaviour
     private int unitPriority; // 单位执行优先级
 
     [Header("基础属性")]
-    [SerializeField] private int baseAttack = 10; //攻击力
+    [SerializeField] private int baseAttack = 30; //攻击力
     [SerializeField] private int baseDefense = 5; //防御力
     [SerializeField] private int baseVisionRange = 5; //视野范围
 
@@ -236,6 +236,7 @@ public class Unit : MonoBehaviour
             actionParam.unitFinalPosition = finalPos;
 
             actionQueue.UpdateBaseActionParameter(actionParam);
+            Debug.Log($"{gameObject.name} 更新行动: {action.GetActionName()} (顺序:{executionOrder}, 目标:{targetPos}, 终位:{finalPos})");
         }
         else
         {
@@ -248,9 +249,10 @@ public class Unit : MonoBehaviour
 
             if (!TrySpendActionPointsToTakeAction(action, actionParam)) return;
             actionQueue.AddAction(actionParam);
+            Debug.Log($"{gameObject.name}  添加行动: {action.GetActionName()} (顺序:{executionOrder}, 目标:{targetPos}, 终位:{finalPos})");
             if (isDeploy) SetDeselectAction(true);
         }
-        Debug.Log($"{gameObject.name} {(isDeployAction ? "更新" : "添加")}行动: {action.GetActionName()} (顺序:{executionOrder}, 目标:{targetPos}, 终位:{finalPos})");
+        
         if (isMove) OnAnyUnitPositionChanged?.Invoke(this, EventArgs.Empty);
     }
 
@@ -325,4 +327,34 @@ public class Unit : MonoBehaviour
         buffList.Add(baseBuff);
     }
 
+    // 计算最终属性（可被Buff修饰）
+    public int GetAttack()
+    {
+        int value = baseAttack;
+        foreach (var buff in buffList)
+        {
+            value = buff.ModifyAttack(value);
+        }
+        return value;
+    }
+
+    public int GetDefense()
+    {
+        int value = baseDefense;
+        foreach (var buff in buffList)
+        {
+            value = buff.ModifyDefense(value);
+        }
+        return value;
+    }
+
+    public int GetVisionRange()
+    {
+        int value = baseVisionRange;
+        foreach (var buff in buffList)
+        {
+            value = buff.ModifyVisionRange(value);
+        }
+        return value;
+    }
 }

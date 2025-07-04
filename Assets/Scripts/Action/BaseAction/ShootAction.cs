@@ -74,7 +74,7 @@ public class ShootAction : BaseAction
             shootingUnit = unit,
         });
 
-        LevelGrid.Instance.DamageUnitForGridPosition( targetUnitPosition , 40);
+        LevelGrid.Instance.DamageUnitForGridPosition(targetUnitPosition, unit.GetAttack());
     }
 
     private void NextState()
@@ -132,7 +132,7 @@ public class ShootAction : BaseAction
             if (targetUnit == null || targetUnit.IsEnemy() == isUnitEnemy)
             {
                 continue;
-            }  
+            }
 
             Vector3 unitWorldPosition = levelGrid.GetWorldPosition(unitGridPosition);
             Vector3 shootDir = (targetUnit.GetWorldPosition() - unitWorldPosition).normalized;

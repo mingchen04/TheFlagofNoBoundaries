@@ -1,11 +1,10 @@
-using UnityEngine;
-
 public class AtkUpBuff : BaseBuff
 {
-    [SerializeField] private int atkBonus; //攻击力加成
+    private int atkBonus; //攻击力加成
 
-    public AtkUpBuff(Unit unit, int bonus, int duration) : base("攻击力提升", unit, duration)
+    public AtkUpBuff(Unit unit, int bonus, int duration) : base(unit, duration)
     {
+        buffName = "攻击力提升";
         atkBonus = bonus;
     }
 
@@ -15,11 +14,7 @@ public class AtkUpBuff : BaseBuff
     }
 
     public override void OnTurnEnd()
-    {       
-        ReduceDuration();
-        if (GetEffectiveTime() <= 0)
-        {
-            OnRemove();
-        }
+    {
+        base.OnTurnEnd();
     }
 }

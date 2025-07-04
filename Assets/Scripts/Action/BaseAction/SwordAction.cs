@@ -54,7 +54,7 @@ public class SwordAction : BaseAction
                 state = State.SwingingSwordAfterHit;
                 float afterHitStateTime = 0.8f;
                 stateTimer = afterHitStateTime;
-                LevelGrid.Instance.DamageUnitForGridPosition(targetUnitPosition , 90);
+                LevelGrid.Instance.DamageUnitForGridPosition(targetUnitPosition , unit.GetAttack());
                 OnAnySwordHit?.Invoke(this, EventArgs.Empty);
                 break;
             case State.SwingingSwordAfterHit:

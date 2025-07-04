@@ -10,26 +10,34 @@ public abstract class BaseBuff
     protected Unit unit;
     protected int stackCount;
 
-    public BaseBuff(string buffName, Unit unit,int effectiveTime)
+    public BaseBuff( Unit unit, int effectiveTime)
     {
         this.unit = unit;
-        this.buffName = buffName;
         this.effectiveTime = effectiveTime;
-        this.stackCount = 1;
+        stackCount = 1;
     }
 
     /// <summary>
     /// 修改单位攻击力
     /// </summary>
     public virtual int ModifyAttack(int origin) => origin;
-    
+    public virtual int ModifyDefense(int origin) => origin;
+    public virtual int ModifyVisionRange(int origin) => origin;
+
     public virtual void OnRemove() { }
     public virtual void OnTurnStart() { }
-    public virtual void OnTurnEnd() { }
+    public virtual void OnTurnEnd()
+    {
+        ReduceDuration();
+        if (effectiveTime <= 0)
+        {
+            OnRemove();
+        }
+    }
 
     public string GetBuffName() => buffName;
     public int GetEffectiveTime() => effectiveTime;
-    public int GetStackCount() => stackCount; 
+    public int GetStackCount() => stackCount;
     public void AddStack(int count = 1) => stackCount += count;
     public void ReduceDuration() => effectiveTime--;
 }

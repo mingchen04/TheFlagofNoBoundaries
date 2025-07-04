@@ -141,6 +141,7 @@ public class LevelGrid : MonoBehaviour
             DamageUnitForGridPosition(gridPosition, damageInt);
         }
     }
+
     public void DamageUnitForGridPosition(GridPosition gridPosition, int damageInt)
     {
         Unit unit = GetUnitAtGridPosition(gridPosition);
