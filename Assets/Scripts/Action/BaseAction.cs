@@ -13,7 +13,7 @@ public abstract class BaseAction : MonoBehaviour
     protected bool isActive;
     protected Action onActionComplete;
     protected string actionName;
- 
+
     //virtual 可重写
     protected virtual void Awake()
     {

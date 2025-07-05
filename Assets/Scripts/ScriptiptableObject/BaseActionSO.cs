@@ -20,9 +20,22 @@ public enum ActionTags
 // Flags扩展方法更简洁
 //bool = actionTags.HasFlag(ActionTags.Move);
 
-public abstract class BaseActionSO : ScriptableObject
+public enum ActionType
 {
-    public abstract System.Type ActionType { get; }
-    [SerializeField] public Sprite baseActionIcon;
-    [SerializeField] public ActionTags actionTags;
+    AttackMagicAction,
+    GrenadeAction,
+    InteractAction,
+    LandMineAction,
+    MoveAction,
+    ShootAction,
+    SpinAction,
+    SwordAction
+}
+
+[CreateAssetMenu(menuName = "BaseActionSO")]
+public class BaseActionSO : ScriptableObject
+{
+    public Sprite baseActionIcon;
+    public ActionType actionType;
+    public ActionTags actionTags;
 }

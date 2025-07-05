@@ -10,7 +10,7 @@ public class AtkUpBuff : BaseBuff
 
     public override int ModifyAttack(int atk)
     {
-        return atk + 10;
+        return atk + atkBonus;
     }
 
     public override void OnTurnEnd()

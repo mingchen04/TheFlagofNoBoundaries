@@ -1,8 +1,28 @@
 using System;
 using System.Collections.Generic;
 
+using UnityEngine;
+
 public class AttackMagicAction : BaseAction
 {
+    private int maxMagicDistance = 3; // 假设攻击魔法的最大距离为3
+    private const float MagicTimeMax = 0.2f;//魔法发动时间
+    private float MagicTime = 0;
+
+    private void Update()
+    {
+        if (!isActive) return;
+
+        if (MagicTime > 0)
+        {
+            MagicTime -= Time.deltaTime;
+        }
+        else
+        {
+            ActionComplete();
+        }
+    }
+
     public override string GetActionName()
     {
         return "攻击魔法";
@@ -19,11 +39,29 @@ public class AttackMagicAction : BaseAction
 
     public override List<GridPosition> GetValidActionGridPositionList()
     {
-        throw new NotImplementedException();
+        List<GridPosition> validActionGridPositionList = new();
+        GridPosition unitGridPosition = unit.GetGridPosition();
+
+        foreach (GridPosition testGridPosition in LevelGrid.Instance.GenerateHexArea(unitGridPosition, maxMagicDistance))
+        {
+
+            if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition))
+            {
+                //网格位置不合法跳过
+                continue;
+            }
+
+            validActionGridPositionList.Add(testGridPosition);
+        }
+
+        return validActionGridPositionList;
     }
 
     public override void TakeAction(List<GridPosition> gridPositions, Action onActionComplete)
     {
-        throw new NotImplementedException();
+        Debug.Log("执行攻击魔法行动");
+        unit.AddBuff(new AtkUpBuff(unit, 30, 3));
+        MagicTime = MagicTimeMax;
+        ActionStart(onActionComplete);
     }
 }

@@ -31,7 +31,7 @@ public class ScriptiptableSOManager : MonoBehaviour
     {
         foreach (BaseActionSO baseActionSO in baseActionListSO)
         {
-            if (baseActionSO.ActionType == baseAction.GetType())
+            if (baseActionSO.actionType.ToString() == baseAction.GetType().ToString())
             {
                 return baseActionSO;
             }

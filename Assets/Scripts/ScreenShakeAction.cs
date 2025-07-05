@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class ScreenShakeAction : MonoBehaviour
 {
-
     private void Start()
     {
         ShootAction.OnAnyShoot += ShootAction_OnAnyShoot;

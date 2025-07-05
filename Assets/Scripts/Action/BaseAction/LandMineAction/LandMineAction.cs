@@ -37,7 +37,7 @@ public class LandMineAction : BaseAction
         return new EnemyAIAction
         {
             gridPosition = gridPosition,
-            actionValue = 10 // 假设地雷的行动值为10
+            actionValue = 0 // 假设地雷的行动值为10
         };
     }
 
