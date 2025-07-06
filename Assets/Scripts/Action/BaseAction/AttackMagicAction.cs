@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-
 using UnityEngine;
 
 public class AttackMagicAction : BaseAction
@@ -59,9 +58,12 @@ public class AttackMagicAction : BaseAction
 
     public override void TakeAction(List<GridPosition> gridPositions, Action onActionComplete)
     {
-        Debug.Log("执行攻击魔法行动");
-        unit.AddBuff(new AtkUpBuff(unit, 30, 3));
-        MagicTime = MagicTimeMax;
+        Unit targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPositions[0]);
+        if (targetUnit == null) return;
         ActionStart(onActionComplete);
+        unit.TrySpendActionPointsToTakeAction(GetActionPointsCost());
+        targetUnit.AddBuff(new AtkUpBuff(targetUnit, 20, 3));
+        MagicTime = MagicTimeMax;
+        
     }
 }

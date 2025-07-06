@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using static System.Collections.Specialized.BitVector32;
 
 public class UnitWorldUI : MonoBehaviour
 {
@@ -8,6 +9,8 @@ public class UnitWorldUI : MonoBehaviour
     [SerializeField] private Image strengthBarImage;
     [SerializeField] private HealthSystem healthSystem;
     [SerializeField] private SrengthSystem strengthSystem;
+    [SerializeField] private Transform buffPref; // Buff的UI预制体
+    [SerializeField] private Transform buffListTransform; // 用于显示Buff的UI列表
 
     private float healthAnimFrom;
     private float healthAnimTo;
@@ -21,10 +24,14 @@ public class UnitWorldUI : MonoBehaviour
 
     private void Start()
     {
+        BuffListUpdateVisual();
+
         if (strengthSystem != null)
             strengthSystem.OnActionPointsChanged += StrengthSystem_OnActionPointsChanged;
         if (healthSystem != null)
             healthSystem.OnDamage += HealthSystem_OnDamage;
+
+        unit.OnBuffListChange += Unit_OnBuffListChange;
 
         // 初始化填充值
         float healthNorm = healthSystem != null ? healthSystem.GetHealthNormalized() : 1f;
@@ -36,6 +43,11 @@ public class UnitWorldUI : MonoBehaviour
         healthAnimFrom = healthAnimTo = healthNorm;
         strengthAnimFrom = strengthAnimTo = strengthNorm;
         healthAnimTimer = strengthAnimTimer = animationTimeMax;
+    }
+
+    private void Unit_OnBuffListChange(object sender, System.EventArgs e)
+    {
+        BuffListUpdateVisual();
     }
 
     private void OnDestroy()
@@ -89,5 +101,19 @@ public class UnitWorldUI : MonoBehaviour
         strengthAnimFrom = strengthBarImage.fillAmount;
         strengthAnimTo = strengthSystem.GetStrengthPointsNormalized();
         strengthAnimTimer = 0f;
+    }
+
+    private void BuffListUpdateVisual()
+    {
+        foreach (Transform buff in buffListTransform)
+        {
+            Destroy(buff.gameObject);
+        }
+
+        foreach (BaseBuff buff in unit.GetBuffList())
+        {
+            Transform buffUI = Instantiate(buffPref, buffListTransform);
+            buffUI.GetComponent<BuffUI>().SetIcon(ScriptiptableSOManager.Instance.GetBuffSO(buff).buffIcon);
+        }
     }
 }

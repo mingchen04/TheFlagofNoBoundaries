@@ -14,12 +14,12 @@ public class GridObject
         unitList = new List<Unit>();
     }
 
-    public void addUnit(Unit unit)
+    public void AddUnit(Unit unit)
     {
         unitList.Add(unit);
     }
 
-    public List<Unit> getUnitList()
+    public List<Unit> GetUnitList()
     {
         return unitList;
     }

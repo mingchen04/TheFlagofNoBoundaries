@@ -50,13 +50,13 @@ public abstract class BaseAction : MonoBehaviour
     {
         //关闭预测
         unit.SetForecast(false);
+        this.onActionComplete = onActionComplete;
         if (!unit.CanspendActionPointsToTakeAction(GetActionPointsCost()))
         {
+            ActionComplete();
             return;
         }
-
         isActive = true;
-        this.onActionComplete = onActionComplete;
         OnAnyActionStarted?.Invoke(this, EventArgs.Empty);
     }
 

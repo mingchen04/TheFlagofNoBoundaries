@@ -29,19 +29,13 @@ public class LandMine : MonoBehaviour
         LevelGrid.Instance.OnAnyUnitMoveGridPosition -= LevelGrid_OnAnyUnitMoveGridPosition;
         List<GridPosition> gridPositions = LevelGrid.Instance.GenerateHexArea(gridPosition, explodedDistance); // 生成爆炸范围
         Instantiate(grenadeExplodeVfxPrfefab, transform.position, Quaternion.identity); // 生成爆炸特效
-        Unit unit;
 
-        foreach (GridPosition currentGridPosition in gridPositions)
+        LevelGrid.Instance.DamageUnitForGridPosition(gridPositions, 90 , out List<Unit> units);
+        foreach (Unit targetUnit in units)
         {
-            if (!LevelGrid.Instance.IsValidGridPosition(currentGridPosition)) return; // 确保传入的网格位置是有效的
-            unit = LevelGrid.Instance.GetUnitAtGridPosition(currentGridPosition);
-            
-            if (unit != null)
-            {
-                unit.Damage(90); // 对单位造成伤害
-                unit.GetActionQueue().ActionQueueStop(); // 停止单位的行动队列
-            }
+            targetUnit.GetActionQueue().ActionQueueStop(); // 停止单位的行动队列
         }
+
         Destroy(gameObject); // 销毁地雷对象
     }
 

@@ -12,9 +12,4 @@ public class AtkUpBuff : BaseBuff
     {
         return atk + atkBonus;
     }
-
-    public override void OnTurnEnd()
-    {
-        base.OnTurnEnd();
-    }
 }

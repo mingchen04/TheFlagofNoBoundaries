@@ -55,7 +55,6 @@ public class InteractAction : BaseAction
     }
 
     public override void TakeAction(List<GridPosition> gridPositions, Action actionCompleted)
-
     {
         IInteractable interactable = LevelGrid.Instance.GetInteractableAtGridPosition(gridPositions[0]);
         if (interactable == null)
@@ -68,7 +67,7 @@ public class InteractAction : BaseAction
         interactable.Interact(OnInteractComplete);
     }
 
-    public int GetMaxSwordDistance()
+    public int GetMaxInteractDistance()
     {
         return maxInteractDistance;
     }

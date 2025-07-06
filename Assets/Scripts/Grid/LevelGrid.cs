@@ -38,12 +38,12 @@ public class LevelGrid : MonoBehaviour
 
     public void AddUnitAtGridPosition(GridPosition gridPosition, Unit unit)
     {
-        gridSystem.GetGridObject(gridPosition).addUnit(unit);
+        gridSystem.GetGridObject(gridPosition).AddUnit(unit);
     }
 
     public List<Unit> GetUnitListAtGridPosition(GridPosition gridPosition)
     {
-        return gridSystem.GetGridObject(gridPosition).getUnitList();
+        return gridSystem.GetGridObject(gridPosition).GetUnitList();
     }
 
     public void ClearUnitAtGridPosition(GridPosition gridPosition, Unit unit)
@@ -134,21 +134,29 @@ public class LevelGrid : MonoBehaviour
         return results;
     }
 
-    public void DamageUnitForGridPosition(List<GridPosition> gridPositions, int damageInt)
+    public void DamageUnitForGridPosition(List<GridPosition> gridPositions, int damageInt, out List<Unit> units)
     {
+        units = new List<Unit>();
         foreach (GridPosition gridPosition in gridPositions)
         {
-            DamageUnitForGridPosition(gridPosition, damageInt);
+            DamageUnitForGridPosition(gridPosition, damageInt, out Unit unit);
+            if (unit != null) units.Add(unit);
         }
+    }
+
+    public void DamageUnitForGridPosition(GridPosition gridPosition, int damageInt, out Unit unit)
+    {
+        unit = GetUnitAtGridPosition(gridPosition);
+        if (!IsValidGridPosition(gridPosition)) return; //网格位置不合法
+        if (unit == null) return; //没有单位在这个网格位置上
+
+        unit.Damage(damageInt);
+
     }
 
     public void DamageUnitForGridPosition(GridPosition gridPosition, int damageInt)
     {
-        Unit unit = GetUnitAtGridPosition(gridPosition);
-        if (unit != null)
-        {
-            unit.Damage(damageInt);
-        }
+        DamageUnitForGridPosition(gridPosition, damageInt, out Unit unit);
     }
 
 }

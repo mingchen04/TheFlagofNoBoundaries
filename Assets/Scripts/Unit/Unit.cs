@@ -8,6 +8,8 @@ public class Unit : MonoBehaviour
     public static event EventHandler OnAnyUnitDead;
     //单位移动
     public static event EventHandler OnAnyUnitPositionChanged;
+    public event EventHandler OnBuffListChange; //行动点数变化
+
 
     [SerializeField] private bool isEnemy; //是否为敌人
     private int unitPriority; // 单位执行优先级
@@ -303,12 +305,13 @@ public class Unit : MonoBehaviour
     }
 
     /// <summary>
-    /// 重新设置预测点数，常用于行动出现意外而停止，直接等于实际行动点数
+    /// 重新设置unit参数，常用于行动出现意外而停止，直接等于实际行动点数
     /// </summary>
-    public void SetForecastActionPoints()
+    public void ReSetUnitParam()
     {
         srengthSystem.SetForecastActionPoints();
-        GridPosition newGridPosition = LevelGrid.Instance.GetGridPosition(transform.position);
+        GridPosition newGridPosition = transform.position; // 转化网格位置归整
+        transform.position = newGridPosition;
         SetUnitGridPosition(newGridPosition);
     }
 
@@ -325,13 +328,14 @@ public class Unit : MonoBehaviour
     public void AddBuff(BaseBuff baseBuff)
     {
         buffList.Add(baseBuff);
+        OnBuffListChange?.Invoke(this, EventArgs.Empty);
     }
 
     // 计算最终属性（可被Buff修饰）
     public int GetAttack()
     {
         int value = baseAttack;
-        foreach (var buff in buffList)
+        foreach (BaseBuff buff in buffList)
         {
             value = buff.ModifyAttack(value);
         }
@@ -341,7 +345,7 @@ public class Unit : MonoBehaviour
     public int GetDefense()
     {
         int value = baseDefense;
-        foreach (var buff in buffList)
+        foreach (BaseBuff buff in buffList)
         {
             value = buff.ModifyDefense(value);
         }
@@ -351,10 +355,15 @@ public class Unit : MonoBehaviour
     public int GetVisionRange()
     {
         int value = baseVisionRange;
-        foreach (var buff in buffList)
+        foreach (BaseBuff buff in buffList)
         {
             value = buff.ModifyVisionRange(value);
         }
         return value;
+    }
+
+    public List<BaseBuff> GetBuffList()
+    {
+        return buffList;
     }
 }

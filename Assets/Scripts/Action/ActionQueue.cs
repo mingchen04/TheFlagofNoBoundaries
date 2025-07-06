@@ -200,7 +200,7 @@ public class ActionQueue : MonoBehaviour
         if (pendingActions.Count == 0) return; // 如果没有待执行的行动则不执行
         pendingActions.Last().baseAction.ActionStop(); // 停止最后一个行动
         pendingActions.Clear(); //取消所有队列的动作
-        unit.SetForecastActionPoints();
+        unit.ReSetUnitParam();
     }
 
 }

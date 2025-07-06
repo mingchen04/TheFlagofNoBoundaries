@@ -5,6 +5,7 @@ public class ScriptiptableSOManager : MonoBehaviour
 {
     public static ScriptiptableSOManager Instance { get; private set; }
     [SerializeField] private List<BaseActionSO> baseActionListSO;
+    [SerializeField] private List<BaseBuffSO> baseBuffSOs;
 
     private void Awake()
     {
@@ -34,6 +35,19 @@ public class ScriptiptableSOManager : MonoBehaviour
             if (baseActionSO.actionType.ToString() == baseAction.GetType().ToString())
             {
                 return baseActionSO;
+            }
+        }
+        return null;
+    }
+
+    public BaseBuffSO GetBuffSO(BaseBuff baseBuff)
+    {
+        foreach (BaseBuffSO baseBuffSO in baseBuffSOs)
+        {
+            Debug.Log($"Checking BaseBuffSO: {baseBuffSO.bufftype} against BaseBuff: {baseBuff.GetType()}");
+            if (baseBuffSO.bufftype.ToString() == baseBuff.GetType().ToString())
+            {
+                return baseBuffSO;
             }
         }
         return null;
