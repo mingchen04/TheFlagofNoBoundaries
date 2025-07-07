@@ -1,9 +1,10 @@
+using System;
 using System.Collections.Generic;
 
 /// <summary>
 /// 操作参数 - 封装行动执行所需的所有参数
 /// </summary>
-[System.Serializable]
+[Serializable]
 public class BaseActionParameter
 {
     /// <summary>

@@ -227,6 +227,7 @@ public class UnitActionSystem : MonoBehaviour
 
         isExecutingGlobalActions = false;
         ClearBusy();
+        ClearSelectedUnits(false);
     }
 
     private void ExecuteActionsAtOrder(int order, Action onComplete)

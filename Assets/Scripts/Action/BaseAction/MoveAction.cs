@@ -10,10 +10,12 @@ public class MoveAction : BaseAction
 
     private List<Vector3> movePathWorldPositions;
     private int currentPathIndex;
+    private LineRenderer lineRenderer; //路径线
 
     protected override void Awake()
     {
         base.Awake();
+        LineRendererAwake();
     }
 
     public void Update()
@@ -54,7 +56,7 @@ public class MoveAction : BaseAction
     {
         unit.SetForecast(false);
         currentPathIndex = 0;
-        var path = BuildMovePathFromTargets(gridPositions);
+        List<GridPosition> path = BuildMovePathFromTargets(gridPositions);
         movePathWorldPositions = path.Select(pos => (Vector3)pos).ToList();
 
         ActionStart(actionCompleted);
@@ -120,14 +122,14 @@ public class MoveAction : BaseAction
     /// </summary>
     private List<GridPosition> BuildMovePathFromTargets(List<GridPosition> targetPositions)
     {
-        List<GridPosition> path = new List<GridPosition>();
+        List<GridPosition> path = new();
         if (targetPositions == null || targetPositions.Count < 2) return path;
 
         for (int i = 1; i < targetPositions.Count; i++)
         {
             GridPosition start = targetPositions[i - 1];
             GridPosition end = targetPositions[i];
-            var segment = Pathfinding.Instance.FindPath(start, end, out int _);
+            List<GridPosition> segment = Pathfinding.Instance.FindPath(start, end, out int _);
             if (segment.Count > 1)
             {
                 path.AddRange(segment.Skip(1)); // 跳过起点
@@ -178,7 +180,6 @@ public class MoveAction : BaseAction
             if (actions.Count > 0)
             {
                 BaseActionParameter lastParam = unit.GetActionQueue().CopyLastActionParameter();
-
                 List<GridPosition> path = BuildMovePathFromTargets(lastParam.targetPositionList);
                 alreadyPlannedSteps = path.Count;
             }
@@ -191,4 +192,39 @@ public class MoveAction : BaseAction
         return maxSteps > 0 ? maxSteps - 1 : 0;
     }
 
+
+    private void LineRendererAwake(){
+        // 初始化LineRenderer
+        lineRenderer = gameObject.AddComponent<LineRenderer>();
+        lineRenderer.positionCount = 0;
+        lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+        lineRenderer.widthMultiplier = 0.15f;
+        lineRenderer.startColor = Color.cyan;
+        lineRenderer.endColor = Color.cyan;
+        lineRenderer.enabled = false;
+    }
+
+    /// <summary>
+    /// 显示路径线
+    /// </summary>
+    public void ShowPathLine(List<GridPosition> path)
+    {
+        if (path == null || path.Count < 2)
+        {
+            lineRenderer.enabled = false;
+            return;
+        }
+        List<Vector3> worldPositions = path.Select(p => LevelGrid.Instance.GetWorldPosition(p)).ToList();
+        lineRenderer.positionCount = worldPositions.Count;
+        lineRenderer.SetPositions(worldPositions.ToArray());
+        lineRenderer.enabled = true;
+    }
+
+    /// <summary>
+    /// 隐藏路径线
+    /// </summary>
+    public void HidePathLine()
+    {
+        lineRenderer.enabled = false;
+    }
 }
