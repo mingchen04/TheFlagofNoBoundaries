@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Unit : MonoBehaviour
@@ -29,9 +30,11 @@ public class Unit : MonoBehaviour
     private bool isForecast; // 是否为预测模式
     private bool isBusy; // 是否忙碌
     private bool isDeployAction; //是否部署行动
-    
+    private LineRenderer lineRenderer; //线条渲染器，用于显示路径
+
     private void Awake()
     {
+        LineRendererAwake();
         isForecast = true;
         buffList = new List<BaseBuff>();
         actionQueue = GetComponent<ActionQueue>();
@@ -207,7 +210,7 @@ public class Unit : MonoBehaviour
 
         ActionTags actionTags = ScriptiptableSOManager.Instance.GetActionTags(action);
         bool isMove = actionTags.HasFlag(ActionTags.Move);
-        bool isDeploy = actionTags.HasFlag(ActionTags.Deploy); //是否为部署行动
+        bool isDeploy = actionTags.HasFlag(ActionTags.Deploy);
 
         BaseActionParameter actionParam;
         GridPosition finalPos;
@@ -220,42 +223,62 @@ public class Unit : MonoBehaviour
         }
         else
         {
-            finalPos = GetGridPosition(); //非移动行动最终位置为当前网格位置
+            finalPos = GetGridPosition();
             targetPositionList = new List<GridPosition> { targetPos };
         }
 
         if (isDeployAction)
         {
             // 复制上一次参数
-            BaseActionParameter lastParam = GetActionQueue().CopyLastActionParameter();
+            BaseActionParameter lastParam = GetActionQueue().CopyLastMoveActionParameter();
             actionParam = lastParam;
-            if (actionParam.targetPositionList.Count == 0 && isMove)
-            {
-                actionParam.targetPositionList = targetPositionList;
-            }
-
             actionParam.targetPositionList.Add(targetPos);
             actionParam.unitFinalPosition = finalPos;
 
-            actionQueue.UpdateBaseActionParameter(actionParam);
+            if (actionParam is MoveActionParameter moveActionParameter)
+            {
+                actionQueue.UpdateBaseActionParameter(moveActionParameter);
+            }
+            else actionQueue.UpdateBaseActionParameter(actionParam);
+
             Debug.Log($"{gameObject.name} 更新行动: {action.GetActionName()} (顺序:{executionOrder}, 目标:{targetPos}, 终位:{finalPos})");
         }
         else
         {
-            actionParam = new BaseActionParameter(
-                action,
-                targetPositionList,
-                finalPos,
-                executionOrder
-            );
+            // 根据标签或类型实例化不同参数
+            if (isMove && action is MoveAction moveAction)
+            {
+                actionParam = new MoveActionParameter(
+                    moveAction,
+                    targetPositionList,
+                    finalPos,
+                    executionOrder
+                );                
+            }
+            else
+            {
+                actionParam = new BaseActionParameter(
+                    action,
+                    targetPositionList,
+                    finalPos,
+                    executionOrder
+                );
+            }
 
             if (!TrySpendActionPointsToTakeAction(action, actionParam)) return;
             actionQueue.AddAction(actionParam);
             Debug.Log($"{gameObject.name}  添加行动: {action.GetActionName()} (顺序:{executionOrder}, 目标:{targetPos}, 终位:{finalPos})");
             if (isDeploy) SetDeselectAction(true);
         }
-        
-        if (isMove) OnAnyUnitPositionChanged?.Invoke(this, EventArgs.Empty);
+
+        if (isMove)
+        {
+            MoveActionParameter moveActionParameter = (actionParam as MoveActionParameter);
+            (moveActionParameter.baseAction as MoveAction).UpdatePath();
+            ShowPathLine();
+            OnAnyUnitPositionChanged?.Invoke(this, EventArgs.Empty);
+        }
+
     }
 
     /// <summary>
@@ -365,5 +388,39 @@ public class Unit : MonoBehaviour
     public List<BaseBuff> GetBuffList()
     {
         return buffList;
+    }
+
+    /// <summary>
+    /// 显示路径线
+    /// </summary>
+    public void ShowPathLine()
+    {
+        List<GridPosition> path = actionQueue.GetAllPath();
+        if (path == null || path.Count < 2)
+        {
+            lineRenderer.enabled = false;
+            return;
+        }
+        List<Vector3> worldPositions = path.Select(p => LevelGrid.Instance.GetWorldPosition(p)).ToList();
+        lineRenderer.positionCount = worldPositions.Count;
+        lineRenderer.SetPositions(worldPositions.ToArray());
+        lineRenderer.enabled = true;
+    }
+
+    private void LineRendererAwake()
+    {
+        // 初始化LineRenderer
+        lineRenderer = gameObject.AddComponent<LineRenderer>();
+        lineRenderer.positionCount = 0;
+        lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+        lineRenderer.widthMultiplier = 0.15f;
+        lineRenderer.startColor = Color.cyan;
+        lineRenderer.endColor = Color.cyan;
+        lineRenderer.enabled = false;
+    }
+
+    private void HideLineRenderer()
+    {
+        lineRenderer.enabled = false; //隐藏线条渲染器
     }
 }

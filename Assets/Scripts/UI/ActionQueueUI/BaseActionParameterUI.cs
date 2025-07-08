@@ -12,6 +12,7 @@ public class BaseActionParameterUI : MonoBehaviour
     [SerializeField] private Button orderForwardButton; //顺序向前调整
     [SerializeField] private Button orderBackButton; //顺序向后调整
 
+    private Action updateVisual;
 
     /// <summary>
     /// 设置UI基本参数
@@ -21,22 +22,26 @@ public class BaseActionParameterUI : MonoBehaviour
     /// <param name="actionQueue"> 行为队列</param>
     /// <param name="actionIndex">行动位置</param>
     /// <param name="executeTurn">行动执行回合</param>
-    public void SetUp(Sprite ActionSprite, Action cancelAction, int executeTurn, int actionIndex, ActionQueue actionQueue)
+    /// <param name="updateVisual">父组件更新视图</param>
+    public void SetUp(Sprite ActionSprite, Action cancelAction, int executeTurn, int actionIndex, ActionQueue actionQueue,Action updateVisual)
     {
+        this.updateVisual = updateVisual;
         actionIcon.sprite = ActionSprite;
-        cancelButton.onClick.AddListener(() => { cancelAction(); });
+        cancelButton.onClick.AddListener(() => { cancelAction(); updateVisual?.Invoke(); });
         SetExecute(executeTurn, actionQueue, actionIndex);
 
         orderForwardButton.onClick.AddListener(() =>
         {
             executeTurn -= 1; //将当前行动位置向前调整
             SetExecute(executeTurn, actionQueue, actionIndex);
+            updateVisual?.Invoke();
         });
 
         orderBackButton.onClick.AddListener(() =>
         {
             executeTurn += 1; //将当前行动位置向后调整
             SetExecute(executeTurn, actionQueue, actionIndex);
+            updateVisual?.Invoke();
         });
     }
 

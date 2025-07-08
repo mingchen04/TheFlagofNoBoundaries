@@ -23,7 +23,7 @@ public abstract class BaseAction : MonoBehaviour
     /// <returns>动作名称</returns>
     public abstract string GetActionName();
 
-    public abstract void TakeAction(List<GridPosition> gridPositions, Action onActionComplete);
+    public abstract void TakeAction(BaseActionParameter baseActionParameter, Action onActionComplete);
 
     public virtual bool IsValidActionGridPosition(GridPosition gridPosition)
     {
@@ -110,5 +110,10 @@ public abstract class BaseAction : MonoBehaviour
     public virtual void ActionStop()
     {
         ActionComplete();
+    }
+
+    public ActionTags GetActionTags()
+    {
+        return ScriptiptableSOManager.Instance.GetActionTags(this);
     }
 }

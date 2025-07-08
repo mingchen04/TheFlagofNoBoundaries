@@ -56,8 +56,9 @@ public class AttackMagicAction : BaseAction
         return validActionGridPositionList;
     }
 
-    public override void TakeAction(List<GridPosition> gridPositions, Action onActionComplete)
+    public override void TakeAction(BaseActionParameter baseActionParameter, Action onActionComplete)
     {
+        List<GridPosition> gridPositions = baseActionParameter.targetPositionList;
         Unit targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPositions[0]);
         if (targetUnit == null) return;
         ActionStart(onActionComplete);

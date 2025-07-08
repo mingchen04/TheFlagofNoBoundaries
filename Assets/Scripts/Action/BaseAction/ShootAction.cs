@@ -152,8 +152,9 @@ public class ShootAction : BaseAction
         return validActionGridPositionList;
     }
 
-    public override void TakeAction(List<GridPosition> gridPositions, Action actionCompleted)
+    public override void TakeAction(BaseActionParameter baseActionParameter, Action onActionComplete)
     {
+        List<GridPosition> gridPositions = baseActionParameter.targetPositionList;
         targetUnitPosition = gridPositions[0];
 
         state = State.Aiming;
@@ -161,7 +162,7 @@ public class ShootAction : BaseAction
         stateTimer = aimingStateTime;
         canShootBullet = true;
 
-        ActionStart(actionCompleted);
+        ActionStart(onActionComplete);
         unit.TrySpendActionPointsToTakeAction(this);
     }
 

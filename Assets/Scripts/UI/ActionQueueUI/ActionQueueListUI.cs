@@ -43,7 +43,7 @@ public class ActionQueueListUI : MonoBehaviour
                 //如果当前动作的执行回合数大于当前索引，则需要在队列中添加占位符
                 int executeTurnDifference = index > 0 ?
                     (baseActionParameter.executeTurn - lastBaseActionParameter.executeTurn - 1) //计算当前动作与上一个动作之间的占位符数量
-                    : 
+                    :
                     (baseActionParameter.executeTurn - index);
 
                 for (int placeholderIndex = 0; placeholderIndex < executeTurnDifference; placeholderIndex++)
@@ -60,14 +60,11 @@ public class ActionQueueListUI : MonoBehaviour
             baseActionUI.SetUp
                 (
                     baseActionIcon,
-                    () =>
-                    {
-                        unit.CancelAction(currentIndex, baseActionParameter.baseAction);
-                        UpdateVisual();
-                    },
+                    () => { unit.CancelAction(currentIndex, baseActionParameter.baseAction); },
                     baseActionParameter.executeTurn,
                     index,
-                    selectedUnitActionQueue
+                    selectedUnitActionQueue,
+                    UpdateVisual
                 );
         }
 

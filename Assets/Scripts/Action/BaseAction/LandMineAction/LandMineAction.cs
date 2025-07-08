@@ -69,8 +69,9 @@ public class LandMineAction : BaseAction
         return validActionGridPositionList;
     }
 
-    public override void TakeAction(List<GridPosition> gridPositions, Action onActionComplete)
+    public override void TakeAction(BaseActionParameter baseActionParameter, Action onActionComplete)
     {
+        List<GridPosition> gridPositions =baseActionParameter.targetPositionList;
         ActionStart(onActionComplete);
         unit.TrySpendActionPointsToTakeAction(this);
         landMineTime = landMineTimeMax;

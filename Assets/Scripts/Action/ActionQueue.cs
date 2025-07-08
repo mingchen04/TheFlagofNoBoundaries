@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 /// <summary>
@@ -12,6 +13,8 @@ public class ActionQueue : MonoBehaviour
     public static event EventHandler OnAnyActionCompleted; //行为结束触发视图更新
     private List<BaseActionParameter> pendingActions; //行为队列
     private Unit unit; //当前单位
+
+
     private void Awake()
     {
         unit = GetComponent<Unit>();
@@ -111,7 +114,7 @@ public class ActionQueue : MonoBehaviour
         int completedCount = 0;
         foreach (BaseActionParameter action in actions)
         {
-            action.baseAction.TakeAction(action.targetPositionList, () =>
+            action.baseAction.TakeAction(action, () =>
             {
                 completedCount++;
                 if (completedCount >= actions.Count)
@@ -179,6 +182,21 @@ public class ActionQueue : MonoBehaviour
         return copyBaseActionParameter;
     }
 
+    public MoveActionParameter CopyLastMoveActionParameter()
+    {
+        BaseActionParameter last = pendingActions.Last();
+        // 深拷贝 targetPositionList，避免引用同一个列表
+        List<GridPosition> newTargetList = new List<GridPosition>(last.targetPositionList);
+
+        MoveActionParameter copyMoveActionParameter = new MoveActionParameter(
+            (MoveAction)last.baseAction,
+            newTargetList,
+            last.unitFinalPosition,
+            last.executeTurn
+        );
+        return copyMoveActionParameter;
+    }
+
     /// <summary>
     /// 检查最后一个动作的参数是否包含指定目标位置
     /// </summary>
@@ -203,4 +221,15 @@ public class ActionQueue : MonoBehaviour
         unit.ReSetUnitParam();
     }
 
+    public List<GridPosition> GetAllPath()
+    {
+        List<GridPosition> allPaths = new List<GridPosition>();
+
+        foreach (MoveActionParameter moveActionParameter in pendingActions)
+        {
+            allPaths.AddRange(moveActionParameter.GetMovePathForGridPosition());
+        }
+
+        return allPaths;
+    }
 }

@@ -54,7 +54,7 @@ public class SwordAction : BaseAction
                 state = State.SwingingSwordAfterHit;
                 float afterHitStateTime = 0.8f;
                 stateTimer = afterHitStateTime;
-                LevelGrid.Instance.DamageUnitForGridPosition(targetUnitPosition , unit.GetAttack());
+                LevelGrid.Instance.DamageUnitForGridPosition(targetUnitPosition, unit.GetAttack());
                 OnAnySwordHit?.Invoke(this, EventArgs.Empty);
                 break;
             case State.SwingingSwordAfterHit:
@@ -108,10 +108,11 @@ public class SwordAction : BaseAction
         return validActionGridPositionList;
     }
 
-    public override void TakeAction(List<GridPosition> gridPositions, Action actionCompleted)
+    public override void TakeAction(BaseActionParameter baseActionParameter, Action onActionComplete)
     {
+        List<GridPosition> gridPositions = baseActionParameter.targetPositionList;
         targetUnitPosition = gridPositions[0];
-        ActionStart(actionCompleted);
+        ActionStart(onActionComplete);
         unit.TrySpendActionPointsToTakeAction(this);
         float swordBeforeHitTime = 0.7f;
         stateTimer = swordBeforeHitTime;
