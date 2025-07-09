@@ -124,7 +124,6 @@ public class MoveAction : BaseAction
     {
         List<GridPosition> path = new();
         if (targetPositions == null || targetPositions.Count < 2) return path;
-
         for (int i = 1; i < targetPositions.Count; i++)
         {
             GridPosition start = targetPositions[i - 1];
@@ -133,7 +132,7 @@ public class MoveAction : BaseAction
             if (segment.Count > 1)
             {
                 path.AddRange(segment.Skip(1)); // 跳过起点
-            }
+            }            
         }
         return path;
     }
@@ -179,7 +178,9 @@ public class MoveAction : BaseAction
             if (actions.Count > 0)
             {
                 MoveActionParameter lastParam = unit.GetActionQueue().CopyLastMoveActionParameter();
+
                 List<GridPosition> path = lastParam.GetMovePathForGridPosition();
+                string debugPath = string.Join(", ", path.Select(p => p.ToString()));
                 alreadyPlannedSteps = path.Count;
             }
         }
@@ -194,7 +195,8 @@ public class MoveAction : BaseAction
 
     public void UpdatePath()
     {
-        MoveActionParameter lastParam = unit.GetActionQueue().GetActions()[^1] as MoveActionParameter;
+        MoveActionParameter lastParam = unit.GetActionQueue().CopyLastMoveActionParameter();
         lastParam.SetMovePath(movePathWorldPositions.Select(worldPosition => (GridPosition)worldPosition).ToList());
+        unit.GetActionQueue().UpdateBaseActionParameter(lastParam);
     }
 }

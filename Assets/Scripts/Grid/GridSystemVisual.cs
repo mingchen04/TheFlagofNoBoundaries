@@ -60,9 +60,15 @@ public class GridSystemVisual : MonoBehaviour
         }
 
         UnitActionSystem.Instance.OnSelectActionChanged += UnitActionSystem_OnSelectActionChanged;
+        UnitActionSystem.Instance.OnDeselectActionChanged += UnitActionSystem_OnDeselectActionChanged;
         LevelGrid.Instance.OnAnyUnitMoveGridPosition += LevelGrid_OnAnyUnitMoveGridPosition;
         BaseAction.OnAnyActionCompleted += BaseAction_OnAnyActionCompleted;
         Unit.OnAnyUnitPositionChanged += Unit_OnMoveActionUnitPositionChange;
+        UpdateGridVisual();
+    }
+
+    private void UnitActionSystem_OnDeselectActionChanged(object sender, bool e)
+    {
         UpdateGridVisual();
     }
 
@@ -171,7 +177,7 @@ public class GridSystemVisual : MonoBehaviour
                 ShowGridPositionRangeSquare(selectedUnit.GetGridPosition(), interactAction.GetMaxInteractDistance(), GridVisualType.RedSoft);
                 break;
         }
-
+        if(selectedAction == null) return;
         ShowGridPositionList(selectedAction.GetValidActionGridPositionList(), gridVisualType);
     }
 

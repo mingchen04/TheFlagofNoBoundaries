@@ -144,7 +144,7 @@ public class ActionQueue : MonoBehaviour
     {
         return pendingActions.Count > 0
             ? pendingActions.Last().executeTurn
-            : -1;
+            : 0;
     }
 
     public void UpdateBaseActionParameter(BaseActionParameter baseActionParameter)
@@ -159,9 +159,18 @@ public class ActionQueue : MonoBehaviour
         }
 
         unit.TrySpendActionPointsToTakeAction(actPoint);
-        pendingActions[^1] = baseActionParameter; //更新当前动作的参数
+        if(baseActionParameter is MoveActionParameter moveActionParameter)
+        {
+            pendingActions[^1] = moveActionParameter;
+        }
+        else
+        {
+            pendingActions[^1] = baseActionParameter; //更新当前动作的参数
+        }
+            
         OnAnyActionAddQueue?.Invoke(this, EventArgs.Empty);
     }
+
 
     /// <summary>
     /// 拷贝最后一个动作的参数
@@ -184,16 +193,18 @@ public class ActionQueue : MonoBehaviour
 
     public MoveActionParameter CopyLastMoveActionParameter()
     {
-        BaseActionParameter last = pendingActions.Last();
+        MoveActionParameter last = pendingActions[^1] as MoveActionParameter;
         // 深拷贝 targetPositionList，避免引用同一个列表
         List<GridPosition> newTargetList = new List<GridPosition>(last.targetPositionList);
 
-        MoveActionParameter copyMoveActionParameter = new MoveActionParameter(
+        MoveActionParameter copyMoveActionParameter = new(
             (MoveAction)last.baseAction,
             newTargetList,
             last.unitFinalPosition,
             last.executeTurn
         );
+        copyMoveActionParameter.SetMovePath(last.GetMovePathForGridPosition()); //拷贝移动路径
+
         return copyMoveActionParameter;
     }
 
@@ -225,9 +236,12 @@ public class ActionQueue : MonoBehaviour
     {
         List<GridPosition> allPaths = new List<GridPosition>();
 
-        foreach (MoveActionParameter moveActionParameter in pendingActions)
+        foreach (BaseActionParameter baseActionParameter in pendingActions)
         {
-            allPaths.AddRange(moveActionParameter.GetMovePathForGridPosition());
+            if(baseActionParameter is MoveActionParameter moveActionParameter)
+            {
+                allPaths.AddRange(moveActionParameter.GetMovePathForGridPosition());
+            }
         }
 
         return allPaths;

@@ -192,6 +192,7 @@ public class Unit : MonoBehaviour
         List<BaseActionParameter> cancelActions = actionQueue.GetCancelActions(actionsIndex, baseAction);
         srengthSystem.CancelActionReturnPosint(cancelActions);
         OnAnyUnitPositionChanged?.Invoke(this, EventArgs.Empty);
+        ShowPathLine();
     }
 
     public void CancelAction(BaseAction cancelActions)
@@ -245,6 +246,7 @@ public class Unit : MonoBehaviour
         }
         else
         {
+            if (isDeploy) SetDeselectAction(true);
             // 根据标签或类型实例化不同参数
             if (isMove && action is MoveAction moveAction)
             {
@@ -253,7 +255,7 @@ public class Unit : MonoBehaviour
                     targetPositionList,
                     finalPos,
                     executionOrder
-                );                
+                );
             }
             else
             {
@@ -268,7 +270,6 @@ public class Unit : MonoBehaviour
             if (!TrySpendActionPointsToTakeAction(action, actionParam)) return;
             actionQueue.AddAction(actionParam);
             Debug.Log($"{gameObject.name}  添加行动: {action.GetActionName()} (顺序:{executionOrder}, 目标:{targetPos}, 终位:{finalPos})");
-            if (isDeploy) SetDeselectAction(true);
         }
 
         if (isMove)
@@ -396,12 +397,18 @@ public class Unit : MonoBehaviour
     public void ShowPathLine()
     {
         List<GridPosition> path = actionQueue.GetAllPath();
-        if (path == null || path.Count < 2)
+        if (path == null)
         {
             lineRenderer.enabled = false;
             return;
         }
         List<Vector3> worldPositions = path.Select(p => LevelGrid.Instance.GetWorldPosition(p)).ToList();
+        worldPositions.Insert(0, transform.position); // 添加当前单位位置到路径开头
+        worldPositions.ForEach(worldPosition =>
+        {
+            worldPosition.y = 0.1f; // 确保线条在地面上方
+        });
+
         lineRenderer.positionCount = worldPositions.Count;
         lineRenderer.SetPositions(worldPositions.ToArray());
         lineRenderer.enabled = true;

@@ -68,27 +68,25 @@ public class UnitActionSystem : MonoBehaviour
 
         foreach (Unit unit in selectedUnits)
         {
-            if (unit.GetDeselectAction()) isDeployAction = true;
-            int actionExecutionOrder = unit.GetActionQueue().EndActionExecuteTurnGet() + 1;
-            if (isDeployAction)
-            {
-                actionExecutionOrder = unit.GetActionQueue().EndActionExecuteTurnGet();
-            }
-            else
-            {
-                actionExecutionOrder = unit.GetActionQueue().EndActionExecuteTurnGet() + 1;
-            }
 
             BaseAction currentUnitAction = unit.GetBaseActionOfType(selectedAction); //获取当前单位的同一类型的行动
+            if (unit.GetDeselectAction()) isDeployAction = true;
+            if (currentUnitAction == null) continue; //如果没有该行动则跳过
+            if (currentUnitAction.GetActionTags().HasFlag(ActionTags.Deploy)) isDeployAction = true;
+
+            int actionExecutionOrder = unit.GetActionQueue().EndActionExecuteTurnGet() + (isDeployAction ? 0 : 1);
 
             if (!currentUnitAction.IsValidActionGridPosition(mouseGridPosition)) continue;
-            if (currentUnitAction == null) continue;            
+            if (currentUnitAction == null) continue;
             unit.HandleOrderedAction(currentUnitAction, mouseGridPosition, actionExecutionOrder);
-            
+
             isAction = true;
         }
 
-        if (isDeployAction) OnDeselectActionChanged?.Invoke(this, isDeployAction);
+        if (isDeployAction)
+        {
+            OnDeselectActionChanged?.Invoke(this, isDeployAction);
+        }
 
         return isAction;
     }
@@ -254,7 +252,7 @@ public class UnitActionSystem : MonoBehaviour
                 {
                     onComplete?.Invoke();// 所有单位完成后触发回调
                 }
-            });            
+            });
         }
     }
 
