@@ -60,11 +60,15 @@ public class AttackMagicAction : BaseAction
     {
         List<GridPosition> gridPositions = baseActionParameter.targetPositionList;
         Unit targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPositions[0]);
-        if (targetUnit == null) return;
         ActionStart(onActionComplete);
+        if (targetUnit == null)
+        {
+            ActionComplete();
+            return;
+        }
+
         unit.TrySpendActionPointsToTakeAction(GetActionPointsCost());
         targetUnit.AddBuff(new AtkUpBuff(targetUnit, 20, 3));
         MagicTime = MagicTimeMax;
-        
     }
 }

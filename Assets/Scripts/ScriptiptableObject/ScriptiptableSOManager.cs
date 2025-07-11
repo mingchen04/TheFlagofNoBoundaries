@@ -44,7 +44,6 @@ public class ScriptiptableSOManager : MonoBehaviour
     {
         foreach (BaseBuffSO baseBuffSO in baseBuffSOs)
         {
-            Debug.Log($"Checking BaseBuffSO: {baseBuffSO.bufftype} against BaseBuff: {baseBuff.GetType()}");
             if (baseBuffSO.bufftype.ToString() == baseBuff.GetType().ToString())
             {
                 return baseBuffSO;

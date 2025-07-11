@@ -144,7 +144,7 @@ public class ActionQueue : MonoBehaviour
     {
         return pendingActions.Count > 0
             ? pendingActions.Last().executeTurn
-            : 0;
+            : -1;
     }
 
     public void UpdateBaseActionParameter(BaseActionParameter baseActionParameter)

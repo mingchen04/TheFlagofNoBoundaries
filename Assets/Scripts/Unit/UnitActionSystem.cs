@@ -71,9 +71,6 @@ public class UnitActionSystem : MonoBehaviour
 
             BaseAction currentUnitAction = unit.GetBaseActionOfType(selectedAction); //获取当前单位的同一类型的行动
             if (unit.GetDeselectAction()) isDeployAction = true;
-            if (currentUnitAction == null) continue; //如果没有该行动则跳过
-            if (currentUnitAction.GetActionTags().HasFlag(ActionTags.Deploy)) isDeployAction = true;
-
             int actionExecutionOrder = unit.GetActionQueue().EndActionExecuteTurnGet() + (isDeployAction ? 0 : 1);
 
             if (!currentUnitAction.IsValidActionGridPosition(mouseGridPosition)) continue;
@@ -83,8 +80,9 @@ public class UnitActionSystem : MonoBehaviour
             isAction = true;
         }
 
-        if (isDeployAction)
+        if (selectedAction.GetActionTags().HasFlag(ActionTags.Deploy))
         {
+            isDeployAction = true;
             OnDeselectActionChanged?.Invoke(this, isDeployAction);
         }
 
