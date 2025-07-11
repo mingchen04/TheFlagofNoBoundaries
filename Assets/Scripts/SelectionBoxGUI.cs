@@ -40,12 +40,7 @@ public class SelectionBoxGUI : MonoBehaviour
 
     ///之后把鼠标操作的代码移动到MouseWorld
     private void Update()
-    {
-        //判断鼠标是否在UI上
-        if (EventSystem.current.IsPointerOverGameObject())
-        {
-            return;
-        }
+    {      
 
         if (InputManager.Instance.IsMouseButtonDownThisFrame())
         {
