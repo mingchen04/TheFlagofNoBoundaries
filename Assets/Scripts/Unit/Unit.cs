@@ -292,6 +292,8 @@ public class Unit : MonoBehaviour
 
     public BaseAction GetBaseActionOfType(BaseAction selBaseAction)
     {
+        if (selBaseAction == null) return GetAction<MoveAction>();
+
         foreach (BaseAction baseAction in baseActionArray)
         {
             if (baseAction.GetType() == selBaseAction.GetType())
@@ -299,7 +301,7 @@ public class Unit : MonoBehaviour
                 return baseAction;
             }
         }
-        return null;
+        return GetAction<MoveAction>();
     }
 
     public bool IsForecast()
