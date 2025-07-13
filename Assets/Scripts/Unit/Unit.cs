@@ -195,10 +195,10 @@ public class Unit : MonoBehaviour
         ShowPathLine();
     }
 
-    public void CancelAction(BaseAction cancelActions)
+    public void CancelAction(BaseAction cancelAction)
     {
         UnitActionSystem.Instance.DeployActionEnd();
-        srengthSystem.CancelActionReturnPosint(cancelActions);
+        srengthSystem.CancelActionReturnPosint(cancelAction);
         OnAnyUnitPositionChanged?.Invoke(this, EventArgs.Empty);
     }
 

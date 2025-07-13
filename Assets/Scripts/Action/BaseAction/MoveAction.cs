@@ -192,7 +192,6 @@ public class MoveAction : BaseAction
         return maxSteps > 0 ? maxSteps - 1 : 0;
     }
 
-
     public void UpdatePath()
     {
         MoveActionParameter lastParam = unit.GetActionQueue().CopyLastMoveActionParameter();

@@ -75,7 +75,7 @@ public class GridSystemVisual : MonoBehaviour
 
     private void Unit_OnMoveActionUnitPositionChange(object sender, EventArgs e)
     {
-        UpdateGridVisual();
+        UpdateGridVisual(sender as Unit);
     }
 
     private void BaseAction_OnAnyActionCompleted(object sender, EventArgs e)
@@ -139,57 +139,76 @@ public class GridSystemVisual : MonoBehaviour
         }
     }
 
-    private void UpdateGridVisual()
+    private void UpdateGridVisual(Unit unit=null)
     {
+        if (unit != null)
+        {
+            // 只刷新该unit相关的格子
+            // 1. 先隐藏该unit所有可行动格子的高亮
+            BaseAction selectAction = unit.GetBaseActionOfType(UnitActionSystem.Instance.GetSelectedAction());
+            foreach (GridPosition pos in selectAction.GetValidActionGridPositionList())
+            {
+                gridSystemVisualSingleArray[pos.x, pos.z].Hide();
+            }
+            // 2. 重新显示该unit的可行动格子
+            ShowUnitActionGridVisual(unit,selectAction);
+
+            return;
+        }
+
         HidegridSystemVisual();
 
         List<Unit> selectedUnits = UnitActionSystem.Instance.GetSelectedUnits();
         if (selectedUnits == null || selectedUnits.Count == 0) return;
 
         BaseAction selectedAction = UnitActionSystem.Instance.GetSelectedAction();
-        ShowUnitsActionGridVisual(selectedUnits, selectedAction);
+        ShowUnitActionGridVisual(selectedUnits, selectedAction);
     }
 
-    private void ShowUnitsActionGridVisual(List<Unit> units, BaseAction baseAction)
+    private void ShowUnitActionGridVisual(List<Unit> units, BaseAction baseAction)
     {
         foreach (Unit selectedUnit in units)
         {
             BaseAction selectedAction = selectedUnit.GetBaseActionOfType(baseAction);
-
-            GridVisualType gridVisualType;
-            //根据选择的行动显示不同颜色的网格
-            switch (selectedAction)
-            {
-                default:
-                case MoveAction moveAction:
-                    gridVisualType = GridVisualType.White;
-                    break;
-                case SpinAction spinAction:
-                    gridVisualType = GridVisualType.Blue;
-                    break;
-                case GrenadeAction grenadeAction:
-                    gridVisualType = GridVisualType.Yellow;
-                    break;
-                case LandMineAction landMineAction:
-                    gridVisualType = GridVisualType.Red;
-                    break;
-
-                case ShootAction shootAction:
-                    gridVisualType = GridVisualType.Red;
-                    ShowGridPositionRangeSquare(selectedUnit.GetGridPosition(), shootAction.GetMaxShootDistance(), GridVisualType.RedSoft);
-                    break;
-                case SwordAction swordAction:
-                    gridVisualType = GridVisualType.Red;
-                    ShowGridPositionRangeSquare(selectedUnit.GetGridPosition(), swordAction.GetMaxSwordDistance(), GridVisualType.RedSoft);
-                    break;
-                case InteractAction interactAction:
-                    gridVisualType = GridVisualType.Blue;
-                    ShowGridPositionRangeSquare(selectedUnit.GetGridPosition(), interactAction.GetMaxInteractDistance(), GridVisualType.RedSoft);
-                    break;
-            }
-            if (selectedAction == null) return;
-            ShowGridPositionList(selectedAction.GetValidActionGridPositionList(), gridVisualType);
+            ShowUnitActionGridVisual(selectedUnit, selectedAction);
         }
+    }
+
+    private void ShowUnitActionGridVisual(Unit selectedUnit, BaseAction baseAction)
+    {
+        GridVisualType gridVisualType;
+        //根据选择的行动显示不同颜色的网格
+        switch (baseAction)
+        {
+            default:
+            case MoveAction moveAction:
+                gridVisualType = GridVisualType.White;
+                break;
+            case SpinAction spinAction:
+                gridVisualType = GridVisualType.Blue;
+                break;
+            case GrenadeAction grenadeAction:
+                gridVisualType = GridVisualType.Yellow;
+                break;
+            case LandMineAction landMineAction:
+                gridVisualType = GridVisualType.Red;
+                break;
+
+            case ShootAction shootAction:
+                gridVisualType = GridVisualType.Red;
+                ShowGridPositionRangeSquare(selectedUnit.GetGridPosition(), shootAction.GetMaxShootDistance(), GridVisualType.RedSoft);
+                break;
+            case SwordAction swordAction:
+                gridVisualType = GridVisualType.Red;
+                ShowGridPositionRangeSquare(selectedUnit.GetGridPosition(), swordAction.GetMaxSwordDistance(), GridVisualType.RedSoft);
+                break;
+            case InteractAction interactAction:
+                gridVisualType = GridVisualType.Blue;
+                ShowGridPositionRangeSquare(selectedUnit.GetGridPosition(), interactAction.GetMaxInteractDistance(), GridVisualType.RedSoft);
+                break;
+        }
+        if (baseAction == null) return;
+        ShowGridPositionList(baseAction.GetValidActionGridPositionList(), gridVisualType);
     }
 
     private Material GetGridVisualTypeMaterial(GridVisualType gridVisualType)

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Pathfinding : MonoBehaviour
@@ -11,12 +12,10 @@ public class Pathfinding : MonoBehaviour
     private int height;
     private float cellSize;
 
-
     /// <summary>
     /// 直线移动成本
     /// </summary>
     private const int MOVE_STRAIGHT_COST = 10;
-
 
     [SerializeField] private Transform gridDebugObjectPrefab; //网格调试对象 显示pathNode g h f值
     [SerializeField] private LayerMask obstaclesLayerMask;
@@ -91,7 +90,7 @@ public class Pathfinding : MonoBehaviour
     /// 3. 时间复杂度：最坏情况O(n)，n为网格节点数
     /// </remarks>
     public List<GridPosition> FindPath(GridPosition startGridPosition, GridPosition endGridPosition, out int pathLength)
-    {
+    {        
         List<PathNode> openList = new List<PathNode>();
         List<PathNode> closeList = new List<PathNode>();
 
