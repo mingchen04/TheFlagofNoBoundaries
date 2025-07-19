@@ -10,6 +10,7 @@ public class MoveAction : BaseAction
 
     private List<Vector3> movePathWorldPositions;
     private int currentPathIndex;
+    private Vector3 targetPosition;
 
     protected override void Awake()
     {
@@ -20,9 +21,38 @@ public class MoveAction : BaseAction
     {
         if (!isActive) return;
 
-        Vector3 targetPosition = movePathWorldPositions[currentPathIndex];
-        Vector3 moveDirection = (targetPosition - transform.position).normalized;
+        targetPosition = movePathWorldPositions[currentPathIndex];
+        Unit targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(targetPosition);
 
+        if (targetUnit != null)
+        {
+            if (targetUnit.GetAction<MoveAction>().isActive)
+            {
+                // 单位正在移动，等待其离开格子
+                Debug.Log($"{unit.name} 当前位置 {unit.GetGridPosition()} " +
+                    $"-> {targetUnit.name} 占用格子: {(GridPosition)targetPosition}");
+                
+
+                bool isTargetUnitA = targetUnit.GetAction<MoveAction>().GetTargetPosition() == unit.GetWorldPosition();
+                bool isTargetUnitB = targetPosition == targetUnit.GetWorldPosition();
+
+                if (isTargetUnitA && isTargetUnitB)
+                {
+                    //路径冲突，结束双方行动
+                    Debug.Log($"{unit.name} 与 {targetUnit.name} 路径冲突，停止行动。");
+                    unit.GetActionQueue().ActionQueueStop();
+                    ActionComplete();
+                }
+                return;
+            }
+
+            // 如果目标单位不再移动，路径被占用停止行动
+            unit.GetActionQueue().ActionQueueStop();
+            ActionComplete();
+
+        }
+
+        Vector3 moveDirection = (targetPosition - transform.position).normalized;
         float stoppingDistance = 0.1f;
         if (Vector3.Distance(transform.position, targetPosition) > stoppingDistance)
         {
@@ -32,10 +62,10 @@ public class MoveAction : BaseAction
         else
         {
             currentPathIndex++;
+            unit.SetUnitGridPosition(targetPosition);
             unit.TrySpendActionPointsToTakeAction(GetMoveStepActionPointCost(currentPathIndex));
             if (currentPathIndex >= movePathWorldPositions.Count)
             {
-                OnStopMoving?.Invoke(this, EventArgs.Empty);
                 ActionComplete();
             }
         }
@@ -52,7 +82,7 @@ public class MoveAction : BaseAction
 
     public override void TakeAction(BaseActionParameter baseActionParameter, Action onActionComplete)
     {
-        
+
         unit.SetForecast(false);
         currentPathIndex = 0;
         movePathWorldPositions = (baseActionParameter as MoveActionParameter).GetMovePathForWorldPosition();
@@ -132,7 +162,7 @@ public class MoveAction : BaseAction
             if (segment.Count > 1)
             {
                 path.AddRange(segment.Skip(1)); // 跳过起点
-            }            
+            }
         }
         return path;
     }
@@ -197,5 +227,17 @@ public class MoveAction : BaseAction
         MoveActionParameter lastParam = unit.GetActionQueue().CopyLastMoveActionParameter();
         lastParam.SetMovePath(movePathWorldPositions.Select(worldPosition => (GridPosition)worldPosition).ToList());
         unit.GetActionQueue().UpdateBaseActionParameter(lastParam);
+    }
+
+    protected override void ActionComplete()
+    {
+        base.ActionComplete();
+        unit.ShowPathLine();
+        OnStopMoving?.Invoke(this, EventArgs.Empty);
+    }
+
+    public Vector3 GetTargetPosition()
+    {
+        return targetPosition;
     }
 }

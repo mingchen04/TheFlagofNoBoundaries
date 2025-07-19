@@ -91,7 +91,7 @@ public class ActionQueue : MonoBehaviour
     /// <summary>
     /// 获取指定顺序的所有行动
     /// </summary>
-    public List<BaseActionParameter> GetActionsAtOrder(int order)
+    private List<BaseActionParameter> GetActionsAtOrder(int order)
     {
         return pendingActions
             .Where(a => a.executeTurn == order)
@@ -228,7 +228,7 @@ public class ActionQueue : MonoBehaviour
         if (pendingActions.Count == 0) return; // 如果没有待执行的行动则不执行
         pendingActions.Last().baseAction.ActionStop(); // 停止最后一个行动
         pendingActions.Clear(); //取消所有队列的动作
-        unit.ReSetUnitParam();
+        unit.ReSetUnitParam(); // 重置单位参数
     }
 
     public List<GridPosition> GetAllPath()
@@ -244,5 +244,13 @@ public class ActionQueue : MonoBehaviour
         }
 
         return allPaths;
+    }
+
+    public List<MoveActionParameter> GetAllMoveActionParameters()
+    {
+        return pendingActions
+            .Where(a => a is MoveActionParameter)
+            .Select(a => (MoveActionParameter)a)
+            .ToList();
     }
 }

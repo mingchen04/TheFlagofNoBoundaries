@@ -191,8 +191,8 @@ public class UnitActionSystem : MonoBehaviour
         if (!isExecutingGlobalActions)
         {
             DeployActionEnd(); // 确保结束部署行动状态
-            ClearSelectedUnits(false);
-            AddSelectedUnit(UnitManager.Instance.GetFriendlyUnitList());
+            //ClearSelectedUnits(false);
+            //AddSelectedUnit(UnitManager.Instance.GetFriendlyUnitList());
             StartCoroutine(ExecuteGlobalActionsCoroutine());
         }
     }
@@ -224,7 +224,6 @@ public class UnitActionSystem : MonoBehaviour
 
         isExecutingGlobalActions = false;
         ClearBusy();
-        ClearSelectedUnits(false);
     }
 
     private void ExecuteActionsAtOrder(int order, Action onComplete)

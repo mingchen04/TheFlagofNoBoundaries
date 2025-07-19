@@ -61,17 +61,17 @@ public class Unit : MonoBehaviour
         Destroy(gameObject);
     }
 
-    private void Update()
-    {
-        if (!isBusy) return; //如果不忙碌则不更新位置
+    //private void Update()
+    //{
+    //    if (!isBusy) return; //如果不忙碌则不更新位置
 
-        GridPosition newGridPosition = LevelGrid.Instance.GetGridPosition(transform.position);
+    //    GridPosition newGridPosition = LevelGrid.Instance.GetGridPosition(transform.position);
 
-        //距离大于0.1暂时不更新位置
-        float stoppingDistance = 0.1f;
-        if (Vector3.Distance(newGridPosition, transform.position) > stoppingDistance) return;
-        SetUnitGridPosition(newGridPosition);
-    }
+    //    //距离大于0.1暂时不更新位置
+    //    float stoppingDistance = 0.1f;
+    //    if (Vector3.Distance(newGridPosition, transform.position) > stoppingDistance) return;
+    //    SetUnitGridPosition(newGridPosition);
+    //}
 
     private void OnDestroy()
     {
@@ -331,17 +331,17 @@ public class Unit : MonoBehaviour
     }
 
     /// <summary>
-    /// 重新设置unit参数，常用于行动出现意外而停止，直接等于实际行动点数
+    /// 重新设置unit参数，常用于行动出现意外而停止
     /// </summary>
     public void ReSetUnitParam()
     {
-        srengthSystem.SetForecastActionPoints();
+        srengthSystem.SetForecastActionPoints(); // 重置预测行动点数
         GridPosition newGridPosition = transform.position; // 转化网格位置归整
         transform.position = newGridPosition;
         SetUnitGridPosition(newGridPosition);
     }
 
-    private void SetUnitGridPosition(GridPosition newGridPosition)
+    public void SetUnitGridPosition(GridPosition newGridPosition)
     {
         if (newGridPosition == gridPosition) return;
 
@@ -428,8 +428,4 @@ public class Unit : MonoBehaviour
         lineRenderer.enabled = false;
     }
 
-    private void HideLineRenderer()
-    {
-        lineRenderer.enabled = false; //隐藏线条渲染器
-    }
 }

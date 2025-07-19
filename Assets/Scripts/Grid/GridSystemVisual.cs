@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class GridSystemVisual : MonoBehaviour
@@ -139,20 +137,22 @@ public class GridSystemVisual : MonoBehaviour
         }
     }
 
-    private void UpdateGridVisual(Unit unit=null)
+    private void UpdateGridVisual(Unit unit = null)
     {
+        //若unit不为，则只更新该unit的行动范围格子
         if (unit != null)
         {
-            // 只刷新该unit相关的格子
-            // 1. 先隐藏该unit所有可行动格子的高亮
-            BaseAction selectAction = unit.GetBaseActionOfType(UnitActionSystem.Instance.GetSelectedAction());
-            foreach (GridPosition pos in selectAction.GetValidActionGridPositionList())
-            {
-                gridSystemVisualSingleArray[pos.x, pos.z].Hide();
-            }
-            // 2. 重新显示该unit的可行动格子
-            ShowUnitActionGridVisual(unit,selectAction);
+            BaseAction selectedAction = UnitActionSystem.Instance.GetSelectedAction();
+            BaseAction thisAction = unit.GetBaseActionOfType(selectedAction);
 
+            if (thisAction != null)
+            {
+                // 只隐藏属于当前unit且不被其他单位包含的格子
+                HideUnitExclusiveGridVisual(unit, thisAction);
+
+                // 显示该unit的行动范围
+                ShowUnitActionGridVisual(unit, thisAction);
+            }
             return;
         }
 
@@ -161,8 +161,46 @@ public class GridSystemVisual : MonoBehaviour
         List<Unit> selectedUnits = UnitActionSystem.Instance.GetSelectedUnits();
         if (selectedUnits == null || selectedUnits.Count == 0) return;
 
+        BaseAction selectedActionAll = UnitActionSystem.Instance.GetSelectedAction();
+        ShowUnitActionGridVisual(selectedUnits, selectedActionAll);
+    }
+
+    /// <summary>
+    /// 隐藏只属于当前unit的可行动格子（不会影响其他单位的高亮）
+    /// </summary>
+    private void HideUnitExclusiveGridVisual(Unit unit, BaseAction thisAction)
+    {
+        HashSet<GridPosition> otherUnitsPositions = GetOtherUnitsActionPositions(unit);
+
+        foreach (GridPosition pos in thisAction.GetValidActionGridPositionList())
+        {
+            if (!otherUnitsPositions.Contains(pos))
+            {
+                gridSystemVisualSingleArray[pos.x, pos.z].Hide();
+            }
+        }
+    }
+
+    /// <summary>
+    /// 获取所有其他选中单位的可行动格子集合
+    /// </summary>
+    private HashSet<GridPosition> GetOtherUnitsActionPositions(Unit excludeUnit)
+    {
+        List<Unit> selectedUnits = UnitActionSystem.Instance.GetSelectedUnits();
         BaseAction selectedAction = UnitActionSystem.Instance.GetSelectedAction();
-        ShowUnitActionGridVisual(selectedUnits, selectedAction);
+
+        HashSet<GridPosition> positions = new HashSet<GridPosition>();
+        foreach (Unit otherUnit in selectedUnits)
+        {
+            if (otherUnit == excludeUnit) continue;
+            BaseAction otherAction = otherUnit.GetBaseActionOfType(selectedAction);
+            if (otherAction == null) continue;
+            foreach (var pos in otherAction.GetValidActionGridPositionList())
+            {
+                positions.Add(pos);
+            }
+        }
+        return positions;
     }
 
     private void ShowUnitActionGridVisual(List<Unit> units, BaseAction baseAction)

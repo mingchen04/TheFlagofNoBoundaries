@@ -46,7 +46,7 @@ public abstract class BaseAction : MonoBehaviour
         return 10;
     }
 
-    protected void ActionStart(Action onActionComplete)
+    protected virtual void ActionStart(Action onActionComplete)
     {
         //关闭预测
         unit.SetForecast(false);
@@ -60,7 +60,7 @@ public abstract class BaseAction : MonoBehaviour
         OnAnyActionStarted?.Invoke(this, EventArgs.Empty);
     }
 
-    protected void ActionComplete()
+    protected virtual void ActionComplete()
     {
         isActive = false;
         onActionComplete?.Invoke();
