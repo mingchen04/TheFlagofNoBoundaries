@@ -394,10 +394,11 @@ public class Unit : MonoBehaviour
         }
         List<Vector3> worldPositions = path.Select(p => LevelGrid.Instance.GetWorldPosition(p)).ToList();
         worldPositions.Insert(0, transform.position); // 添加当前单位位置到路径开头
-        worldPositions.ForEach(worldPosition =>
+        
+        for(int i=0; i < worldPositions.Count; i++)
         {
-            worldPosition.y = 0.1f; // 确保线条在地面上方
-        });
+            worldPositions[i] = new Vector3(worldPositions[i].x, 0.1f, worldPositions[i].z); // 调整高度
+        }
 
         lineRenderer.positionCount = worldPositions.Count;
         lineRenderer.SetPositions(worldPositions.ToArray());
