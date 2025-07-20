@@ -40,7 +40,6 @@ public class MoveAction : BaseAction
         else
         {
             currentPathIndex++;
-            Debug.Log($"{unit.name} 目标位置: {targetPosition}");
             unit.SetUnitGridPosition(targetPosition);
             unit.TrySpendActionPointsToTakeAction(GetMoveStepActionPointCost(currentPathIndex));
             if (currentPathIndex >= movePathWorldPositions.Count)
@@ -72,18 +71,19 @@ public class MoveAction : BaseAction
                     //路径冲突，结束双方行动
                     unit.GetActionQueue().ActionQueueStop();
                     targetUnit.GetActionQueue().ActionQueueStop();
-                    ActionComplete();
                 }
             }
             else
             {
                 // 如果目标单位不再移动，路径被占用停止行动
                 unit.GetActionQueue().ActionQueueStop();
-                ActionComplete();
             }
             return false;
         }
 
+        IsWalking = true; //停止行走动画
+        OnStartMoving?.Invoke(this, EventArgs.Empty);
+        // 目标格可达，可以继续移动
         return true;
     }
 

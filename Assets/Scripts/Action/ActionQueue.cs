@@ -12,7 +12,7 @@ public class ActionQueue : MonoBehaviour
     public static event EventHandler OnAnyActionCompleted; //行为结束触发视图更新
     private List<BaseActionParameter> pendingActions; //行为队列
     private Unit unit; //当前单位
-
+    private BaseActionParameter underwayAction; //正在进行的行为
 
     private void Awake()
     {
@@ -113,6 +113,7 @@ public class ActionQueue : MonoBehaviour
         int completedCount = 0;
         foreach (BaseActionParameter action in actions)
         {
+            underwayAction = action; //记录当前正在进行的行动
             action.baseAction.TakeAction(action, () =>
             {
                 completedCount++;
@@ -158,7 +159,7 @@ public class ActionQueue : MonoBehaviour
         }
 
         unit.TrySpendActionPointsToTakeAction(actPoint);
-        if(baseActionParameter is MoveActionParameter moveActionParameter)
+        if (baseActionParameter is MoveActionParameter moveActionParameter)
         {
             pendingActions[^1] = moveActionParameter;
         }
@@ -166,7 +167,7 @@ public class ActionQueue : MonoBehaviour
         {
             pendingActions[^1] = baseActionParameter; //更新当前动作的参数
         }
-            
+
         OnAnyActionAddQueue?.Invoke(this, EventArgs.Empty);
     }
 
@@ -226,9 +227,48 @@ public class ActionQueue : MonoBehaviour
     public void ActionQueueStop()
     {
         if (pendingActions.Count == 0) return; // 如果没有待执行的行动则不执行
-        pendingActions.Last().baseAction.ActionStop(); // 停止最后一个行动
-        pendingActions.Clear(); //取消所有队列的动作
+
+        underwayAction.baseAction.ActionStop(); // 如果有正在进行的行动则结束它
+        pendingActions.RemoveAll(a => a.executeTurn == underwayAction.executeTurn); // 移除所有与正在进行的行动相同执行顺序的行动
+
+        bool isValid = false;
+        if (pendingActions.Count != 0)
+        {
+            // 检查下一个方法是否有效
+
+            BaseActionParameter nextBaseActionParameter = pendingActions[0];
+            
+            bool isMove = nextBaseActionParameter.baseAction.GetActionTags().HasFlag(ActionTags.Move);
+
+            GridPosition unitFinalPosition = nextBaseActionParameter.unitFinalPosition;
+            GridPosition targetPosition = nextBaseActionParameter.targetPositionList[0];
+
+            isValid =
+                nextBaseActionParameter.baseAction.
+                IsValidActionGridPosition
+                (
+                    isMove ? unitFinalPosition : targetPosition
+                );
+        }
+
         unit.ReSetUnitParam(); // 重置单位参数
+
+        if (!isValid) 
+        {
+            //如果下一个行动有效，则重新计算消耗点数
+            int actionPointsCost = 0;
+            pendingActions.ForEach(BaseActionParameter => 
+            {
+                actionPointsCost += BaseActionParameter.GetActionPoint();
+            });
+            unit.SetForecast(true); // 重新设置预测状态
+            unit.TrySpendActionPointsToTakeAction(actionPointsCost); // 尝试消耗行动点
+        }
+        else
+        {
+            // 如果下一个行动无效，则清空队列
+            pendingActions.Clear(); //取消所有队列的动作
+        }        
     }
 
     public List<GridPosition> GetAllPath()
@@ -237,7 +277,7 @@ public class ActionQueue : MonoBehaviour
 
         foreach (BaseActionParameter baseActionParameter in pendingActions)
         {
-            if(baseActionParameter is MoveActionParameter moveActionParameter)
+            if (baseActionParameter is MoveActionParameter moveActionParameter)
             {
                 allPaths.AddRange(moveActionParameter.GetMovePathForGridPosition());
             }
