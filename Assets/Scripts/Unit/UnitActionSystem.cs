@@ -61,7 +61,6 @@ public class UnitActionSystem : MonoBehaviour
     {
         if (selectedUnits.Count == 0) return false;
         if (!LevelGrid.Instance.IsValidGridPosition(mouseGridPosition)) return false;
-        if (!selectedAction.IsValidActionGridPosition(mouseGridPosition)) return false;
 
         bool isAction = false;
         isDeployAction = false; //重置部署行动状态
