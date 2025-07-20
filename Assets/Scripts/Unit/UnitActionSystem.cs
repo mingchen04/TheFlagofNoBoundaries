@@ -245,6 +245,7 @@ public class UnitActionSystem : MonoBehaviour
             unit.GetActionQueue().ExecuteActionsAtOrder(order, () =>
             {
                 completedCount++;
+                Debug.Log($"单位 {unit.name} 完成行动，当前完成数量: {completedCount}/{units.Count}");
                 if (completedCount == units.Count())
                 {
                     onComplete?.Invoke();// 所有单位完成后触发回调

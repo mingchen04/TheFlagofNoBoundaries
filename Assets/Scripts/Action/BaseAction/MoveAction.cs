@@ -8,9 +8,10 @@ public class MoveAction : BaseAction
     public event EventHandler OnStartMoving;
     public event EventHandler OnStopMoving;
 
+    private bool IsWalking = false;
     private List<Vector3> movePathWorldPositions;
     private int currentPathIndex;
-    private Vector3 targetPosition;
+    private GridPosition targetPosition;
 
     protected override void Awake()
     {
@@ -22,37 +23,14 @@ public class MoveAction : BaseAction
         if (!isActive) return;
 
         targetPosition = movePathWorldPositions[currentPathIndex];
-        Unit targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(targetPosition);
+        if (!TargetPositionStance()) return;
 
-        if (targetUnit != null)
+        if (!IsWalking)
         {
-            if (targetUnit.GetAction<MoveAction>().isActive)
-            {
-                // 单位正在移动，等待其离开格子
-                Debug.Log($"{unit.name} 当前位置 {unit.GetGridPosition()} " +
-                    $"-> {targetUnit.name} 占用格子: {(GridPosition)targetPosition}");
-                
-
-                bool isTargetUnitA = targetUnit.GetAction<MoveAction>().GetTargetPosition() == unit.GetWorldPosition();
-                bool isTargetUnitB = targetPosition == targetUnit.GetWorldPosition();
-
-                if (isTargetUnitA && isTargetUnitB)
-                {
-                    //路径冲突，结束双方行动
-                    Debug.Log($"{unit.name} 与 {targetUnit.name} 路径冲突，停止行动。");
-                    unit.GetActionQueue().ActionQueueStop();
-                    ActionComplete();
-                }
-                return;
-            }
-
-            // 如果目标单位不再移动，路径被占用停止行动
-            unit.GetActionQueue().ActionQueueStop();
-            ActionComplete();
-
+            OnStartMoving?.Invoke(this, EventArgs.Empty);
         }
 
-        Vector3 moveDirection = (targetPosition - transform.position).normalized;
+        Vector3 moveDirection = ((Vector3)targetPosition - transform.position).normalized;
         float stoppingDistance = 0.1f;
         if (Vector3.Distance(transform.position, targetPosition) > stoppingDistance)
         {
@@ -62,6 +40,7 @@ public class MoveAction : BaseAction
         else
         {
             currentPathIndex++;
+            Debug.Log($"{unit.name} 目标位置: {targetPosition}");
             unit.SetUnitGridPosition(targetPosition);
             unit.TrySpendActionPointsToTakeAction(GetMoveStepActionPointCost(currentPathIndex));
             if (currentPathIndex >= movePathWorldPositions.Count)
@@ -72,6 +51,40 @@ public class MoveAction : BaseAction
 
         float rotateSpeed = 10f;
         transform.forward = Vector3.Slerp(transform.forward, moveDirection, Time.deltaTime * rotateSpeed);
+    }
+
+    private bool TargetPositionStance()
+    {
+        Unit targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(targetPosition);
+
+        if (targetUnit != null && targetUnit != unit)
+        {
+            if (targetUnit.GetAction<MoveAction>().isActive)
+            {
+                // 单位正在移动，等待其离开格子
+                IsWalking = false; //停止行走动画
+                OnStopMoving?.Invoke(this, EventArgs.Empty);
+
+                bool isTargetUnitA = targetUnit.GetAction<MoveAction>().GetTargetPosition() == unit.GetGridPosition();
+                bool isTargetUnitB = targetPosition == targetUnit.GetGridPosition();
+                if (isTargetUnitA && isTargetUnitB)
+                {
+                    //路径冲突，结束双方行动
+                    unit.GetActionQueue().ActionQueueStop();
+                    targetUnit.GetActionQueue().ActionQueueStop();
+                    ActionComplete();
+                }
+            }
+            else
+            {
+                // 如果目标单位不再移动，路径被占用停止行动
+                unit.GetActionQueue().ActionQueueStop();
+                ActionComplete();
+            }
+            return false;
+        }
+
+        return true;
     }
 
     public override void ActionStop()
@@ -231,12 +244,14 @@ public class MoveAction : BaseAction
 
     protected override void ActionComplete()
     {
+        if (!isActive) return;
+        
         base.ActionComplete();
         unit.ShowPathLine();
         OnStopMoving?.Invoke(this, EventArgs.Empty);
     }
 
-    public Vector3 GetTargetPosition()
+    public GridPosition GetTargetPosition()
     {
         return targetPosition;
     }

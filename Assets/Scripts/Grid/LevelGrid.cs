@@ -28,7 +28,7 @@ public class LevelGrid : MonoBehaviour
             (GridSystemHex<GridObject> g, GridPosition gridPosition) => new GridObject(g, gridPosition));
 
         //显示网格的x z坐标
-        //gridSystem.CreateDebugObject(gridDebugObjectPrefab);
+        gridSystem.CreateDebugObject(gridDebugObjectPrefab);
     }
 
     private void Start()

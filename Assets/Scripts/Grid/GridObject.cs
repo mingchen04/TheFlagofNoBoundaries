@@ -7,6 +7,7 @@ public class GridObject
     private GridPosition gridPosition;
     private IInteractable interactable;
 
+
     public GridObject(GridSystemHex<GridObject> gridSystem, GridPosition gridPosition)
     {
         this.gridSystem = gridSystem;

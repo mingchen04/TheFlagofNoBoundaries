@@ -61,18 +61,6 @@ public class Unit : MonoBehaviour
         Destroy(gameObject);
     }
 
-    //private void Update()
-    //{
-    //    if (!isBusy) return; //如果不忙碌则不更新位置
-
-    //    GridPosition newGridPosition = LevelGrid.Instance.GetGridPosition(transform.position);
-
-    //    //距离大于0.1暂时不更新位置
-    //    float stoppingDistance = 0.1f;
-    //    if (Vector3.Distance(newGridPosition, transform.position) > stoppingDistance) return;
-    //    SetUnitGridPosition(newGridPosition);
-    //}
-
     private void OnDestroy()
     {
         if (healthSystem != null)
