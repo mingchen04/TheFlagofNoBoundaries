@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GridSystemVisual : MonoBehaviour
@@ -93,6 +95,7 @@ public class GridSystemVisual : MonoBehaviour
 
     private void Update()
     {
+
         Vector3 mouseWorld = MouseWorld.GetPosition();
         GridPosition gridPosition = LevelGrid.Instance.GetGridPosition(mouseWorld);
         if (LevelGrid.Instance.IsValidGridPosition(gridPosition))
@@ -115,7 +118,7 @@ public class GridSystemVisual : MonoBehaviour
 
     private void ShowGridPositionRangeSquare(GridPosition gridPosition, int range, GridVisualType gridVisualType)
     {
-        List<GridPosition> gridPositionList = new List<GridPosition>();
+        List<GridPosition> gridPositionList = new();
 
         foreach (GridPosition testGridPosition in LevelGrid.Instance.GenerateHexArea(gridPosition, range))
         {
@@ -139,6 +142,7 @@ public class GridSystemVisual : MonoBehaviour
 
     private void UpdateGridVisual()
     {
+        //如果UpdateGridVisualTime大于0，说明还没有到更新网格视觉的时间，直接返回
         HidegridSystemVisual();
 
         List<Unit> selectedUnits = UnitActionSystem.Instance.GetSelectedUnits();
@@ -146,18 +150,26 @@ public class GridSystemVisual : MonoBehaviour
 
         BaseAction selectedActionAll = UnitActionSystem.Instance.GetSelectedAction();
         ShowUnitActionGridVisual(selectedUnits, selectedActionAll);
+
     }
 
     private void ShowUnitActionGridVisual(List<Unit> units, BaseAction baseAction)
     {
+        HashSet<GridPosition> showGridPositions = new();
+        GridVisualType gridVisualType = GridVisualType.White;
+        //先计算所有单位的网格视觉
         foreach (Unit selectedUnit in units)
         {
             BaseAction selectedAction = selectedUnit.GetBaseActionOfType(baseAction);
-            ShowUnitActionGridVisual(selectedUnit, selectedAction);
+            gridVisualType = ShowUnitActionGridVisual(selectedUnit, selectedAction); //
+            //添加所有单位的网格视觉
+            showGridPositions.AddRange(selectedAction.GetValidActionGridPositionList());
         }
+        ShowGridPositionList(showGridPositions.ToList(), gridVisualType);
+
     }
 
-    private void ShowUnitActionGridVisual(Unit selectedUnit, BaseAction baseAction)
+    private GridVisualType ShowUnitActionGridVisual(Unit selectedUnit, BaseAction baseAction)
     {
         GridVisualType gridVisualType;
         //根据选择的行动显示不同颜色的网格
@@ -190,8 +202,9 @@ public class GridSystemVisual : MonoBehaviour
                 ShowGridPositionRangeSquare(selectedUnit.GetGridPosition(), interactAction.GetMaxInteractDistance(), GridVisualType.RedSoft);
                 break;
         }
-        if (baseAction == null) return;
-        ShowGridPositionList(baseAction.GetValidActionGridPositionList(), gridVisualType);
+        if (baseAction == null) return GridVisualType.White;
+        //ShowGridPositionList(baseAction.GetValidActionGridPositionList(), gridVisualType);
+        return gridVisualType;
     }
 
     private Material GetGridVisualTypeMaterial(GridVisualType gridVisualType)

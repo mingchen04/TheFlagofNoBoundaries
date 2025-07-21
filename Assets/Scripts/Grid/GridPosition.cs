@@ -5,6 +5,8 @@ using UnityEngine;
 public struct GridPosition : IEquatable<GridPosition>
 {
 
+    public static GridPosition nullGridPosition = new(-1, -1); //定义一个空的网格位置
+
     //结构体作为函数参数时可被改变 class作为引用类型参数不能改变
     public int x;
     public int z;

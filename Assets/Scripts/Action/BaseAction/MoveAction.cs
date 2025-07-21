@@ -11,7 +11,7 @@ public class MoveAction : BaseAction
     private bool IsWalking = false;
     private List<Vector3> movePathWorldPositions;
     private int currentPathIndex;
-    private GridPosition targetPosition;
+    private GridPosition targetPosition = GridPosition.nullGridPosition;
 
     protected override void Awake()
     {
@@ -20,9 +20,21 @@ public class MoveAction : BaseAction
 
     public void Update()
     {
-        if (!isActive) return;
+        if (!isActive) {
+            if (IsWalking)
+            {
+                IsWalking = false; // 停止行走动画
+                OnStopMoving?.Invoke(this, EventArgs.Empty);
+            }
+            return; 
+        }
 
-        targetPosition = movePathWorldPositions[currentPathIndex];
+        if (targetPosition == GridPosition.nullGridPosition)
+        {
+            targetPosition = movePathWorldPositions[currentPathIndex];
+            UnitActionSystem.Instance.StopInvalidMoveUnits();
+        }
+
         if (!TargetPositionStance()) return;
 
         if (!IsWalking)
@@ -40,10 +52,15 @@ public class MoveAction : BaseAction
         else
         {
             currentPathIndex++;
-            unit.SetUnitGridPosition(targetPosition);
+            GridPosition oldTargetPosition = targetPosition;
+            if (movePathWorldPositions.Count > currentPathIndex) targetPosition = movePathWorldPositions[currentPathIndex];
+            
+            unit.SetUnitGridPosition(oldTargetPosition);
             unit.TrySpendActionPointsToTakeAction(GetMoveStepActionPointCost(currentPathIndex));
             if (currentPathIndex >= movePathWorldPositions.Count)
             {
+                targetPosition = GridPosition.nullGridPosition;
+                currentPathIndex = 0; // 重置索引
                 ActionComplete();
             }
         }
@@ -81,7 +98,7 @@ public class MoveAction : BaseAction
             return false;
         }
 
-        IsWalking = true; //停止行走动画
+        IsWalking = true; //开始行走动画
         OnStartMoving?.Invoke(this, EventArgs.Empty);
         // 目标格可达，可以继续移动
         return true;
@@ -95,9 +112,9 @@ public class MoveAction : BaseAction
 
     public override void TakeAction(BaseActionParameter baseActionParameter, Action onActionComplete)
     {
-
         unit.SetForecast(false);
         currentPathIndex = 0;
+        targetPosition = GridPosition.nullGridPosition; // 重置目标位置
         movePathWorldPositions = (baseActionParameter as MoveActionParameter).GetMovePathForWorldPosition();
 
         ActionStart(onActionComplete);
@@ -245,7 +262,7 @@ public class MoveAction : BaseAction
     protected override void ActionComplete()
     {
         if (!isActive) return;
-        
+
         base.ActionComplete();
         unit.ShowPathLine();
         OnStopMoving?.Invoke(this, EventArgs.Empty);

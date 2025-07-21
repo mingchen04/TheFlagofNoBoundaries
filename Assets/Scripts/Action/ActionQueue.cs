@@ -235,7 +235,6 @@ public class ActionQueue : MonoBehaviour
         if (pendingActions.Count != 0)
         {
             // 检查下一个方法是否有效
-
             BaseActionParameter nextBaseActionParameter = pendingActions[0];
             
             bool isMove = nextBaseActionParameter.baseAction.GetActionTags().HasFlag(ActionTags.Move);
@@ -292,5 +291,10 @@ public class ActionQueue : MonoBehaviour
             .Where(a => a is MoveActionParameter)
             .Select(a => (MoveActionParameter)a)
             .ToList();
+    }
+
+    public BaseActionParameter GetUnderwayAction()
+    {
+        return underwayAction;
     }
 }

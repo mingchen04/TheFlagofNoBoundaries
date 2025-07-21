@@ -13,11 +13,12 @@ public class UnitActionSystem : MonoBehaviour
     public event EventHandler<bool> OnBusyChanged;
     public event EventHandler<bool> OnDeselectActionChanged;
 
-    private List<Unit> selectedUnits; //选中的单位
+    private List<Unit> selectedUnits = new(); //选中的单位
     private BaseAction selectedAction;
     private bool isDeployAction; //是否部署行动
     private bool isBusy;
     private bool isExecutingGlobalActions = false;
+    private List<Unit> underwayUnits = new(); //正在进行的单位列表
 
     private void Awake()
     {
@@ -32,7 +33,7 @@ public class UnitActionSystem : MonoBehaviour
 
     private void Start()
     {
-        selectedUnits = new List<Unit>();
+        LevelGrid.Instance.OnAnyUnitMoveGridPosition += LevelGrid_OnAnyUnitPositionChanged;
         SelectionBoxGUI.OnClick += SelectionBoxGUI_OnClick;
     }
 
@@ -231,7 +232,7 @@ public class UnitActionSystem : MonoBehaviour
             .Where(u => u.GetCurrentActionOrder() == order)
             .OrderBy(u => u.GetPriority())
             .ToList();
-
+        underwayUnits = units; // 更新正在进行的单位列表
         if (!units.Any())
         {
             onComplete?.Invoke();
@@ -244,7 +245,6 @@ public class UnitActionSystem : MonoBehaviour
             unit.GetActionQueue().ExecuteActionsAtOrder(order, () =>
             {
                 completedCount++;
-                Debug.Log($"单位 {unit.name} 完成行动，当前完成数量: {completedCount}/{units.Count}");
                 if (completedCount == units.Count())
                 {
                     onComplete?.Invoke();// 所有单位完成后触发回调
@@ -265,5 +265,61 @@ public class UnitActionSystem : MonoBehaviour
         }
 
         OnDeselectActionChanged?.Invoke(this, isDeployAction);
+    }
+
+    /// <summary>
+    /// 检查一组单位的移动目标是否发生冲突（如多个单位目标格相同），
+    /// 并停止所有冲突单位的集合。
+    /// 优化点：
+    /// 1. 支持多个单位同时冲突（如3个单位目标相同，全部判为无效）。
+    /// 2. 变量命名更语义化，注释更详细。
+    /// 3. 只处理正在进行的MoveAction。
+    /// </summary>
+    public void StopInvalidMoveUnits()
+    {
+        // 记录每个目标格对应的所有单位
+        Dictionary<GridPosition, List<Unit>> targetMap = new();
+
+        foreach (Unit unit in underwayUnits)
+        {
+            ActionQueue actionQueue = unit.GetActionQueue();
+            BaseActionParameter underwayAction = actionQueue.GetUnderwayAction();
+            if (underwayAction == null) continue;
+
+            // 只处理移动行动
+            if (underwayAction.baseAction is MoveAction moveAction)
+            {
+                GridPosition targetPos = moveAction.GetTargetPosition();
+                if (targetPos == GridPosition.nullGridPosition) continue; // 跳过无效目标位置
+                if (!targetMap.ContainsKey(targetPos))
+                {
+                    targetMap[targetPos] = new List<Unit>();
+                }
+                targetMap[targetPos].Add(unit);
+            }
+        }
+
+        foreach (KeyValuePair<GridPosition, List<Unit>> kvp in targetMap)
+        {
+            List<Unit> units = kvp.Value
+                .Where(unit => (GridPosition)unit.GetWorldPosition() != kvp.Key)
+                .ToList();
+
+            if (units.Count > 1)
+            {
+                // 所有目标相同的单位都判为无效
+                Debug.Log($"目标格 {kvp.Key} 有 {units.Count} 个单位冲突，全部判为无效。");
+                foreach (Unit unit in units)
+                {
+                    ActionQueue actionQueue = unit.GetActionQueue();
+                    actionQueue.ActionQueueStop();
+                }
+            }
+        }
+    }
+
+    private void LevelGrid_OnAnyUnitPositionChanged(object sender, EventArgs e)
+    {
+        StopInvalidMoveUnits();
     }
 }

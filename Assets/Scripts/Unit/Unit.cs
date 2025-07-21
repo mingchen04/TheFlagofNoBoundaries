@@ -416,5 +416,4 @@ public class Unit : MonoBehaviour
         lineRenderer.endColor = Color.cyan;
         lineRenderer.enabled = false;
     }
-
 }
