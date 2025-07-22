@@ -69,6 +69,10 @@ public class MoveAction : BaseAction
         transform.forward = Vector3.Slerp(transform.forward, moveDirection, Time.deltaTime * rotateSpeed);
     }
 
+    /// <summary>
+    /// 检查目标位置是否可达，并处理路径冲突
+    /// </summary>
+    /// <returns></returns>
     private bool TargetPositionStance()
     {
         Unit targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(targetPosition);

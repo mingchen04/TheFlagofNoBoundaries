@@ -9,8 +9,7 @@ public class Unit : MonoBehaviour
     public static event EventHandler OnAnyUnitDead;
     //单位移动
     public static event EventHandler OnAnyUnitPositionChanged;
-    public event EventHandler OnBuffListChange; //行动点数变化
-
+    public event EventHandler OnBuffListChange; //buff变化
 
     [SerializeField] private bool isEnemy; //是否为敌人
     private int unitPriority; // 单位执行优先级

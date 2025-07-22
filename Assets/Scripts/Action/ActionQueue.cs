@@ -272,7 +272,7 @@ public class ActionQueue : MonoBehaviour
 
     public List<GridPosition> GetAllPath()
     {
-        List<GridPosition> allPaths = new List<GridPosition>();
+        List<GridPosition> allPaths = new();
 
         foreach (BaseActionParameter baseActionParameter in pendingActions)
         {
