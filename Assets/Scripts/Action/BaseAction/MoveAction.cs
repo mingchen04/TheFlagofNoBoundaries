@@ -12,6 +12,8 @@ public class MoveAction : BaseAction
     private List<Vector3> movePathWorldPositions;
     private int currentPathIndex;
     private GridPosition targetPosition = GridPosition.nullGridPosition;
+    private Action ArriveTargetLocationCall; //到达目标位置时的回调
+
 
     protected override void Awake()
     {
@@ -20,13 +22,14 @@ public class MoveAction : BaseAction
 
     public void Update()
     {
-        if (!isActive) {
+        if (!isActive)
+        {
             if (IsWalking)
             {
                 IsWalking = false; // 停止行走动画
                 OnStopMoving?.Invoke(this, EventArgs.Empty);
             }
-            return; 
+            return;
         }
 
         if (targetPosition == GridPosition.nullGridPosition)
@@ -35,7 +38,12 @@ public class MoveAction : BaseAction
             UnitActionSystem.Instance.StopInvalidMoveUnits();
         }
 
-        if (!TargetPositionStance()) return;
+        if (!TargetPositionStance())
+        {
+            ArriveTargetLocationCall?.Invoke(); // 如果目标位置不可达，调用回调避免阻碍队列
+            return;
+        }
+        ;
 
         if (!IsWalking)
         {
@@ -51,10 +59,13 @@ public class MoveAction : BaseAction
         }
         else
         {
+            ArriveTargetLocationCall?.Invoke(); // 到达目标位置时调用回调
+            ArriveTargetLocationCall = null; // 清除回调，避免重复调用
+
             currentPathIndex++;
             GridPosition oldTargetPosition = targetPosition;
             if (movePathWorldPositions.Count > currentPathIndex) targetPosition = movePathWorldPositions[currentPathIndex];
-            
+
             unit.SetUnitGridPosition(oldTargetPosition);
             unit.TrySpendActionPointsToTakeAction(GetMoveStepActionPointCost(currentPathIndex));
             if (currentPathIndex >= movePathWorldPositions.Count)
@@ -72,7 +83,6 @@ public class MoveAction : BaseAction
     /// <summary>
     /// 检查目标位置是否可达，并处理路径冲突
     /// </summary>
-    /// <returns></returns>
     private bool TargetPositionStance()
     {
         Unit targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(targetPosition);
@@ -268,12 +278,37 @@ public class MoveAction : BaseAction
         if (!isActive) return;
 
         base.ActionComplete();
-        unit.ShowPathLine();
         OnStopMoving?.Invoke(this, EventArgs.Empty);
     }
 
     public GridPosition GetTargetPosition()
     {
         return targetPosition;
+    }
+
+    /// <summary>
+    /// 暂停行动，并返回一个新的Action用于恢复行动，并且在到达目标格子时执行回调
+    /// </summary>
+    /// <returns>恢复行动回调方法</returns>
+    public Action<Action> SuspendAction()
+    {
+        isActive = false;
+        void action(Action ArriveTargetLocationCall)
+        {
+            Debug.Log($"{unit.name} 恢复行动");
+            isActive = true;
+
+            //附加到达目标位置的回调，避免短时间多次冲突覆盖上一个线程的回调
+            this.ArriveTargetLocationCall +=
+            ArriveTargetLocationCall +=
+            () => { Debug.Log($"{unit.name} 到达目标位置 启动下一个单位 "); };
+        }
+
+        return action;
+    }
+
+    public bool GetIsActive()
+    {
+        return isActive;
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -280,6 +281,7 @@ public class UnitActionSystem : MonoBehaviour
         // 记录每个目标格对应的所有单位
         Dictionary<GridPosition, List<Unit>> targetMap = new();
 
+        //集中管理所有正在进行的单位 保存目标位置
         foreach (Unit unit in underwayUnits)
         {
             ActionQueue actionQueue = unit.GetActionQueue();
@@ -289,8 +291,11 @@ public class UnitActionSystem : MonoBehaviour
             // 只处理移动行动
             if (underwayAction.baseAction is MoveAction moveAction)
             {
+                if (!moveAction.GetIsActive()) continue; // 确保移动行动正在进行中
                 GridPosition targetPos = moveAction.GetTargetPosition();
                 if (targetPos == GridPosition.nullGridPosition) continue; // 跳过无效目标位置
+                if ((GridPosition)unit.GetWorldPosition() == targetPos) continue; // 跳过当前单位位置与目标位置相同的情况
+
                 if (!targetMap.ContainsKey(targetPos))
                 {
                     targetMap[targetPos] = new List<Unit>();
@@ -301,30 +306,53 @@ public class UnitActionSystem : MonoBehaviour
 
         foreach (KeyValuePair<GridPosition, List<Unit>> kvp in targetMap)
         {
-            List<Unit> units = kvp.Value
-                .Where(unit => (GridPosition)unit.GetWorldPosition() != kvp.Key)
-                .ToList();
+            List<Unit> units = kvp.Value;
+            Action<Action>[] actions = new Action<Action>[units.Count];
 
+            // 如果多个单位目标格相同
             if (units.Count > 1)
             {
-                // 所有目标相同的单位都判为无效
-                Debug.Log($"目标格 {kvp.Key} 有 {units.Count} 个单位冲突，全部判为无效。");
-                foreach (Unit unit in units)
+                // 所有目标相同的单位都暂停
+                Debug.Log($"目标格 {kvp.Key} 有 " +
+                    $"{string.Join(",", units.Select(unit => unit.name))} " +
+                    $"单位冲突，全部暂停。");
+
+                for (int i = 0; i < units.Count; i++)
                 {
-                    ActionQueue actionQueue = unit.GetActionQueue();
-                    actionQueue.ActionQueueStop();
+                    Unit unit = units[i];
+                    // 暂停所有冲突单位的行动
+                    MoveAction moveAction = unit.GetActionQueue().GetUnderwayAction().baseAction as MoveAction;
+                    Action<Action> resumeAction = moveAction.SuspendAction();
+                    actions[i] = resumeAction; //保存恢复行动的方法
                 }
+
+                StartCoroutine(ExecuteActionsSequentially(actions));
             }
         }
     }
 
-
+    /// <summary>
+    /// 按顺序启动目标的恢复方法，在到达目标位置时再启动下一个
+    /// </summary>
+    /// <param name="actions"></param>
+    /// <param name="units"></param>
+    /// <returns></returns>
+    private IEnumerator ExecuteActionsSequentially(Action<Action>[] actions)
+    {
+        for (int i = 0; i < actions.Length; i++)
+        {
+            bool ReachTarget = false;
+            // 执行每个恢复行动的委托,并设置到达目标的回调方法
+            actions[i](() =>
+            {
+                ReachTarget = true;
+            });
+            yield return new WaitUntil(() => ReachTarget); // 等待单位到达目标位置
+        }
+    }
 
     private void LevelGrid_OnAnyUnitPositionChanged(object sender, EventArgs e)
     {
         StopInvalidMoveUnits();
     }
-
-
-
 }
