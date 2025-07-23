@@ -29,11 +29,11 @@ public class Unit : MonoBehaviour
     private bool isForecast; // 是否为预测模式
     private bool isBusy; // 是否忙碌
     private bool isDeployAction; //是否部署行动
-    private LineRenderer lineRenderer; //线条渲染器，用于显示路径
+    private UnitPathLineUI UnitPathLineUI;
+
 
     private void Awake()
     {
-        LineRendererAwake();
         isForecast = true;
         buffList = new List<BaseBuff>();
         actionQueue = GetComponent<ActionQueue>();
@@ -179,7 +179,6 @@ public class Unit : MonoBehaviour
         List<BaseActionParameter> cancelActions = actionQueue.GetCancelActions(actionsIndex, baseAction);
         srengthSystem.CancelActionReturnPosint(cancelActions);
         OnAnyUnitPositionChanged?.Invoke(this, EventArgs.Empty);
-        ShowPathLine();
     }
 
     public void CancelAction(BaseAction cancelAction)
@@ -263,7 +262,6 @@ public class Unit : MonoBehaviour
         {
             MoveActionParameter moveActionParameter = (actionParam as MoveActionParameter);
             (moveActionParameter.baseAction as MoveAction).UpdatePath();
-            ShowPathLine();
             OnAnyUnitPositionChanged?.Invoke(this, EventArgs.Empty);
         }
 
@@ -380,39 +378,5 @@ public class Unit : MonoBehaviour
         return buffList;
     }
 
-    /// <summary>
-    /// 显示路径线
-    /// </summary>
-    public void ShowPathLine()
-    {
-        List<GridPosition> path = actionQueue.GetAllPath();
-        if (path == null)
-        {
-            lineRenderer.enabled = false;
-            return;
-        }
-        List<Vector3> worldPositions = path.Select(p => LevelGrid.Instance.GetWorldPosition(p)).ToList();
-        worldPositions.Insert(0, transform.position); // 添加当前单位位置到路径开头
-        
-        for(int i=0; i < worldPositions.Count; i++)
-        {
-            worldPositions[i] = new Vector3(worldPositions[i].x, 0.1f, worldPositions[i].z); // 调整高度
-        }
-
-        lineRenderer.positionCount = worldPositions.Count;
-        lineRenderer.SetPositions(worldPositions.ToArray());
-        lineRenderer.enabled = true;
-    }
-
-    private void LineRendererAwake()
-    {
-        // 初始化LineRenderer
-        lineRenderer = gameObject.AddComponent<LineRenderer>();
-        lineRenderer.positionCount = 0;
-        lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
-        lineRenderer.widthMultiplier = 0.15f;
-        lineRenderer.startColor = Color.cyan;
-        lineRenderer.endColor = Color.cyan;
-        lineRenderer.enabled = false;
-    }
+    
 }
