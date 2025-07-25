@@ -222,7 +222,7 @@ public class Pathfinding : MonoBehaviour
         bool xReduceValid = gridPosition.x - 1 >= 0;
         bool xAddValid = gridPosition.x + 1 < gridSystem.GetWidth();
         bool zReduceValid = gridPosition.z - 1 >= 0;
-        bool zAddValid = gridPosition.z + 1 < gridSystem.GetHeight(); ;
+        bool zAddValid = gridPosition.z + 1 < gridSystem.GetHeight();
 
         //Left
         if (xReduceValid) neighbourList.Add(GetNode(gridPosition.x - 1, gridPosition.z + 0));

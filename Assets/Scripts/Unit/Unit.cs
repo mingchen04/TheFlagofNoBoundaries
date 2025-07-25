@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class Unit : MonoBehaviour
@@ -234,10 +233,10 @@ public class Unit : MonoBehaviour
         {
             if (isDeploy) SetDeselectAction(true);
             // 根据标签或类型实例化不同参数
-            if (isMove && action is MoveAction moveAction)
+            if (isMove && action is BaseMoveAction baseMove)
             {
                 actionParam = new MoveActionParameter(
-                    moveAction,
+                    baseMove,
                     targetPositionList,
                     finalPos,
                     executionOrder
@@ -261,7 +260,7 @@ public class Unit : MonoBehaviour
         if (isMove)
         {
             MoveActionParameter moveActionParameter = (actionParam as MoveActionParameter);
-            (moveActionParameter.baseAction as MoveAction).UpdatePath();
+            (moveActionParameter.baseAction as BaseMoveAction).UpdatePath();
             OnAnyUnitPositionChanged?.Invoke(this, EventArgs.Empty);
         }
 

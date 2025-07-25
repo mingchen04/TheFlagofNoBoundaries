@@ -116,4 +116,9 @@ public abstract class BaseAction : MonoBehaviour
     {
         return ScriptiptableSOManager.Instance.GetActionTags(this);
     }
+
+    public bool GetIsActive()
+    {
+        return isActive;
+    }
 }

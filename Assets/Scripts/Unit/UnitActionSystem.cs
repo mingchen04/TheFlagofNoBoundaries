@@ -146,7 +146,7 @@ public class UnitActionSystem : MonoBehaviour
             this.selectedUnits.Add(unit);
         }
 
-        if (selectedUnits.Count > 0) SetSelectedAction(selectedUnits[0].GetAction<MoveAction>());
+        if (selectedUnits.Count > 0 && selectedAction == null) SetSelectedAction(selectedUnits[0].GetAction<MoveAction>());
         OnSelectedUnitChanged?.Invoke(this, EventArgs.Empty);
     }
 
@@ -289,10 +289,10 @@ public class UnitActionSystem : MonoBehaviour
             if (underwayAction == null) continue;
 
             // 只处理移动行动
-            if (underwayAction.baseAction is MoveAction moveAction)
+            if (underwayAction.baseAction is BaseMoveAction baseMove)
             {
-                if (!moveAction.GetIsActive()) continue; // 确保移动行动正在进行中
-                GridPosition targetPos = moveAction.GetTargetPosition();
+                if (!baseMove.GetIsActive()) continue; // 确保移动行动正在进行中
+                GridPosition targetPos = baseMove.GetTargetPosition();
                 if (targetPos == GridPosition.nullGridPosition) continue; // 跳过无效目标位置
                 if ((GridPosition)unit.GetWorldPosition() == targetPos) continue; // 跳过当前单位位置与目标位置相同的情况
 
@@ -313,15 +313,11 @@ public class UnitActionSystem : MonoBehaviour
             if (units.Count > 1)
             {
                 // 所有目标相同的单位都暂停
-                Debug.Log($"目标格 {kvp.Key} 有 " +
-                    $"{string.Join(",", units.Select(unit => unit.name))} " +
-                    $"单位冲突，全部暂停。");
-
                 for (int i = 0; i < units.Count; i++)
                 {
                     Unit unit = units[i];
                     // 暂停所有冲突单位的行动
-                    MoveAction moveAction = unit.GetActionQueue().GetUnderwayAction().baseAction as MoveAction;
+                    BaseMoveAction moveAction = unit.GetActionQueue().GetUnderwayAction().baseAction as BaseMoveAction;
                     Action<Action> resumeAction = moveAction.SuspendAction();
                     actions[i] = resumeAction; //保存恢复行动的方法
                 }
@@ -334,9 +330,6 @@ public class UnitActionSystem : MonoBehaviour
     /// <summary>
     /// 按顺序启动目标的恢复方法，在到达目标位置时再启动下一个
     /// </summary>
-    /// <param name="actions"></param>
-    /// <param name="units"></param>
-    /// <returns></returns>
     private IEnumerator ExecuteActionsSequentially(Action<Action>[] actions)
     {
         for (int i = 0; i < actions.Length; i++)

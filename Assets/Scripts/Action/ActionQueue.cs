@@ -198,7 +198,7 @@ public class ActionQueue : MonoBehaviour
         List<GridPosition> newTargetList = new List<GridPosition>(last.targetPositionList);
 
         MoveActionParameter copyMoveActionParameter = new(
-            (MoveAction)last.baseAction,
+            (BaseMoveAction)last.baseAction,
             newTargetList,
             last.unitFinalPosition,
             last.executeTurn

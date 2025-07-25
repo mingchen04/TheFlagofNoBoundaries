@@ -3,18 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class MoveAction : BaseAction
+public class MoveAction : BaseMoveAction
 {
-    public event EventHandler OnStartMoving;
-    public event EventHandler OnStopMoving;
-
-    private bool IsWalking = false;
-    private List<Vector3> movePathWorldPositions;
-    private int currentPathIndex;
-    private GridPosition targetPosition = GridPosition.nullGridPosition;
-    private Action ArriveTargetLocationCall; //到达目标位置时的回调
-
-
+    public override event EventHandler OnStartMoving;
+    public override event EventHandler OnStopMoving;
+    [SerializeField] private static int moveCost = 10; // 每步移动的基础体力消耗
     protected override void Awake()
     {
         base.Awake();
@@ -38,90 +31,18 @@ public class MoveAction : BaseAction
             UnitActionSystem.Instance.StopInvalidMoveUnits();
         }
 
-        if (!TargetPositionStance())
-        {
-            ArriveTargetLocationCall?.Invoke(); // 如果目标位置不可达，调用回调避免阻碍队列
-            return;
-        }
-        ;
-
-        if (!IsWalking)
+        if (TargetPositionStance())
         {
             OnStartMoving?.Invoke(this, EventArgs.Empty);
         }
-
-        Vector3 moveDirection = ((Vector3)targetPosition - transform.position).normalized;
-        float stoppingDistance = 0.1f;
-        if (Vector3.Distance(transform.position, targetPosition) > stoppingDistance)
-        {
-            float moveSpeed = 4f;
-            transform.position += moveSpeed * Time.deltaTime * moveDirection;
-        }
         else
         {
-            ArriveTargetLocationCall?.Invoke(); // 到达目标位置时调用回调
-            ArriveTargetLocationCall = null; // 清除回调，避免重复调用
-
-            currentPathIndex++;
-            GridPosition oldTargetPosition = targetPosition;
-            if (movePathWorldPositions.Count > currentPathIndex) targetPosition = movePathWorldPositions[currentPathIndex];
-
-            unit.SetUnitGridPosition(oldTargetPosition);
-            unit.TrySpendActionPointsToTakeAction(GetMoveStepActionPointCost(currentPathIndex));
-            if (currentPathIndex >= movePathWorldPositions.Count)
-            {
-                targetPosition = GridPosition.nullGridPosition;
-                currentPathIndex = 0; // 重置索引
-                ActionComplete();
-            }
+            ArriveTargetLocationCall?.Invoke(); // 如果目标位置不可达，调用回调避免阻碍队列
+            OnStopMoving?.Invoke(this, EventArgs.Empty);
+            return;
         }
 
-        float rotateSpeed = 10f;
-        transform.forward = Vector3.Slerp(transform.forward, moveDirection, Time.deltaTime * rotateSpeed);
-    }
-
-    /// <summary>
-    /// 检查目标位置是否可达，并处理路径冲突
-    /// </summary>
-    private bool TargetPositionStance()
-    {
-        Unit targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(targetPosition);
-
-        if (targetUnit != null && targetUnit != unit)
-        {
-            if (targetUnit.GetAction<MoveAction>().isActive)
-            {
-                // 单位正在移动，等待其离开格子
-                IsWalking = false; //停止行走动画
-                OnStopMoving?.Invoke(this, EventArgs.Empty);
-
-                bool isTargetUnitA = targetUnit.GetAction<MoveAction>().GetTargetPosition() == unit.GetGridPosition();
-                bool isTargetUnitB = targetPosition == targetUnit.GetGridPosition();
-                if (isTargetUnitA && isTargetUnitB)
-                {
-                    //路径冲突，结束双方行动
-                    unit.GetActionQueue().ActionQueueStop();
-                    targetUnit.GetActionQueue().ActionQueueStop();
-                }
-            }
-            else
-            {
-                // 如果目标单位不再移动，路径被占用停止行动
-                unit.GetActionQueue().ActionQueueStop();
-            }
-            return false;
-        }
-
-        IsWalking = true; //开始行走动画
-        OnStartMoving?.Invoke(this, EventArgs.Empty);
-        // 目标格可达，可以继续移动
-        return true;
-    }
-
-    public override void ActionStop()
-    {
-        OnStopMoving?.Invoke(this, EventArgs.Empty);
-        base.ActionStop();
+        UnitMove();
     }
 
     public override void TakeAction(BaseActionParameter baseActionParameter, Action onActionComplete)
@@ -191,25 +112,6 @@ public class MoveAction : BaseAction
         return CalculateTotalMoveActionPoints(moveSteps);
     }
 
-    /// <summary>
-    /// 根据目标点列表构建完整路径（不含起点重复）
-    /// </summary>
-    private List<GridPosition> BuildMovePathFromTargets(List<GridPosition> targetPositions)
-    {
-        List<GridPosition> path = new();
-        if (targetPositions == null || targetPositions.Count < 2) return path;
-        for (int i = 1; i < targetPositions.Count; i++)
-        {
-            GridPosition start = targetPositions[i - 1];
-            GridPosition end = targetPositions[i];
-            List<GridPosition> segment = Pathfinding.Instance.FindPath(start, end, out int _);
-            if (segment.Count > 1)
-            {
-                path.AddRange(segment.Skip(1)); // 跳过起点
-            }
-        }
-        return path;
-    }
 
     /// <summary>
     /// 计算总行动点消耗
@@ -230,7 +132,7 @@ public class MoveAction : BaseAction
     private static int GetMoveStepActionPointCost(int stepIndex)
     {
         if (stepIndex == 0) return 0;
-        float cost = 10f;
+        float cost = moveCost;
         for (int i = 1; i < stepIndex; i++)
         {
             cost *= 1.2f;
@@ -266,13 +168,6 @@ public class MoveAction : BaseAction
         return maxSteps > 0 ? maxSteps - 1 : 0;
     }
 
-    public void UpdatePath()
-    {
-        MoveActionParameter lastParam = unit.GetActionQueue().CopyLastMoveActionParameter();
-        lastParam.SetMovePath(movePathWorldPositions.Select(worldPosition => (GridPosition)worldPosition).ToList());
-        unit.GetActionQueue().UpdateBaseActionParameter(lastParam);
-    }
-
     protected override void ActionComplete()
     {
         if (!isActive) return;
@@ -281,34 +176,43 @@ public class MoveAction : BaseAction
         OnStopMoving?.Invoke(this, EventArgs.Empty);
     }
 
-    public GridPosition GetTargetPosition()
+    public override void ActionStop()
     {
-        return targetPosition;
+        base.ActionStop();
     }
 
-    /// <summary>
-    /// 暂停行动，并返回一个新的Action用于恢复行动，并且在到达目标格子时执行回调
-    /// </summary>
-    /// <returns>恢复行动回调方法</returns>
-    public Action<Action> SuspendAction()
+    private void UnitMove()
     {
-        isActive = false;
-        void action(Action ArriveTargetLocationCall)
+        Vector3 moveDirection = ((Vector3)targetPosition - transform.position).normalized;
+        float stoppingDistance = 0.1f;
+        if (Vector3.Distance(transform.position, targetPosition) > stoppingDistance)
         {
-            Debug.Log($"{unit.name} 恢复行动");
-            isActive = true;
+            float moveSpeed = 4f;
+            transform.position += moveSpeed * Time.deltaTime * moveDirection;
+        }
+        else
+        {
+            ArriveTargetLocationCall?.Invoke(); // 到达目标位置时调用回调
+            ArriveTargetLocationCall = null; // 清除回调，避免重复调用
 
-            //附加到达目标位置的回调，避免短时间多次冲突覆盖上一个线程的回调
-            this.ArriveTargetLocationCall +=
-            ArriveTargetLocationCall +=
-            () => { Debug.Log($"{unit.name} 到达目标位置 启动下一个单位 "); };
+            currentPathIndex++;
+            GridPosition oldTargetPosition = targetPosition;
+            if (movePathWorldPositions.Count > currentPathIndex)
+            {
+                targetPosition = movePathWorldPositions[currentPathIndex];
+            }
+
+            unit.SetUnitGridPosition(oldTargetPosition);
+            unit.TrySpendActionPointsToTakeAction(GetMoveStepActionPointCost(currentPathIndex));
+            if (currentPathIndex >= movePathWorldPositions.Count)
+            {
+                targetPosition = GridPosition.nullGridPosition;
+                currentPathIndex = 0; // 重置索引
+                ActionComplete();
+            }
         }
 
-        return action;
-    }
-
-    public bool GetIsActive()
-    {
-        return isActive;
+        float rotateSpeed = 10f;
+        transform.forward = Vector3.Slerp(transform.forward, moveDirection, Time.deltaTime * rotateSpeed);
     }
 }

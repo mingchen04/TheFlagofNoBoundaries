@@ -6,9 +6,8 @@ public class MoveActionParameter : BaseActionParameter
 {
     private List<GridPosition> movePath;
 
-    public MoveActionParameter(MoveAction action, List<GridPosition> targetPos, GridPosition finalPos, int executeTurn) : base(action, targetPos, finalPos, executeTurn)
+    public MoveActionParameter(BaseMoveAction moveAction, List<GridPosition> targetPos, GridPosition finalPos, int executeTurn) : base(moveAction, targetPos, finalPos, executeTurn)
     {
-        baseAction = action;
         movePath = new List<GridPosition>();
     }
 
