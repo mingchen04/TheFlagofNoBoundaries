@@ -11,10 +11,10 @@ public class GridSystemHex<TGridObject>
     private float cellSize;
     private TGridObject[,] gridObjectsArray;
 
-    //Action	ÎŞ·µ»ØÖµµÄ·½·¨	Action<²ÎÊı, ²ÎÊı>
-    //Func  ÓĞ·µ»ØÖµµÄ·½·¨ Func<²ÎÊı, ²ÎÊı, ·µ»ØÖµ>
+    //Action	æ— è¿”å›å€¼çš„æ–¹æ³•	Action<å‚æ•°, å‚æ•°>
+    //Func  æœ‰è¿”å›å€¼çš„æ–¹æ³• Func<å‚æ•°, å‚æ•°, è¿”å›å€¼>
 
-    //¹¹Ôìº¯Êı
+    //æ„é€ å‡½æ•°
     public GridSystemHex(int width, int height, float cellSize,
         Func<GridSystemHex<TGridObject>, GridPosition, TGridObject> createTGridObject)
     {
@@ -28,7 +28,7 @@ public class GridSystemHex<TGridObject>
             for (int z = 0; z < height; z++)
             {
                 GridPosition gridPosition = new GridPosition(x, z);
-                //Ê¹ÓÃ·ºĞÍ new ĞèÒªÊ¹ÓÃwhere new()Ô¼Êø ÇÒ²»Ö§³Ö¶à¸ö²ÎÊı ÀûÓÃ·½·¨²ÎÊı´«µİnew
+                //ä½¿ç”¨æ³›å‹ new éœ€è¦ä½¿ç”¨where new()çº¦æŸ ä¸”ä¸æ”¯æŒå¤šä¸ªå‚æ•° åˆ©ç”¨æ–¹æ³•å‚æ•°ä¼ é€’new
                 //gridObjectsArray[x, z] = new TGridObject(this, GridPosition);
                 gridObjectsArray[x, z] = createTGridObject(this, gridPosition);
             }
@@ -37,9 +37,17 @@ public class GridSystemHex<TGridObject>
 
     public Vector3 GetWorldPositon(GridPosition gridPosition)
     {
-        Vector3 worldPosition = new Vector3(gridPosition.x, 0, 0) * cellSize +
-            new Vector3(0, 0, gridPosition.z) * cellSize * HEX_VERTICAL_OFFSET_MULTIPLIER + //zÖáÆ«ÒÆ
-        (((gridPosition.z % 2) == 1) ? new Vector3(1, 0, 0) * cellSize * 0.5f : Vector3.zero); //ÆæÊıĞĞ Áù±ßĞÎÆ«ÒÆXÖá°ë¸ñ¾àÀë
+        // è®¡ç®—åŸºç¡€ä½ç½®ï¼ˆä¸è€ƒè™‘è¡Œåç§»ï¼‰
+        Vector3 worldPosition = new Vector3(gridPosition.x, 0, gridPosition.z * HEX_VERTICAL_OFFSET_MULTIPLIER) * cellSize;
+
+        // ä¿®æ­£å¥‡æ•°è¡Œåç§»ï¼ˆå…¼å®¹è´Ÿæ•°åæ ‡ï¼‰
+        bool isOddRow = Mathf.Abs(gridPosition.z % 2) == 1;
+        if (isOddRow)
+        {
+            // æ ¹æ®zåæ ‡çš„æ­£è´Ÿå†³å®šåç§»æ–¹å‘
+            float offsetDirection = Mathf.Sign(gridPosition.z);
+            worldPosition += new Vector3(0.5f * offsetDirection, 0, 0) * cellSize;
+        }
 
         return worldPosition;
     }
@@ -54,7 +62,7 @@ public class GridSystemHex<TGridObject>
 
         bool oddRow = (roughXZ.z % 2f == 0);
 
-        //»ñÈ¡ÖÜÎ§µÄÁÚ½ü½Úµã
+        //è·å–å‘¨å›´çš„é‚»è¿‘èŠ‚ç‚¹
         List<GridPosition> neighbourGridPositionList = new List<GridPosition>
         {
             roughXZ + new GridPosition(+1,0),
@@ -62,13 +70,13 @@ public class GridSystemHex<TGridObject>
             roughXZ + new GridPosition(0,+1),
             roughXZ + new GridPosition(0,-1),
 
-            //¸ù¾İÆæÅ¼ĞĞ¸Ä±ä»ñÈ¡µÄÎ»ÖÃ
+            //æ ¹æ®å¥‡å¶è¡Œæ”¹å˜è·å–çš„ä½ç½®
             roughXZ + new GridPosition(oddRow? -1:+1,+1),
             roughXZ + new GridPosition(oddRow? -1:+1,-1),
         };
 
 
-        //»ñÈ¡¾àÀë×î¶ÌµÄ½Úµã
+        //è·å–è·ç¦»æœ€çŸ­çš„èŠ‚ç‚¹
         GridPosition closestGridPosition = roughXZ;
         foreach (GridPosition neighbourGridPosition in neighbourGridPositionList)
         {
