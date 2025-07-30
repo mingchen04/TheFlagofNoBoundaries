@@ -18,7 +18,7 @@ public abstract class BaseMoveAction : BaseAction
     /// <summary>
     /// 检查目标位置是否可达，并处理路径冲突
     /// </summary>
-    protected bool TargetPositionStance()
+    protected bool TargetPositionStance()  
     {
         Unit targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(targetPosition);
         bool IsWalking = true;
@@ -62,6 +62,64 @@ public abstract class BaseMoveAction : BaseAction
 
 
     /// <summary>
+    /// 体力消耗模式
+    /// </summary>
+    protected enum SrengthConsumption
+    {
+        everyStep, // 每一步移动消耗体力
+        immediate, // 立即消耗体力
+    }
+
+    /// <summary>
+    /// 控制单位移动到目标位置
+    /// </summary>
+    /// <param name="moveSpeed">移动速度</param>
+    /// <param name="srengthConsumption">体力消耗模式</param>
+    /// <param name="srengthConsumptionCost">体力消耗点数</param>
+    protected void UnitMove(float moveSpeed = 4f,
+        SrengthConsumption srengthConsumption = SrengthConsumption.immediate,
+        int srengthConsumptionCost = 0)
+    {
+        Vector3 moveDirection = ((Vector3)targetPosition - transform.position).normalized;
+        float stoppingDistance = 0.1f;
+        if (Vector3.Distance(transform.position, targetPosition) > stoppingDistance)
+        {
+            transform.position += moveSpeed * Time.deltaTime * moveDirection;
+        }
+        else
+        {
+            ArriveTargetLocationCall?.Invoke(); // 到达目标位置时调用回调
+            ArriveTargetLocationCall = null; // 清除回调，避免重复调用
+
+            currentPathIndex++;
+            GridPosition oldTargetPosition = targetPosition;
+            if (movePathWorldPositions.Count > currentPathIndex)
+            {
+                targetPosition = movePathWorldPositions[currentPathIndex];
+            }
+
+            unit.SetUnitGridPosition(oldTargetPosition);
+
+            //每到达一格消耗体力
+            if(srengthConsumption == SrengthConsumption.everyStep)
+            {
+                unit.TrySpendActionPointsToTakeAction(srengthConsumptionCost);
+            }
+           
+            if (currentPathIndex >= movePathWorldPositions.Count)
+            {
+                targetPosition = GridPosition.nullGridPosition;
+                currentPathIndex = 0; // 重置索引
+                ActionComplete();
+            }
+        }
+
+        float rotateSpeed = 10f;
+        transform.forward = Vector3.Slerp(transform.forward, moveDirection, Time.deltaTime * rotateSpeed);
+    }
+
+
+    /// <summary>
     /// 根据目标点列表构建完整路径（不含起点重复）
     /// </summary>
     protected List<GridPosition> BuildMovePathFromTargets(List<GridPosition> targetPositions)
@@ -88,6 +146,8 @@ public abstract class BaseMoveAction : BaseAction
     public Action<Action> SuspendAction()
     {
         isActive = false;
+
+        // 等效于 Action action =new Action(() => { });
         void action(Action ArriveTargetLocationCall)
         {
             isActive = true;
@@ -97,5 +157,15 @@ public abstract class BaseMoveAction : BaseAction
         }
 
         return action;
+    }
+
+    public override void TakeAction(BaseActionParameter baseActionParameter, Action onActionComplete)
+    {
+        unit.SetForecast(false);
+        currentPathIndex = 0;
+        targetPosition = GridPosition.nullGridPosition; // 重置目标位置
+        movePathWorldPositions = (baseActionParameter as MoveActionParameter).GetMovePathForWorldPosition();
+
+        ActionStart(onActionComplete);
     }
 }

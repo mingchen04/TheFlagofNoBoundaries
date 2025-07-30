@@ -42,18 +42,8 @@ public class MoveAction : BaseMoveAction
             return;
         }
 
-        UnitMove();
-    }
-
-    public override void TakeAction(BaseActionParameter baseActionParameter, Action onActionComplete)
-    {
-        unit.SetForecast(false);
-        currentPathIndex = 0;
-        targetPosition = GridPosition.nullGridPosition; // 重置目标位置
-        movePathWorldPositions = (baseActionParameter as MoveActionParameter).GetMovePathForWorldPosition();
-
-        ActionStart(onActionComplete);
-        OnStartMoving?.Invoke(this, EventArgs.Empty);
+        //设置消耗模式和消耗体力值
+        UnitMove(srengthConsumption: SrengthConsumption.everyStep, srengthConsumptionCost: GetMoveStepActionPointCost(currentPathIndex + 1));
     }
 
     public override List<GridPosition> GetValidActionGridPositionList()
@@ -176,43 +166,14 @@ public class MoveAction : BaseMoveAction
         OnStopMoving?.Invoke(this, EventArgs.Empty);
     }
 
+    protected override void ActionStart(Action onActionComplete)
+    {
+        base.ActionStart(onActionComplete);
+        IsWalking = true; // 开始行走动画
+    }
+
     public override void ActionStop()
     {
         base.ActionStop();
-    }
-
-    private void UnitMove()
-    {
-        Vector3 moveDirection = ((Vector3)targetPosition - transform.position).normalized;
-        float stoppingDistance = 0.1f;
-        if (Vector3.Distance(transform.position, targetPosition) > stoppingDistance)
-        {
-            float moveSpeed = 4f;
-            transform.position += moveSpeed * Time.deltaTime * moveDirection;
-        }
-        else
-        {
-            ArriveTargetLocationCall?.Invoke(); // 到达目标位置时调用回调
-            ArriveTargetLocationCall = null; // 清除回调，避免重复调用
-
-            currentPathIndex++;
-            GridPosition oldTargetPosition = targetPosition;
-            if (movePathWorldPositions.Count > currentPathIndex)
-            {
-                targetPosition = movePathWorldPositions[currentPathIndex];
-            }
-
-            unit.SetUnitGridPosition(oldTargetPosition);
-            unit.TrySpendActionPointsToTakeAction(GetMoveStepActionPointCost(currentPathIndex));
-            if (currentPathIndex >= movePathWorldPositions.Count)
-            {
-                targetPosition = GridPosition.nullGridPosition;
-                currentPathIndex = 0; // 重置索引
-                ActionComplete();
-            }
-        }
-
-        float rotateSpeed = 10f;
-        transform.forward = Vector3.Slerp(transform.forward, moveDirection, Time.deltaTime * rotateSpeed);
     }
 }

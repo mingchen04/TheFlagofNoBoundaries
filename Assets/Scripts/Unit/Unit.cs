@@ -28,7 +28,6 @@ public class Unit : MonoBehaviour
     private bool isForecast; // 是否为预测模式
     private bool isBusy; // 是否忙碌
     private bool isDeployAction; //是否部署行动
-    private UnitPathLineUI UnitPathLineUI;
 
 
     private void Awake()
