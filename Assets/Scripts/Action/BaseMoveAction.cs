@@ -18,7 +18,7 @@ public abstract class BaseMoveAction : BaseAction
     /// <summary>
     /// 检查目标位置是否可达，并处理路径冲突
     /// </summary>
-    protected bool TargetPositionStance()  
+    protected bool TargetPositionStance()
     {
         Unit targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(targetPosition);
         bool IsWalking = true;
@@ -56,8 +56,16 @@ public abstract class BaseMoveAction : BaseAction
     public void UpdatePath()
     {
         MoveActionParameter lastParam = unit.GetActionQueue().CopyLastMoveActionParameter();
+
+        if (movePathWorldPositions == null || movePathWorldPositions.Count == 0)
+        {
+            List<GridPosition> path = BuildMovePathFromTargets(lastParam.targetPositionList);
+            movePathWorldPositions = path.Select(gridPosition => (Vector3)gridPosition).ToList();
+        }
+
         lastParam.SetMovePath(movePathWorldPositions.Select(worldPosition => (GridPosition)worldPosition).ToList());
         unit.GetActionQueue().UpdateBaseActionParameter(lastParam);
+        movePathWorldPositions.Clear();
     }
 
 
@@ -80,6 +88,11 @@ public abstract class BaseMoveAction : BaseAction
         SrengthConsumption srengthConsumption = SrengthConsumption.immediate,
         int srengthConsumptionCost = 0)
     {
+        if (srengthConsumption == SrengthConsumption.immediate && srengthConsumptionCost != 0)
+        {
+            unit.TrySpendActionPointsToTakeAction(srengthConsumptionCost);
+        }
+
         Vector3 moveDirection = ((Vector3)targetPosition - transform.position).normalized;
         float stoppingDistance = 0.1f;
         if (Vector3.Distance(transform.position, targetPosition) > stoppingDistance)
@@ -101,11 +114,11 @@ public abstract class BaseMoveAction : BaseAction
             unit.SetUnitGridPosition(oldTargetPosition);
 
             //每到达一格消耗体力
-            if(srengthConsumption == SrengthConsumption.everyStep)
+            if (srengthConsumption == SrengthConsumption.everyStep)
             {
                 unit.TrySpendActionPointsToTakeAction(srengthConsumptionCost);
             }
-           
+
             if (currentPathIndex >= movePathWorldPositions.Count)
             {
                 targetPosition = GridPosition.nullGridPosition;
@@ -167,5 +180,11 @@ public abstract class BaseMoveAction : BaseAction
         movePathWorldPositions = (baseActionParameter as MoveActionParameter).GetMovePathForWorldPosition();
 
         ActionStart(onActionComplete);
+    }
+
+    protected override void ActionComplete()
+    {
+        movePathWorldPositions.Clear();
+        base.ActionComplete();
     }
 }

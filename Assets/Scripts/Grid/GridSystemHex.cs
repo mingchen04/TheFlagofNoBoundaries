@@ -35,21 +35,21 @@ public class GridSystemHex<TGridObject>
         }
     }
 
-    public Vector3 GetWorldPositon(GridPosition gridPosition)
+    public Vector3 GetWorldPosition(GridPosition gridPosition)
     {
-        // 计算基础位置（不考虑行偏移）
-        Vector3 worldPosition = new Vector3(gridPosition.x, 0, gridPosition.z * HEX_VERTICAL_OFFSET_MULTIPLIER) * cellSize;
+        // 基础垂直位置（保持六边形垂直间距）
+        float zPos = gridPosition.z * cellSize * HEX_VERTICAL_OFFSET_MULTIPLIER;
 
-        // 修正奇数行偏移（兼容负数坐标）
-        bool isOddRow = Mathf.Abs(gridPosition.z % 2) == 1;
-        if (isOddRow)
+        // 水平位置计算
+        float xPos = gridPosition.x * cellSize;
+
+        // 奇数行偏移处理（兼容负坐标）
+        if (Mathf.Abs(gridPosition.z) % 2 == 1)
         {
-            // 根据z坐标的正负决定偏移方向
-            float offsetDirection = Mathf.Sign(gridPosition.z);
-            worldPosition += new Vector3(0.5f * offsetDirection, 0, 0) * cellSize;
+            xPos += (Mathf.Abs(gridPosition.z) > 0 || xPos == 0 ? 0.5f : -0.5f) * cellSize;
         }
 
-        return worldPosition;
+        return new Vector3(xPos, 0, zPos);
     }
 
 
@@ -82,8 +82,8 @@ public class GridSystemHex<TGridObject>
         {
             if (!IsValidGridPosition(neighbourGridPosition)) continue;
 
-            Vector3 shortestWorldPosition = GetWorldPositon(closestGridPosition);
-            Vector3 itemWorldposition = GetWorldPositon(neighbourGridPosition);
+            Vector3 shortestWorldPosition = GetWorldPosition(closestGridPosition);
+            Vector3 itemWorldposition = GetWorldPosition(neighbourGridPosition);
 
             if (Vector3.Distance(shortestWorldPosition, worldPosition) > Vector3.Distance(itemWorldposition, worldPosition))
             {
@@ -102,7 +102,7 @@ public class GridSystemHex<TGridObject>
             for (int z = 0; z < height; z++)
             {
                 GridPosition gridPosition = new GridPosition(x, z);
-                Transform debugTransform = GameObject.Instantiate(debugPrefab, GetWorldPositon(gridPosition), Quaternion.identity);
+                Transform debugTransform = GameObject.Instantiate(debugPrefab, GetWorldPosition(gridPosition), Quaternion.identity);
                 GridDebugObject gridDebugObject = debugTransform.GetComponent<GridDebugObject>();
 
                 gridDebugObject.SetGridObject(GetGridObject(gridPosition));

@@ -4712,7 +4712,7 @@ PrefabInstance:
     - target: {fileID: 3919550748142699886, guid: a665b09d1753c1549bcb089ef57f3578,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 11
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 3919550748142699886, guid: a665b09d1753c1549bcb089ef57f3578,
         type: 3}
@@ -4722,7 +4722,7 @@ PrefabInstance:
     - target: {fileID: 3919550748142699886, guid: a665b09d1753c1549bcb089ef57f3578,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 4.5
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3919550748142699886, guid: a665b09d1753c1549bcb089ef57f3578,
         type: 3}
@@ -5802,6 +5802,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 97b3f2e66d0b7a34bbc697f5631a1ef6, type: 2}
   - {fileID: 11400000, guid: 8ca3140da1a1e814a9e1968dda0fc054, type: 2}
   - {fileID: 11400000, guid: 0c13f8f7f1660d34b82ce6e3f2f44ffc, type: 2}
+  - {fileID: 11400000, guid: 5f2bba7833b55a246a9894f6fc4f48cd, type: 2}
   baseBuffSOs:
   - {fileID: 11400000, guid: 81eef1fcbd3493a428e8615979c6cb7b, type: 2}
 --- !u!4 &1581849501

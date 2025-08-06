@@ -29,7 +29,8 @@ public enum ActionType
     MoveAction,
     ShootAction,
     SpinAction,
-    SwordAction
+    SwordAction,
+    MobileSlashAction
 }
 
 [CreateAssetMenu(menuName = "BaseActionSO")]

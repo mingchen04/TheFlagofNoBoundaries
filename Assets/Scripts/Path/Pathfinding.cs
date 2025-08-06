@@ -178,8 +178,8 @@ public class Pathfinding : MonoBehaviour
     private int CalculateHeuristicDistance(GridPosition gridPositionA, GridPosition gridPositionB)
     {
         return Mathf.RoundToInt(MOVE_STRAIGHT_COST * 
-            Vector3.Distance(gridSystem.GetWorldPositon(gridPositionA), 
-            gridSystem.GetWorldPositon(gridPositionB)));
+            Vector3.Distance(gridSystem.GetWorldPosition(gridPositionA), 
+            gridSystem.GetWorldPosition(gridPositionB)));
     }
 
     /// <summary>

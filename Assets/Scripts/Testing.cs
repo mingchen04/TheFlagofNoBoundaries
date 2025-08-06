@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Testing : MonoBehaviour
@@ -20,13 +21,19 @@ public class Testing : MonoBehaviour
         {
             // 11,10 true
             // 11,9 false
-            var a = new GridPosition(11, 10);
-            var b = new GridPosition(6, 0);
-            bool isLine = b.IsStraightLine(a); // 返回true
-            Debug.Log($"IsStraightLine: {isLine}");
+            var a = new GridPosition(10, 2);
 
-            isLine = a.IsStraightLine(b); // 返回true
-            Debug.Log($"IsStraightLine: {isLine}");
+            List<GridPosition> positions = new List<GridPosition>
+            {
+                new GridPosition(11, 1), //false
+                new GridPosition(9, 0), //true
+            };
+
+            foreach(GridPosition position in positions)
+            {
+                a.IsStraightLine(position);
+            }
+
         }
 
     }

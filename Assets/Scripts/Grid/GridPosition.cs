@@ -100,20 +100,23 @@ public struct GridPosition : IEquatable<GridPosition>
     {
         return LevelGrid.Instance.GetGridPosition(worldPosition);
     }
-
-
 }
 
 public static class GridPositionExtensions
 {
-    // 计算六边形网格中的直线方向
+    /// <summary>
+    /// 检查两点是否在一条直线上 夹角为0则表示在一条直线上 返回true
+    /// </summary>
+    /// <param name="from"></param>
+    /// <param name="to"></param>
+    /// <returns></returns>
     //this 关键字表示这是一个扩展方法
-    public static GridPosition GetHexLineDirection(this GridPosition from, GridPosition to)
+    public static bool IsStraightLine(this GridPosition from, GridPosition to)
     {
-        GridPosition delta = to - from;
+        Vector2 delta = (Vector2)to - (Vector2)from;
 
         // 六边形网格的六个基本方向
-        var hexDirections = new List<GridPosition>
+        List<GridPosition> hexDirections = new List<GridPosition>
         {
             new(+1, 0),  // 右
             new(-1, 0),  // 左
@@ -131,37 +134,23 @@ public static class GridPositionExtensions
         {
 
             //计算两个向量之间的夹角 例如从1，0到-1,0的夹角为180度，从0,1到1,1的夹角为45度
+
             float angle = Vector2.Angle(delta, dir);
+
             if (angle < minAngle)
             {
                 minAngle = angle;
                 closestDirection = dir;
-                Debug.Log($"位置{(Vector2)delta} ：{(Vector2)dir} 夹角：{minAngle}");
+
+                #region  如果夹角为0则直接返回
+                if (Mathf.Approximately(minAngle, 0f))
+                {
+                    return true;
+                }
+                #endregion
             }
         }
-        return closestDirection;
+        return false;
     }
 
-    // 检查两点是否在一条直线上
-    public static bool IsStraightLine(this GridPosition from, GridPosition to)
-    {
-        Vector2 delta = (Vector2)to - (Vector2)from;
-        Vector2 direction = from.GetHexLineDirection(to); //获取最小夹角的向量
-
-        // 检查delta是否是direction的整数倍
-        if (direction.x == 0)
-        {
-            return delta.x == 0 && delta.y % direction.y == 0;
-        }
-        else if (direction.y == 0)
-        {
-            return delta.y == 0 && delta.x % direction.x == 0;
-        }
-        else
-        {
-            //计算 delta 在 x 方向与 direction.x 的比值 ratio。
-            float ratio = delta.x / direction.x;
-            return Mathf.Approximately(ratio, delta.y / direction.y);
-        }
-    }
 }

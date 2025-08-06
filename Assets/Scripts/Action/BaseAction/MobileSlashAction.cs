@@ -6,7 +6,8 @@ public class MobileSlashAction : BaseMoveAction
 {
     public override event EventHandler OnStartMoving;
     public override event EventHandler OnStopMoving;
-    [SerializeField] private int maxSteps = 5;
+    [SerializeField] private int maxSteps = 3;
+    private bool SpendActionPoints = false;
 
     public void Update()
     {
@@ -37,7 +38,16 @@ public class MobileSlashAction : BaseMoveAction
             return;
         }
 
-        UnitMove();
+        if (!SpendActionPoints)
+        {
+            UnitMove(moveSpeed: 10f, srengthConsumptionCost: GetActionPointsCost());
+            SpendActionPoints = true;
+        }
+        else
+        {
+            UnitMove(moveSpeed: 10f);
+        }
+        
     }
 
     public override string GetActionName()
@@ -74,12 +84,7 @@ public class MobileSlashAction : BaseMoveAction
                 if (!Pathfinding.Instance.IsWalkableGridPosition(testPos)) continue;
                 if (!Pathfinding.Instance.HasPath(unit.GetGridPosition(), testPos)) continue;
                 if (unit.GetActionQueue().IsLastActionParameterTargetPosition(testPos)) continue;
-
-                int pathfindingDistanceMultiplier = 10;
-                if (Pathfinding.Instance.GetPathLength(unit.GetGridPosition(), testPos) > maxSteps * pathfindingDistanceMultiplier)
-                {
-                    continue;
-                }
+                if (!unit.GetGridPosition().IsStraightLine(testPos)) continue;
 
                 validTargets.Add(testPos);
             }
@@ -87,4 +92,9 @@ public class MobileSlashAction : BaseMoveAction
         return validTargets;
     }
 
+    protected override void ActionComplete()
+    {
+        SpendActionPoints = false;
+        base.ActionComplete();
+    }
 }
