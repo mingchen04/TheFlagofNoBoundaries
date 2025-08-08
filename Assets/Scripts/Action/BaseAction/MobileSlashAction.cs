@@ -6,8 +6,20 @@ public class MobileSlashAction : BaseMoveAction
 {
     public override event EventHandler OnStartMoving;
     public override event EventHandler OnStopMoving;
+    [SerializeField] private int damageAmount = 20;
     [SerializeField] private int maxSteps = 3;
     private bool SpendActionPoints = false;
+    private int oldCurrentPathIndex = 0;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        defaultPathfindingRules = new Pathfinding.PathfindingRules[]
+        {
+            Pathfinding.PathfindingRules.Walkable,
+            Pathfinding.PathfindingRules.Straight
+        };
+    }
 
     public void Update()
     {
@@ -27,15 +39,29 @@ public class MobileSlashAction : BaseMoveAction
             UnitActionSystem.Instance.StopInvalidMoveUnits();
         }
 
-        if (TargetPositionStance())
+        if (currentPathIndex + 1 == movePathWorldPositions.Count)
         {
-            OnStartMoving?.Invoke(this, EventArgs.Empty);
+            if (TargetPositionStance())
+            {
+                OnStartMoving?.Invoke(this, EventArgs.Empty);
+            }
+            else
+            {
+                ArriveTargetLocationCall?.Invoke(); // 如果目标位置不可达，调用回调避免阻碍队列
+                OnStopMoving?.Invoke(this, EventArgs.Empty);
+                return;
+            }
         }
-        else
+
+        if (oldCurrentPathIndex != currentPathIndex)
         {
-            ArriveTargetLocationCall?.Invoke(); // 如果目标位置不可达，调用回调避免阻碍队列
-            OnStopMoving?.Invoke(this, EventArgs.Empty);
-            return;
+            oldCurrentPathIndex = currentPathIndex;
+            //对经过的格子进行伤害判定
+            Unit tarGetUnit = LevelGrid.Instance.GetUnitAtGridPosition(unit.GetGridPosition());
+            if (tarGetUnit != unit)
+            {
+                tarGetUnit?.Damage(damageAmount);
+            }
         }
 
         if (!SpendActionPoints)
@@ -47,7 +73,7 @@ public class MobileSlashAction : BaseMoveAction
         {
             UnitMove(moveSpeed: 10f);
         }
-        
+
     }
 
     public override string GetActionName()
@@ -82,9 +108,9 @@ public class MobileSlashAction : BaseMoveAction
                 if (unitGridPosition == testPos) continue;
                 if (LevelGrid.Instance.HasAnyUnitOnGridPosition(testPos)) continue;
                 if (!Pathfinding.Instance.IsWalkableGridPosition(testPos)) continue;
-                if (!Pathfinding.Instance.HasPath(unit.GetGridPosition(), testPos)) continue;
+                if (!Pathfinding.Instance.HasPathStraight(unit.GetGridPosition(), testPos)) continue;
                 if (unit.GetActionQueue().IsLastActionParameterTargetPosition(testPos)) continue;
-                if (!unit.GetGridPosition().IsStraightLine(testPos)) continue;
+                if (!unit.GetGridPosition().IsStraightLine(testPos)) continue; //判断是否在一条直线上
 
                 validTargets.Add(testPos);
             }
@@ -94,7 +120,9 @@ public class MobileSlashAction : BaseMoveAction
 
     protected override void ActionComplete()
     {
+        oldCurrentPathIndex = 0;
         SpendActionPoints = false;
         base.ActionComplete();
     }
+
 }

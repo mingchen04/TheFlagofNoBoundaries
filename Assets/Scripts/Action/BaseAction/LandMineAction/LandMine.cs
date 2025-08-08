@@ -23,7 +23,6 @@ public class LandMine : MonoBehaviour
         gridPosition = targetGridPosition;
     }
 
-
     private void LandMineExploded()
     {
         LevelGrid.Instance.OnAnyUnitMoveGridPosition -= LevelGrid_OnAnyUnitMoveGridPosition;

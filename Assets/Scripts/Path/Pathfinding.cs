@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using UnityEngine;
 
@@ -21,6 +22,13 @@ public class Pathfinding : MonoBehaviour
     [SerializeField] private LayerMask obstaclesLayerMask;
 
     private GridSystemHex<PathNode> gridSystem;
+    //默认寻路规则
+    public static PathfindingRules[] defaultPathfindingRules = new PathfindingRules[]
+    {
+        PathfindingRules.Walkable, //检查是否有障碍
+        PathfindingRules.HasUnit, //检查是否有单位
+    };
+
 
     private void Awake()
     {
@@ -39,7 +47,7 @@ public class Pathfinding : MonoBehaviour
         this.height = height;
         this.cellSize = cellSize;
 
-        gridSystem = new GridSystemHex<PathNode>(width, height, cellSize, 
+        gridSystem = new GridSystemHex<PathNode>(width, height, cellSize,
             (GridSystemHex<PathNode> g, GridPosition gridPosition) => new PathNode(gridPosition));
 
         //gridSystem.CreateDebugObject(gridDebugObjectPrefab);
@@ -74,6 +82,11 @@ public class Pathfinding : MonoBehaviour
     /// </summary>
     /// <param name="startGridPosition">起始网格坐标</param>
     /// <param name="endGridPosition">目标网格坐标</param>
+    /// <param name="pathfindingRules"> 寻路规则数组，包含以下选项：
+    /// Straight 是否直线移动
+    /// Walkable 是否有障碍物
+    /// HasUnit 是否有单位
+    /// </param>
     /// <returns>
     /// 返回网格坐标列表表示路径，第一个元素是起点，最后一个元素是终点。
     /// 如果无法到达目标则返回null。
@@ -89,8 +102,14 @@ public class Pathfinding : MonoBehaviour
     /// 2. 支持8方向移动（含对角线）
     /// 3. 时间复杂度：最坏情况O(n)，n为网格节点数
     /// </remarks>
-    public List<GridPosition> FindPath(GridPosition startGridPosition, GridPosition endGridPosition, out int pathLength)
-    {        
+    public List<GridPosition> FindPath(GridPosition startGridPosition, GridPosition endGridPosition, out int pathLength,
+        PathfindingRules[] pathfindingRules = null)
+    {
+        //设置默认路径查找规则
+        if (pathfindingRules == null)
+        {
+            pathfindingRules = defaultPathfindingRules;
+        }
         List<PathNode> openList = new List<PathNode>();
         List<PathNode> closeList = new List<PathNode>();
 
@@ -139,18 +158,11 @@ public class Pathfinding : MonoBehaviour
                     continue;
                 }
 
-                if (!neighbourNode.IsWalkable())
+                if (!IsNodeValid(startNode, neighbourNode, pathfindingRules))
                 {
                     closeList.Add(neighbourNode);
                     continue;
                 }
-
-                if(LevelGrid.Instance.HasAnyUnitOnGridPosition(neighbourNode.GetGridPosition()))
-                {
-                    closeList.Add(neighbourNode);
-                    continue;
-                }
-
 
                 int tentativeGcost = currentNode.GetGCost() +
                     MOVE_STRAIGHT_COST;
@@ -175,10 +187,57 @@ public class Pathfinding : MonoBehaviour
         return null;
     }
 
+    /// <summary>
+    /// 寻路验证规则
+    /// </summary>
+    public enum PathfindingRules
+    {
+        Straight, //直线移动
+        Walkable, //障碍物
+        HasUnit, //有单位
+    }
+
+    private bool IsNodeValid(PathNode startPathNode, PathNode endPathNode, PathfindingRules[] pathfindingRules)
+    {
+
+        if (endPathNode == null) return false;
+        foreach (PathfindingRules rule in pathfindingRules)
+        {
+            switch (rule)
+            {
+                case PathfindingRules.Walkable:
+                    if (!endPathNode.IsWalkable())
+                    {
+                        if (endPathNode.GetGridPosition() == new GridPosition(5, 6))
+                        return false;
+                    }
+                    break;
+                case PathfindingRules.HasUnit:
+                    if (LevelGrid.Instance.HasAnyUnitOnGridPosition(endPathNode.GetGridPosition()))
+                    {
+                        if (endPathNode.GetGridPosition() == new GridPosition(5, 6))
+                        return false;
+                    }
+                    break;
+                case PathfindingRules.Straight:
+                    //检查是否在一条直线上
+                    if (!startPathNode.GetGridPosition().IsStraightLine(endPathNode.GetGridPosition()))
+                    {
+                        if (endPathNode.GetGridPosition() == new GridPosition(5, 6))
+                        return false;
+                    }
+                    break;
+            }
+        }
+
+        return true;
+    }
+
+
     private int CalculateHeuristicDistance(GridPosition gridPositionA, GridPosition gridPositionB)
     {
-        return Mathf.RoundToInt(MOVE_STRAIGHT_COST * 
-            Vector3.Distance(gridSystem.GetWorldPosition(gridPositionA), 
+        return Mathf.RoundToInt(MOVE_STRAIGHT_COST *
+            Vector3.Distance(gridSystem.GetWorldPosition(gridPositionA),
             gridSystem.GetWorldPosition(gridPositionB)));
     }
 
@@ -236,14 +295,16 @@ public class Pathfinding : MonoBehaviour
             neighbourList.Add(GetNode(gridPosition.x + 0, gridPosition.z + 1));
 
             if (oddRow ? xReduceValid : xAddValid) neighbourList.Add(GetNode(gridPosition.x + (oddRow ? -1 : +1), gridPosition.z + 1));
-        };
+        }
+        ;
 
         //Down
         if (zReduceValid)
         {
             neighbourList.Add(GetNode(gridPosition.x + 0, gridPosition.z - 1));
             if (oddRow ? xReduceValid : xAddValid) neighbourList.Add(GetNode(gridPosition.x + (oddRow ? -1 : +1), gridPosition.z - 1));
-        };
+        }
+        ;
 
         return neighbourList;
     }
@@ -302,6 +363,23 @@ public class Pathfinding : MonoBehaviour
     public bool HasPath(GridPosition startGridPositionm, GridPosition endGridPositionm)
     {
         return FindPath(startGridPositionm, endGridPositionm, out int pathLength) != null;
+    }
+
+    /// <summary>
+    /// 检查直线路径是否可行
+    /// </summary>
+    /// <param name="startGridPositionm">开始位置</param>
+    /// <param name="endGridPositionm">结束位置</param>
+    /// <returns>路径通行结果</returns>
+    public bool HasPathStraight(GridPosition startGridPositionm, GridPosition endGridPositionm)
+    {
+        PathfindingRules[] pathfindingRules = new PathfindingRules[]
+        {
+            PathfindingRules.Walkable, //检查是否有障碍
+            PathfindingRules.Straight //检查是否直线移动
+        };
+
+        return FindPath(startGridPositionm, endGridPositionm, out int pathLength, pathfindingRules) != null;
     }
 
     /// <summary>

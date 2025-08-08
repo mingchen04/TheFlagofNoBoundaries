@@ -13,6 +13,7 @@ public abstract class BaseMoveAction : BaseAction
     protected int currentPathIndex;
     protected GridPosition targetPosition = GridPosition.nullGridPosition;
     protected Action ArriveTargetLocationCall; //到达目标位置时的回调
+    protected Pathfinding.PathfindingRules[] defaultPathfindingRules = Pathfinding.defaultPathfindingRules;
 
 
     /// <summary>
@@ -53,7 +54,7 @@ public abstract class BaseMoveAction : BaseAction
         return targetPosition;
     }
 
-    public void UpdatePath()
+    public virtual void UpdatePath()
     {
         MoveActionParameter lastParam = unit.GetActionQueue().CopyLastMoveActionParameter();
 
@@ -143,7 +144,7 @@ public abstract class BaseMoveAction : BaseAction
         {
             GridPosition start = targetPositions[i - 1];
             GridPosition end = targetPositions[i];
-            List<GridPosition> segment = Pathfinding.Instance.FindPath(start, end, out int _);
+            List<GridPosition> segment = Pathfinding.Instance.FindPath(start, end, out int _ , defaultPathfindingRules);
             if (segment.Count > 1)
             {
                 path.AddRange(segment.Skip(1)); // 跳过起点
