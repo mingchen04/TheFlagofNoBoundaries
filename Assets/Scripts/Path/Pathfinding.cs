@@ -208,14 +208,12 @@ public class Pathfinding : MonoBehaviour
                 case PathfindingRules.Walkable:
                     if (!endPathNode.IsWalkable())
                     {
-                        if (endPathNode.GetGridPosition() == new GridPosition(5, 6))
                         return false;
                     }
                     break;
                 case PathfindingRules.HasUnit:
                     if (LevelGrid.Instance.HasAnyUnitOnGridPosition(endPathNode.GetGridPosition()))
                     {
-                        if (endPathNode.GetGridPosition() == new GridPosition(5, 6))
                         return false;
                     }
                     break;
@@ -223,7 +221,6 @@ public class Pathfinding : MonoBehaviour
                     //检查是否在一条直线上
                     if (!startPathNode.GetGridPosition().IsStraightLine(endPathNode.GetGridPosition()))
                     {
-                        if (endPathNode.GetGridPosition() == new GridPosition(5, 6))
                         return false;
                     }
                     break;
