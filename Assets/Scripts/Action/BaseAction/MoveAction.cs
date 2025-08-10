@@ -8,6 +8,7 @@ public class MoveAction : BaseMoveAction
     public override event EventHandler OnStartMoving;
     public override event EventHandler OnStopMoving;
     [SerializeField] private static int moveCost = 10; // 每步移动的基础体力消耗
+
     protected override void Awake()
     {
         base.Awake();

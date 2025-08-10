@@ -327,6 +327,7 @@ GameObject:
   - component: {fileID: 7804314412996553123}
   - component: {fileID: 2552117429896821055}
   - component: {fileID: 1893027492996790260}
+  - component: {fileID: 3943530444118733573}
   m_Layer: 3
   m_Name: SelectedVisual
   m_TagString: Untagged
@@ -345,7 +346,7 @@ Transform:
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0.01, z: 0}
   m_LocalScale: {x: 1.4, y: 1.4, z: 1.4}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 3919550748142699886}
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
@@ -412,6 +413,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unit: {fileID: 2034662736231050189}
+--- !u!95 &3943530444118733573
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1552156117724977182}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 05201767dc036604184d81ec0d85d715, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &5263675910771125597
 GameObject:
   m_ObjectHideFlags: 0
@@ -954,6 +976,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d363d20ae7ce3a64b92ed1a50528495f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  actionSpeed: 0
 --- !u!114 &-2894542637019877412
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -966,6 +989,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3d2517fca86ccc4e927285416460cbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  actionSpeed: 0
 --- !u!114 &979371953557367167
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -978,6 +1002,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98e9d604a4a83a44db1ffe14ba8d8668, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  actionSpeed: 0
   maxShootDistance: 5
   obstaclesLayerMask:
     serializedVersion: 2
@@ -994,6 +1019,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c62a93e4f6b2f894c922ce03489c5e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  actionSpeed: 0
   grenadeProjectilePrefab: {fileID: 2765077195779564584, guid: 9d58a711974045e4a8b996cf5799afb7,
     type: 3}
 --- !u!114 &3029014702042351316
@@ -1008,6 +1034,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b075b199a31742a4384670ffbd1c83bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  actionSpeed: 0
 --- !u!114 &1384058065204066233
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1020,6 +1047,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 916f67e7a0deae446b40c23c4e63e693, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  actionSpeed: 0
   maxSteps: 3
 --- !u!114 &8781643674633829981
 MonoBehaviour:
@@ -1033,6 +1061,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09801e5edbf0b684698a50f9382dfc94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  actionSpeed: 0
 --- !u!114 &4394302509620297805
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1045,6 +1074,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc40ee1416f7b414aaaf7c4628794d31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  actionSpeed: 0
   landMineTransformPrefab: {fileID: 8440213086168840181, guid: 44619a820d27e2143bb9011774cb34c9,
     type: 3}
 --- !u!114 &-2049203873941461844
@@ -1059,6 +1089,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f09117f59e9e41468bea13176ab176d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  actionSpeed: 0
 --- !u!114 &6515417029740260954
 MonoBehaviour:
   m_ObjectHideFlags: 0

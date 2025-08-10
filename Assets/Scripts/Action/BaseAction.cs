@@ -3,16 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+public enum ActionSpeed
+{
+    fast, //第一次为快速行动 第二次为慢速行动
+    slow, //永远为慢速行动
+    quickness, //永远为快速行动
+}
+
 public abstract class BaseAction : MonoBehaviour
 {
     public static event EventHandler OnAnyActionStarted;
     public static event EventHandler OnAnyActionCompleted;
-
+    
     //protected 子类可以访问
     protected Unit unit;
     protected bool isActive;
     protected Action onActionComplete;
     protected string actionName;
+    [SerializeField] protected ActionSpeed actionSpeed;
 
     //virtual 可重写
     protected virtual void Awake()
@@ -120,5 +128,10 @@ public abstract class BaseAction : MonoBehaviour
     public bool GetIsActive()
     {
         return isActive;
+    }
+
+    public ActionSpeed GetActionSpeed()
+    {
+        return actionSpeed;
     }
 }

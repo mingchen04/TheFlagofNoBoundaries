@@ -10,9 +10,11 @@ public class ActionQueue : MonoBehaviour
 {
     public static event EventHandler OnAnyActionAddQueue;
     public static event EventHandler OnAnyActionCompleted; //行为结束触发视图更新
-    private List<BaseActionParameter> pendingActions; //行为队列
-    private Unit unit; //当前单位
+
+    private List<BaseActionParameter> pendingActions; //行为队列    
     private BaseActionParameter underwayAction; //正在进行的行为
+    private Unit unit; //当前单位
+
 
     private void Awake()
     {
@@ -24,10 +26,98 @@ public class ActionQueue : MonoBehaviour
         pendingActions = new List<BaseActionParameter>();
     }
 
-    public void AddAction(BaseActionParameter baseActionParameter)
+    public bool HandleOrderedAction(BaseAction action, GridPosition targetPos, int executionOrder)
     {
-        pendingActions.Add(baseActionParameter);
+        Debug.Log("添加动作");
+        if (IsActionSpeedSlow()) return false;
+
+        unit.SetForecast(true);
+
+        ActionTags actionTags = ScriptiptableSOManager.Instance.GetActionTags(action);
+        bool isMove = actionTags.HasFlag(ActionTags.Move);
+        bool isDeploy = actionTags.HasFlag(ActionTags.Deploy);
+
+        BaseActionParameter actionParam;
+        GridPosition finalPos;
+        List<GridPosition> targetPositionList;
+
+        #region 部署移动处理
+
+        if (isMove)
+        {
+            finalPos = targetPos;
+            targetPositionList = new List<GridPosition> { unit.GetGridPosition(), targetPos };
+        }
+        else
+        {
+            finalPos = unit.GetGridPosition();
+            targetPositionList = new List<GridPosition> { targetPos };
+        }
+
+        if (unit.GetDeselectAction())
+        {
+            // 复制上一次参数
+            BaseActionParameter lastParam = CopyLastMoveActionParameter();
+            actionParam = lastParam;
+            actionParam.targetPositionList.Add(targetPos);
+            actionParam.unitFinalPosition = finalPos;
+
+            bool IsUpdateSuccess;
+            if (actionParam is MoveActionParameter moveActionParameter)
+            {
+                IsUpdateSuccess = UpdateBaseActionParameter(moveActionParameter);
+            }
+            else
+            {
+                IsUpdateSuccess = UpdateBaseActionParameter(actionParam);
+            }
+            if (!IsUpdateSuccess)
+            {
+                // 更新失败，可能是行动点不足或其他限制
+                return IsUpdateSuccess;
+            }
+            Debug.Log($"{gameObject.name} 更新行动: {action.GetActionName()} (顺序:{executionOrder}, 目标:{targetPos}, 终位:{finalPos})");
+        }
+        else
+        {
+            if (isDeploy) unit.SetDeselectAction(true);
+            // 根据标签或类型实例化不同参数
+            if (isMove && action is BaseMoveAction baseMove)
+            {
+                actionParam = new MoveActionParameter(
+                    baseMove,
+                    targetPositionList,
+                    finalPos,
+                    executionOrder
+                );
+            }
+            else
+            {
+                actionParam = new BaseActionParameter(
+                    action,
+                    targetPositionList,
+                    finalPos,
+                    executionOrder
+                );
+            }
+
+            if (!unit.TrySpendActionPointsToTakeAction(action, actionParam)) return false;
+
+            pendingActions.Add(actionParam);
+
+            Debug.Log($"{gameObject.name}  添加行动: {action.GetActionName()} (顺序:{executionOrder}, 目标:{targetPos}, 终位:{finalPos})");
+        }
+
+        if (isMove)
+        {
+            MoveActionParameter moveActionParameter = (actionParam as MoveActionParameter);
+            (moveActionParameter.baseAction as BaseMoveAction).UpdatePath();
+            unit.OnAnyUnitPositionChangedInvoke();
+        }
+
         OnAnyActionAddQueue?.Invoke(this, EventArgs.Empty);
+        return true; // 返回true表示成功添加行动
+        #endregion
     }
 
     //判断行为队列是否全部完成
@@ -147,15 +237,14 @@ public class ActionQueue : MonoBehaviour
             : -1;
     }
 
-    public void UpdateBaseActionParameter(BaseActionParameter baseActionParameter)
+    public bool UpdateBaseActionParameter(BaseActionParameter baseActionParameter)
     {
         int lastActionParActPoint = CopyLastActionParameter().GetActionPoint();
         int actPoint = baseActionParameter.GetActionPoint() - lastActionParActPoint; //更新动作所增加的消耗行动点
 
         if (!unit.CanspendActionPointsToTakeAction(actPoint)) //检查是否可以消耗行动点
         {
-            Debug.LogWarning("行动点不足，无法执行该动作。");
-            return;
+            return false;
         }
 
         unit.TrySpendActionPointsToTakeAction(actPoint);
@@ -168,7 +257,7 @@ public class ActionQueue : MonoBehaviour
             pendingActions[^1] = baseActionParameter; //更新当前动作的参数
         }
 
-        OnAnyActionAddQueue?.Invoke(this, EventArgs.Empty);
+        return true; //返回true表示更新成功
     }
 
 
@@ -236,7 +325,7 @@ public class ActionQueue : MonoBehaviour
         {
             // 检查下一个方法是否有效
             BaseActionParameter nextBaseActionParameter = pendingActions[0];
-            
+
             bool isMove = nextBaseActionParameter.baseAction.GetActionTags().HasFlag(ActionTags.Move);
 
             GridPosition unitFinalPosition = nextBaseActionParameter.unitFinalPosition;
@@ -252,11 +341,11 @@ public class ActionQueue : MonoBehaviour
 
         unit.ReSetUnitParam(); // 重置单位参数
 
-        if (!isValid) 
+        if (!isValid)
         {
             //如果下一个行动有效，则重新计算消耗点数
             int actionPointsCost = 0;
-            pendingActions.ForEach(BaseActionParameter => 
+            pendingActions.ForEach(BaseActionParameter =>
             {
                 actionPointsCost += BaseActionParameter.GetActionPoint();
             });
@@ -267,7 +356,7 @@ public class ActionQueue : MonoBehaviour
         {
             // 如果下一个行动无效，则清空队列
             pendingActions.Clear(); //取消所有队列的动作
-        }        
+        }
     }
 
     public List<GridPosition> GetAllPath()
@@ -296,5 +385,21 @@ public class ActionQueue : MonoBehaviour
     public BaseActionParameter GetUnderwayAction()
     {
         return underwayAction;
+    }
+
+    /// <summary>
+    /// 检查队列中是否存在慢速行动
+    /// </summary>
+    private bool IsActionSpeedSlow()
+    {
+        foreach (BaseActionParameter action in pendingActions)
+        {
+            if (action.baseAction.GetActionSpeed() == ActionSpeed.slow)
+            {
+                Debug.Log("找到慢速行动");
+                return true;
+            }
+        }
+        return false; // 如果没有慢速行动则返回true
     }
 }

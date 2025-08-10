@@ -11,7 +11,6 @@ public class SpinAction : BaseAction
     //private Action<int> spinComplete; 无返回值
     //private Func<int,bool> spinCompleteFunc; 有返回值 接受int参数返回bool
     private float totalSpinAmount;
-
     private void Update()
     {
         if (!isActive)

@@ -6,6 +6,9 @@ public class Unit : MonoBehaviour
 {
     public static event EventHandler OnAnyUnitSpawned;
     public static event EventHandler OnAnyUnitDead;
+    public event EventHandler OnActionAddQueueSuccess; //行为添加到队列时触发动画
+    public event EventHandler OnActionAddQueueFailed; //行为添加到队列失败时触发视图更新
+
     //单位移动
     public static event EventHandler OnAnyUnitPositionChanged;
     public event EventHandler OnBuffListChange; //buff变化
@@ -191,78 +194,19 @@ public class Unit : MonoBehaviour
     /// </summary>
     public void HandleOrderedAction(BaseAction action, GridPosition targetPos, int executionOrder)
     {
-        SetForecast(true);
-
-        ActionTags actionTags = ScriptiptableSOManager.Instance.GetActionTags(action);
-        bool isMove = actionTags.HasFlag(ActionTags.Move);
-        bool isDeploy = actionTags.HasFlag(ActionTags.Deploy);
-
-        BaseActionParameter actionParam;
-        GridPosition finalPos;
-        List<GridPosition> targetPositionList;
-
-        if (isMove)
+        if (actionQueue.HandleOrderedAction(action, targetPos, executionOrder))
         {
-            finalPos = targetPos;
-            targetPositionList = new List<GridPosition> { GetGridPosition(), targetPos };
+            OnActionAddQueueSuccess?.Invoke(this, EventArgs.Empty);
         }
         else
         {
-            finalPos = GetGridPosition();
-            targetPositionList = new List<GridPosition> { targetPos };
+            OnActionAddQueueFailed?.Invoke(this, EventArgs.Empty);
         }
+    }
 
-        if (isDeployAction)
-        {
-            // 复制上一次参数
-            BaseActionParameter lastParam = GetActionQueue().CopyLastMoveActionParameter();
-            actionParam = lastParam;
-            actionParam.targetPositionList.Add(targetPos);
-            actionParam.unitFinalPosition = finalPos;
-
-            if (actionParam is MoveActionParameter moveActionParameter)
-            {
-                actionQueue.UpdateBaseActionParameter(moveActionParameter);
-            }
-            else actionQueue.UpdateBaseActionParameter(actionParam);
-
-            Debug.Log($"{gameObject.name} 更新行动: {action.GetActionName()} (顺序:{executionOrder}, 目标:{targetPos}, 终位:{finalPos})");
-        }
-        else
-        {
-            if (isDeploy) SetDeselectAction(true);
-            // 根据标签或类型实例化不同参数
-            if (isMove && action is BaseMoveAction baseMove)
-            {
-                actionParam = new MoveActionParameter(
-                    baseMove,
-                    targetPositionList,
-                    finalPos,
-                    executionOrder
-                );
-            }
-            else
-            {
-                actionParam = new BaseActionParameter(
-                    action,
-                    targetPositionList,
-                    finalPos,
-                    executionOrder
-                );
-            }
-
-            if (!TrySpendActionPointsToTakeAction(action, actionParam)) return;
-            actionQueue.AddAction(actionParam);
-            Debug.Log($"{gameObject.name}  添加行动: {action.GetActionName()} (顺序:{executionOrder}, 目标:{targetPos}, 终位:{finalPos})");
-        }
-
-        if (isMove)
-        {
-            MoveActionParameter moveActionParameter = (actionParam as MoveActionParameter);
-            (moveActionParameter.baseAction as BaseMoveAction).UpdatePath();
-            OnAnyUnitPositionChanged?.Invoke(this, EventArgs.Empty);
-        }
-
+    public void OnAnyUnitPositionChangedInvoke()
+    {
+        OnAnyUnitPositionChanged?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>
@@ -376,5 +320,5 @@ public class Unit : MonoBehaviour
         return buffList;
     }
 
-    
+
 }

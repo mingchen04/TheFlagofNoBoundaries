@@ -4,19 +4,35 @@ using UnityEngine;
 public class UnitSelectedVisual : MonoBehaviour
 {
     [SerializeField] private Unit unit;
-
+    private Animator selectedAnimator;
     private MeshRenderer meshRenderer;
-
+    
     private void Awake()
     {
         meshRenderer = GetComponent<MeshRenderer>();
+        selectedAnimator = GetComponent<Animator>();
     }
 
     private void Start()
     {
         meshRenderer.enabled = false;
+        unit.OnActionAddQueueSuccess += Unit_OnActionAddQueueSuccess;
+        unit.OnActionAddQueueFailed += Unit_OnActionAddQueueFailed;
+
         UnitActionSystem.Instance.OnSelectedUnitChanged += UnitActionSystem_OnSelectedUnitChanged;
         UpdateVisual();
+    }
+
+    private void Unit_OnActionAddQueueFailed(object sender, EventArgs e)
+    {
+        Debug.Log("失败动画");
+        selectedAnimator.SetTrigger("Fail");
+    }
+
+    private void Unit_OnActionAddQueueSuccess(object sender, EventArgs e)
+    {
+        Debug.Log("成功动画");
+        selectedAnimator.SetTrigger("Success");        
     }
 
     private void UnitActionSystem_OnSelectedUnitChanged(object sender, EventArgs e)
@@ -39,5 +55,7 @@ public class UnitSelectedVisual : MonoBehaviour
     private void OnDestroy()
     {
         UnitActionSystem.Instance.OnSelectedUnitChanged -= UnitActionSystem_OnSelectedUnitChanged;
+        unit.OnActionAddQueueSuccess -= Unit_OnActionAddQueueSuccess;
+        unit.OnActionAddQueueFailed -= Unit_OnActionAddQueueFailed;
     }
 }

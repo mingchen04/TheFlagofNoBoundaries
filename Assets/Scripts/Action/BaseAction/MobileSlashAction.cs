@@ -6,8 +6,8 @@ public class MobileSlashAction : BaseMoveAction
 {
     public override event EventHandler OnStartMoving;
     public override event EventHandler OnStopMoving;
-    [SerializeField] private int damageAmount = 20;
     [SerializeField] private int maxSteps = 3;
+
     private bool SpendActionPoints = false;
     private int oldCurrentPathIndex = 0;
 
@@ -60,7 +60,7 @@ public class MobileSlashAction : BaseMoveAction
             Unit tarGetUnit = LevelGrid.Instance.GetUnitAtGridPosition(unit.GetGridPosition());
             if (tarGetUnit != unit)
             {
-                tarGetUnit?.Damage(damageAmount);
+                tarGetUnit?.Damage(unit.GetAttack());
             }
         }
 

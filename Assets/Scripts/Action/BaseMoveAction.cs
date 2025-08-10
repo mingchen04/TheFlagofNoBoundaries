@@ -54,7 +54,7 @@ public abstract class BaseMoveAction : BaseAction
         return targetPosition;
     }
 
-    public virtual void UpdatePath()
+    public void UpdatePath()
     {
         MoveActionParameter lastParam = unit.GetActionQueue().CopyLastMoveActionParameter();
 

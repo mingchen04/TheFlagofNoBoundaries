@@ -205,7 +205,12 @@ public class UnitActionSystem : MonoBehaviour
         while (true)
         {
             // 获取所有单位中最小执行顺序
-            int currentOrder = UnitManager.Instance.GetFriendlyUnitList()
+
+            List<Unit> units= TurnSystem.Instance.IsPlayerTrun() ?
+                UnitManager.Instance.GetFriendlyUnitList() :
+                UnitManager.Instance.GetEnemyUnitList();
+
+            int currentOrder = units
                 .Select(u => u.GetCurrentActionOrder())
                 .Min();
 
