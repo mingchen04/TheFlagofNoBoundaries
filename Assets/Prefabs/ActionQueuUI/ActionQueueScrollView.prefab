@@ -920,6 +920,16 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6238026237137746047}
     m_Modifications:
+    - target: {fileID: 5943729747617234516, guid: d4d83df0f5df19e4abc08e6c89feefb0,
+        type: 3}
+      propertyPath: m_SortingLayer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5943729747617234516, guid: d4d83df0f5df19e4abc08e6c89feefb0,
+        type: 3}
+      propertyPath: m_MaskInteraction
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6993794363819411301, guid: d4d83df0f5df19e4abc08e6c89feefb0,
         type: 3}
       propertyPath: m_Pivot.x

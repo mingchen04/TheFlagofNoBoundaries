@@ -989,7 +989,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3d2517fca86ccc4e927285416460cbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  actionSpeed: 0
+  actionSpeed: 2
 --- !u!114 &979371953557367167
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1002,7 +1002,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98e9d604a4a83a44db1ffe14ba8d8668, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  actionSpeed: 0
+  actionSpeed: 1
   maxShootDistance: 5
   obstaclesLayerMask:
     serializedVersion: 2
@@ -1074,7 +1074,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc40ee1416f7b414aaaf7c4628794d31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  actionSpeed: 0
+  actionSpeed: 1
   landMineTransformPrefab: {fileID: 8440213086168840181, guid: 44619a820d27e2143bb9011774cb34c9,
     type: 3}
 --- !u!114 &-2049203873941461844

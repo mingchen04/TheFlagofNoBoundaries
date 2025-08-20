@@ -5862,6 +5862,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5f2bba7833b55a246a9894f6fc4f48cd, type: 2}
   baseBuffSOs:
   - {fileID: 11400000, guid: 81eef1fcbd3493a428e8615979c6cb7b, type: 2}
+  actionSpeeds:
+  - {fileID: 11400000, guid: 8f80edcef10e3c54fab43fd7f0d7694d, type: 2}
+  - {fileID: 11400000, guid: 8b6d3b4a61673794ab9568f1d2474c8d, type: 2}
+  - {fileID: 11400000, guid: e8d1c7add9201f34f903911d717caeac, type: 2}
 --- !u!4 &1581849501
 Transform:
   m_ObjectHideFlags: 0
@@ -8643,6 +8647,11 @@ PrefabInstance:
       propertyPath: actionSpeed
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -2894542637019877412, guid: a665b09d1753c1549bcb089ef57f3578,
+        type: 3}
+      propertyPath: actionSpeed
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 979371953557367167, guid: a665b09d1753c1549bcb089ef57f3578,
         type: 3}
       propertyPath: actionSpeed
@@ -8691,7 +8700,7 @@ PrefabInstance:
     - target: {fileID: 3029014702042351316, guid: a665b09d1753c1549bcb089ef57f3578,
         type: 3}
       propertyPath: actionSpeed
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3919550748142699886, guid: a665b09d1753c1549bcb089ef57f3578,
         type: 3}

@@ -19,6 +19,7 @@ public class Unit : MonoBehaviour
     [Header("基础属性")]
     [SerializeField] private int baseAttack = 30; //攻击力
     [SerializeField] private int baseDefense = 5; //防御力
+    [SerializeField] private int fastActionPointsCost = 1; //快速行动点数消耗
     [SerializeField] private int baseVisionRange = 5; //视野范围
 
     private GridPosition gridPosition; //网格位置
@@ -182,13 +183,6 @@ public class Unit : MonoBehaviour
         OnAnyUnitPositionChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    public void CancelAction(BaseAction cancelAction)
-    {
-        UnitActionSystem.Instance.DeployActionEnd();
-        srengthSystem.CancelActionReturnPosint(cancelAction);
-        OnAnyUnitPositionChanged?.Invoke(this, EventArgs.Empty);
-    }
-
     /// <summary>
     /// 添加带顺序的行动
     /// </summary>
@@ -311,6 +305,16 @@ public class Unit : MonoBehaviour
         foreach (BaseBuff buff in buffList)
         {
             value = buff.ModifyVisionRange(value);
+        }
+        return value;
+    }
+
+    public int GetFastActionPointsCost()
+    {
+        int value = fastActionPointsCost;
+        foreach (BaseBuff buff in buffList)
+        {
+            value = buff.ModifyFastActionPointsCost(value);
         }
         return value;
     }

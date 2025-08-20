@@ -54,11 +54,13 @@ public class ActionQueueListUI : MonoBehaviour
             }
 
             Sprite baseActionIcon = ScriptiptableSOManager.Instance.GetActionIcon(baseActionParameter.baseAction);
+            ActionSpeed actionSpeed = baseActionParameter.actionSpeed;
             BaseActionParameterUI baseActionUI = Instantiate(baseActionParameterPre, actionQueueList);
 
             int currentIndex = index;// 保持当前索引的副本，避免闭包问题
             baseActionUI.SetUp
                 (
+                    actionSpeed,
                     baseActionIcon,
                     () => { unit.CancelAction(currentIndex, baseActionParameter.baseAction); },
                     baseActionParameter.executeTurn,

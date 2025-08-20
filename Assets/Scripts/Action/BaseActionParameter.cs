@@ -24,14 +24,20 @@ public class BaseActionParameter
     /// </summary>
     public int executeTurn;
 
-    
+    /// <summary>
+    /// 执行速度
+    /// </summary>
+    public ActionSpeed actionSpeed;
+
+
     // 添加构造函数以便于创建
-    public BaseActionParameter(BaseAction action, List<GridPosition> targetPos, GridPosition finalPos, int executeTurn)
+    public BaseActionParameter(BaseAction action, ActionSpeed actionSpeed, List<GridPosition> targetPos, GridPosition finalPos, int executeTurn)
     {
         baseAction = action;
         targetPositionList = targetPos;
         unitFinalPosition = finalPos;
         this.executeTurn = executeTurn;
+        this.actionSpeed = actionSpeed;
     }
 
     public int GetActionPoint()

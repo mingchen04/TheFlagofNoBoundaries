@@ -8,6 +8,7 @@ public class BaseActionParameterUI : MonoBehaviour
     [SerializeField] private Button actionDetailsButton;
     [SerializeField] private Button cancelButton;
     [SerializeField] private Image actionIcon;
+    [SerializeField] private Image actionSpeedIcon; //行动速度图标
     [SerializeField] private TextMeshProUGUI textActionIndex;
     [SerializeField] private Button orderForwardButton; //顺序向前调整
     [SerializeField] private Button orderBackButton; //顺序向后调整
@@ -23,10 +24,13 @@ public class BaseActionParameterUI : MonoBehaviour
     /// <param name="actionIndex">行动位置</param>
     /// <param name="executeTurn">行动执行回合</param>
     /// <param name="updateVisual">父组件更新视图</param>
-    public void SetUp(Sprite ActionSprite, Action cancelAction, int executeTurn, int actionIndex, ActionQueue actionQueue,Action updateVisual)
+    public void SetUp(ActionSpeed actionSpeed, Sprite ActionSprite, Action cancelAction, int executeTurn, int actionIndex, ActionQueue actionQueue, Action updateVisual)
     {
         this.updateVisual = updateVisual;
         actionIcon.sprite = ActionSprite;
+
+        Color actionSpeedColor = ScriptiptableSOManager.Instance.GetActionSpeedSO(actionSpeed).actionSpeedColor; //设置行动速度图标颜色
+        actionSpeedIcon.color = actionSpeedColor;
         cancelButton.onClick.AddListener(() => { cancelAction(); updateVisual?.Invoke(); });
         SetExecute(executeTurn, actionQueue, actionIndex);
 

@@ -23,6 +23,7 @@ public abstract class BaseBuff
     public virtual int ModifyAttack(int origin) => origin;
     public virtual int ModifyDefense(int origin) => origin;
     public virtual int ModifyVisionRange(int origin) => origin;
+    public virtual int ModifyFastActionPointsCost(int origin) => origin;
 
     public virtual void OnRemove() { }
     public virtual void OnTurnStart() { }

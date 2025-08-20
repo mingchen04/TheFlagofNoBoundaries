@@ -6,6 +6,7 @@ public class ScriptiptableSOManager : MonoBehaviour
     public static ScriptiptableSOManager Instance { get; private set; }
     [SerializeField] private List<BaseActionSO> baseActionListSO;
     [SerializeField] private List<BaseBuffSO> baseBuffSOs;
+    [SerializeField] private List<ActionSpeedSO> actionSpeeds;
 
     private void Awake()
     {
@@ -50,5 +51,23 @@ public class ScriptiptableSOManager : MonoBehaviour
             }
         }
         return null;
+    }
+
+    public ActionSpeedSO GetActionSpeedSO(ActionSpeed actionSpeed)
+    {
+        foreach (ActionSpeedSO actionSpeedSO in actionSpeeds)
+        {
+            Debug.Log("Checking ActionSpeedSO: " + actionSpeedSO.actionSpeedType + " against ActionSpeed: " + actionSpeed);
+            if (actionSpeedSO.actionSpeedType == actionSpeed)
+            {
+                return actionSpeedSO;
+            }
+        }
+        return null;
+    }
+
+    public ActionSpeedSO GetActionSpeedSO(BaseAction baseAction)
+    {        
+        return GetActionSpeedSO(baseAction.GetActionSpeed());
     }
 }

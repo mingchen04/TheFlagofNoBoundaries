@@ -11,10 +11,10 @@ public class ActionQueue : MonoBehaviour
     public static event EventHandler OnAnyActionAddQueue;
     public static event EventHandler OnAnyActionCompleted; //行为结束触发视图更新
 
-    private List<BaseActionParameter> pendingActions; //行为队列    
-    private BaseActionParameter underwayAction; //正在进行的行为
+    private List<BaseActionParameter> pendingActions; //行为队列
+    private BaseActionParameter underwayAction; //正在进行的行动
+    private BaseActionParameter slowAction; //队列中慢速行动
     private Unit unit; //当前单位
-
 
     private void Awake()
     {
@@ -28,8 +28,9 @@ public class ActionQueue : MonoBehaviour
 
     public bool HandleOrderedAction(BaseAction action, GridPosition targetPos, int executionOrder)
     {
-        Debug.Log("添加动作");
-        if (IsActionSpeedSlow()) return false;
+        //检测动作合法性
+        if (!IsActionSpeedValid()) return false;
+        bool fastValid = GetActionSpeedFastCount() >= unit.GetFastActionPointsCost();
 
         unit.SetForecast(true);
 
@@ -86,6 +87,8 @@ public class ActionQueue : MonoBehaviour
             {
                 actionParam = new MoveActionParameter(
                     baseMove,
+                    // 如果到达快速行动点上限则设置为慢速，否则使用默认速度
+                    fastValid ? ActionSpeed.slow : baseMove.GetActionSpeed(),
                     targetPositionList,
                     finalPos,
                     executionOrder
@@ -95,6 +98,7 @@ public class ActionQueue : MonoBehaviour
             {
                 actionParam = new BaseActionParameter(
                     action,
+                    fastValid ? ActionSpeed.slow : action.GetActionSpeed(),
                     targetPositionList,
                     finalPos,
                     executionOrder
@@ -273,6 +277,7 @@ public class ActionQueue : MonoBehaviour
 
         BaseActionParameter copyBaseActionParameter = new BaseActionParameter(
             last.baseAction,
+            last.actionSpeed,
             newTargetList,
             last.unitFinalPosition,
             last.executeTurn
@@ -288,6 +293,7 @@ public class ActionQueue : MonoBehaviour
 
         MoveActionParameter copyMoveActionParameter = new(
             (BaseMoveAction)last.baseAction,
+            last.actionSpeed,
             newTargetList,
             last.unitFinalPosition,
             last.executeTurn
@@ -396,10 +402,39 @@ public class ActionQueue : MonoBehaviour
         {
             if (action.baseAction.GetActionSpeed() == ActionSpeed.slow)
             {
-                Debug.Log("找到慢速行动");
                 return true;
             }
         }
-        return false; // 如果没有慢速行动则返回true
+        return false; // 如果没有慢速行动则返回false
     }
+
+    /// <summary>
+    /// 获取队列中快速行动的数量
+    /// </summary>
+    /// <returns>快速行动的数量</returns>
+    private int GetActionSpeedFastCount()
+    {
+        int fastActionCount = 0; // 快速行动计数器
+
+        foreach (BaseActionParameter action in pendingActions)
+        {
+            if (action.baseAction.GetActionSpeed() == ActionSpeed.fast)
+            {
+                fastActionCount++; // 计数快速行动
+            }
+        }
+
+        return fastActionCount; // 如果快速行动少于两个则返回false
+    }
+
+    private bool IsActionSpeedValid()
+    {
+        if (IsActionSpeedSlow())
+        {
+            return false; // 如果发现有慢速行动则返回false
+        }
+
+        return true;
+    }
+
 }
