@@ -51,12 +51,13 @@ public class EnemyAI : MonoBehaviour
                     state = State.Busy;
                     if (TryTakeEnemyAIAction(SetStateTakingTurn))
                     {
-                        state = State.Busy;
+                        state = State.TakingTurn;
                     }
                     else
                     {
                         // 敌方单位无法继续行动
-                        TurnSystem.Instance.NextTurn();
+                        //TurnSystem.Instance.NextTurn();
+                        UnitActionSystem.Instance.ExecuteAllQueuedActions();
                     }
                 }
                 break;
@@ -75,6 +76,12 @@ public class EnemyAI : MonoBehaviour
     {
         foreach (Unit enemyUnit in UnitManager.Instance.GetEnemyUnitList())
         {
+            if (enemyUnit.GetActionQueue().IsActionQueueFull())
+            {
+                //行动队列满了
+                continue;
+            }
+
             if (TryTakeEnemyAIAction(enemyUnit, onEnemyAIActionComplete))
             {
                 return true;
@@ -117,6 +124,29 @@ public class EnemyAI : MonoBehaviour
 
         if (bestEnemyAIAction != null && enemyUnit.TrySpendActionPointsToTakeAction(bestBaseAction, null))
         {
+            int ActionQueueOrder = enemyUnit.GetActionQueue().EndActionExecuteTurnGet();
+            bool isDeploy = bestBaseAction.GetActionTags().HasFlag(ActionTags.Deploy);
+            bool ActionQueueEndAction = false;
+            int endOrder;
+
+            BaseActionParameter lastActionPar = enemyUnit.GetActionQueue().CopyLastActionParameter();
+
+            if (lastActionPar != null)
+            {
+                ActionQueueEndAction = lastActionPar.baseAction == bestBaseAction;
+            }
+
+            if (ActionQueueEndAction && isDeploy)
+            {
+                endOrder = enemyUnit.GetActionQueue().EndActionExecuteTurnGet();
+            }
+            else
+            {
+                endOrder = ActionQueueOrder + 1;
+            }
+
+            enemyUnit.HandleOrderedAction(bestBaseAction, bestEnemyAIAction.gridPosition, endOrder);
+            onEnemyAIActionComplete?.Invoke();
             //bestBaseAction.TakeAction(new List<GridPosition> { bestEnemyAIAction.gridPosition }, onEnemyAIActionComplete);
             return true;
         }

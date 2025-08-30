@@ -7,7 +7,7 @@ public class MoveAction : BaseMoveAction
 {
     public override event EventHandler OnStartMoving;
     public override event EventHandler OnStopMoving;
-    [SerializeField] private static int moveCost = 10; // 每步移动的基础体力消耗
+    [SerializeField] private int moveCost = 10; // 每步移动的基础体力消耗
 
     protected override void Awake()
     {
@@ -120,8 +120,8 @@ public class MoveAction : BaseMoveAction
     /// <summary>
     /// 获取第N格的行动点消耗
     /// </summary>
-    private static int GetMoveStepActionPointCost(int stepIndex)
-    {
+    private int GetMoveStepActionPointCost(int stepIndex)
+    {        
         if (stepIndex == 0) return 0;
         float cost = moveCost;
         for (int i = 1; i < stepIndex; i++)

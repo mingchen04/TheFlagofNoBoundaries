@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class AttackMagicAction : BaseAction
 {
-    private int maxMagicDistance = 3; // 假设攻击魔法的最大距离为3
+    private int maxMagicDistance = 3; // 设攻击魔法的最大距离为3
     private const float MagicTimeMax = 0.2f;//魔法发动时间
     private float MagicTime = 0;
 
@@ -32,7 +32,7 @@ public class AttackMagicAction : BaseAction
         return new EnemyAIAction
         {
             gridPosition = gridPosition,
-            actionValue = 10 // 假设攻击魔法的值为10
+            actionValue = 0 // 假设攻击魔法的值为10
         };
     }
 

@@ -201,28 +201,39 @@ public class UnitActionSystem : MonoBehaviour
     {
         isExecutingGlobalActions = true;
         SetBusy();
+        List<Unit> closeUnit = new List<Unit>();
 
         while (true)
         {
             // 获取所有单位中最小执行顺序
 
-            List<Unit> units= TurnSystem.Instance.IsPlayerTrun() ?
+            List<Unit> units = TurnSystem.Instance.IsPlayerTrun() ?
                 UnitManager.Instance.GetFriendlyUnitList() :
                 UnitManager.Instance.GetEnemyUnitList();
+            units = units.FindAll(u => !closeUnit.Contains(u));
 
-            int currentOrder = units
+            int currentOrder = int.MaxValue;
+            if (units.Any()) 
+            {
+                currentOrder = units
                 .Select(u => u.GetCurrentActionOrder())
                 .Min();
-
-            if (currentOrder == int.MaxValue) break; // 所有行动完成
+            }// 没有单位可执行
+ 
+            if (currentOrder == int.MaxValue)
+            {
+                NextTurn();
+                break;
+            } // 所有行动完成
 
             Debug.Log($"开始执行顺序: {currentOrder}");
 
             bool orderCompleted = false;
-            ExecuteActionsAtOrder(currentOrder, () =>
-            {
-                orderCompleted = true;
-            });
+            closeUnit.AddRange
+                (
+                    ExecuteActionsAtOrder(currentOrder, () => { orderCompleted = true; })
+                );
+
 
             yield return new WaitUntil(() => orderCompleted);
         }
@@ -231,9 +242,19 @@ public class UnitActionSystem : MonoBehaviour
         ClearBusy();
     }
 
-    private void ExecuteActionsAtOrder(int order, Action onComplete)
+    /// <summary>
+    /// 执行指定顺序的所有单位行动 并输出正在进行的单位列表
+    /// </summary>
+    /// <param name="order"></param>
+    /// <param name="onComplete"></param>
+
+    private List<Unit> ExecuteActionsAtOrder(int order, Action onComplete)
     {
-        List<Unit> units = UnitManager.Instance.GetFriendlyUnitList()
+        List<Unit> closeUnit = new List<Unit>();
+
+        List<Unit> units = (TurnSystem.Instance.IsPlayerTrun() ?
+            UnitManager.Instance.GetFriendlyUnitList() :
+            UnitManager.Instance.GetEnemyUnitList())
             .Where(u => u.GetCurrentActionOrder() == order)
             .OrderBy(u => u.GetPriority())
             .ToList();
@@ -241,7 +262,7 @@ public class UnitActionSystem : MonoBehaviour
         if (!units.Any())
         {
             onComplete?.Invoke();
-            return;
+            return closeUnit;
         }
 
         int completedCount = 0;
@@ -249,6 +270,12 @@ public class UnitActionSystem : MonoBehaviour
         {
             unit.GetActionQueue().ExecuteActionsAtOrder(order, () =>
             {
+                Debug.Log($"单位 {unit.name} 完成行动，顺序: {order}");
+
+                if (unit.GetActionQueue().IsActionQueueComplete())
+                {
+                    closeUnit.Add(unit);
+                }
                 completedCount++;
                 if (completedCount == units.Count())
                 {
@@ -256,6 +283,7 @@ public class UnitActionSystem : MonoBehaviour
                 }
             });
         }
+        return closeUnit;
     }
 
     /// <summary>
@@ -351,5 +379,13 @@ public class UnitActionSystem : MonoBehaviour
     private void LevelGrid_OnAnyUnitPositionChanged(object sender, EventArgs e)
     {
         StopInvalidMoveUnits();
+    }
+
+    private void NextTurn()
+    {
+        if (!TurnSystem.Instance.IsPlayerTrun())
+        {
+            TurnSystem.Instance.NextTurn();
+        }
     }
 }

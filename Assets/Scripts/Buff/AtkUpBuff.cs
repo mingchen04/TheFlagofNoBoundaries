@@ -2,7 +2,7 @@ public class AtkUpBuff : BaseBuff
 {
     private int atkBonus; //攻击力加成
 
-    public AtkUpBuff(Unit unit, int bonus, int duration) : base(unit, duration)
+    public AtkUpBuff(Unit unit, int bonus, int effectiveTime) : base(unit, effectiveTime)
     {
         buffName = "攻击力提升";
         atkBonus = bonus;

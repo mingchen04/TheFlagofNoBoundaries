@@ -13,7 +13,7 @@ public class ActionQueue : MonoBehaviour
 
     private List<BaseActionParameter> pendingActions; //行为队列
     private BaseActionParameter underwayAction; //正在进行的行动
-    private BaseActionParameter slowAction; //队列中慢速行动
+    private BaseActionParameter slowAction; //队列中的慢速行动
     private Unit unit; //当前单位
 
     private void Awake()
@@ -30,7 +30,10 @@ public class ActionQueue : MonoBehaviour
     {
         //检测动作合法性
         if (!IsActionSpeedValid()) return false;
-        bool fastValid = GetActionSpeedFastCount() >= unit.GetFastActionPointsCost();
+        bool fastCountValid =
+            action.GetActionSpeed() == ActionSpeed.fast
+            &&
+            GetActionSpeedFastCount() >= unit.GetFastActionPointsCost();
 
         unit.SetForecast(true);
 
@@ -43,6 +46,11 @@ public class ActionQueue : MonoBehaviour
         List<GridPosition> targetPositionList;
 
         #region 部署移动处理
+
+        if (!isDeploy)
+        {
+            unit.SetDeselectAction(false);
+        }
 
         if (isMove)
         {
@@ -88,7 +96,7 @@ public class ActionQueue : MonoBehaviour
                 actionParam = new MoveActionParameter(
                     baseMove,
                     // 如果到达快速行动点上限则设置为慢速，否则使用默认速度
-                    fastValid ? ActionSpeed.slow : baseMove.GetActionSpeed(),
+                    fastCountValid ? ActionSpeed.slow : baseMove.GetActionSpeed(),
                     targetPositionList,
                     finalPos,
                     executionOrder
@@ -98,7 +106,7 @@ public class ActionQueue : MonoBehaviour
             {
                 actionParam = new BaseActionParameter(
                     action,
-                    fastValid ? ActionSpeed.slow : action.GetActionSpeed(),
+                    fastCountValid ? ActionSpeed.slow : action.GetActionSpeed(),
                     targetPositionList,
                     finalPos,
                     executionOrder
@@ -177,9 +185,19 @@ public class ActionQueue : MonoBehaviour
     /// </summary>
     public int GetCurrentExecutionOrder()
     {
-        return pendingActions.Count > 0
-            ? pendingActions[0].executeTurn
-            : int.MaxValue;
+        int order = int.MaxValue;
+
+        if (pendingActions.Count > 0)
+        {
+            order = pendingActions[0].executeTurn;
+        }
+
+        if (slowAction != null)
+        {
+            order = slowAction.executeTurn;
+        }
+
+        return order;
     }
 
     /// <summary>
@@ -198,6 +216,19 @@ public class ActionQueue : MonoBehaviour
     public void ExecuteActionsAtOrder(int order, Action onComplete)
     {
         List<BaseActionParameter> actions = GetActionsAtOrder(order);
+
+        if (slowAction != null)
+        {
+            Debug.Log("执行慢速行动");
+            slowAction.baseAction.TakeAction(slowAction, () =>
+            {
+                slowAction = null; //清空慢速行动
+                ExecuteActionsAtOrder(order, onComplete); //慢速行动结束后继续执行当前顺序的其他行动
+                OnAnyActionCompleted?.Invoke(this, EventArgs.Empty);
+            });
+            return; //如果有慢速行动正在进行则直接返回
+        }
+
         if (actions.Count == 0)
         {
             onComplete?.Invoke();
@@ -208,6 +239,17 @@ public class ActionQueue : MonoBehaviour
         foreach (BaseActionParameter action in actions)
         {
             underwayAction = action; //记录当前正在进行的行动
+            if (action.actionSpeed == ActionSpeed.slow)
+            {
+                Debug.Log("慢速行动稍后执行");
+                action.actionSpeed = ActionSpeed.quickness;
+                slowAction = action; //记录慢速行动
+                pendingActions.Clear(); //清空队列
+                OnAnyActionCompleted?.Invoke(this, EventArgs.Empty);
+                onComplete?.Invoke();
+                return; //慢速行动单独执行，结束后直接返回
+            }
+
             action.baseAction.TakeAction(action, () =>
             {
                 completedCount++;
@@ -271,6 +313,11 @@ public class ActionQueue : MonoBehaviour
     /// <returns>最后一个动作的参数</returns>
     public BaseActionParameter CopyLastActionParameter()
     {
+        if (pendingActions.Count == 0)
+        {
+            return null;
+        }
+
         BaseActionParameter last = pendingActions.Last();
         // 深拷贝 targetPositionList，避免引用同一个列表
         List<GridPosition> newTargetList = new List<GridPosition>(last.targetPositionList);
@@ -424,7 +471,7 @@ public class ActionQueue : MonoBehaviour
             }
         }
 
-        return fastActionCount; // 如果快速行动少于两个则返回false
+        return fastActionCount;
     }
 
     private bool IsActionSpeedValid()
@@ -435,6 +482,24 @@ public class ActionQueue : MonoBehaviour
         }
 
         return true;
+    }
+
+    public BaseActionParameter GetSlowAction()
+    {
+        return slowAction;
+    }
+
+    /// <summary>
+    /// 队列已满
+    /// </summary>
+    public bool IsActionQueueFull()
+    {
+        bool isFull = false;
+
+        if (!IsActionSpeedValid()) isFull = true;
+        if (pendingActions.Count >= 10) isFull = true;
+
+        return isFull;
     }
 
 }

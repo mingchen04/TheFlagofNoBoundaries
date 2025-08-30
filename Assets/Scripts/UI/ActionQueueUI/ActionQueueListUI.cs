@@ -32,7 +32,12 @@ public class ActionQueueListUI : MonoBehaviour
         //生成选中单位的行为队列UI
         ActionQueue selectedUnitActionQueue = unit.GetActionQueue();
         List<BaseActionParameter> baseActionParameters = selectedUnitActionQueue.GetActions();
-
+        BaseActionParameter selectUnitLostAction = selectedUnitActionQueue.GetSlowAction(); //获取选中单位的丢失动作
+        if (selectUnitLostAction != null)
+        {
+            //baseActionParameters.Insert(0, selectUnitLostAction);
+        }
+        
         for (int index = 0; index < baseActionParameters.Count; index++)
         {
             BaseActionParameter lastBaseActionParameter = index > 0 ? baseActionParameters[index - 1] : null;
@@ -72,6 +77,11 @@ public class ActionQueueListUI : MonoBehaviour
 
         //启动协程等待两帧更新Transform大小再进行滚动至最右侧显示最新动作
         StartCoroutine(DelayedScroll());
+    }
+
+    private void CreateBaseActionParametersUI(BaseActionParameter baseActionParameter)
+    {
+
     }
 
     private IEnumerator DelayedScroll()

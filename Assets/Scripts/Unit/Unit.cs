@@ -33,7 +33,6 @@ public class Unit : MonoBehaviour
     private bool isBusy; // 是否忙碌
     private bool isDeployAction; //是否部署行动
 
-
     private void Awake()
     {
         isForecast = true;
@@ -323,6 +322,4 @@ public class Unit : MonoBehaviour
     {
         return buffList;
     }
-
-
 }

@@ -20,7 +20,7 @@ public class BaseActionParameterUI : MonoBehaviour
     /// </summary>
     /// <param name="ActionSprite">行动图标</param>
     /// <param name="cancelAction">行动取消事件</param>
-    /// <param name="actionQueue"> 行为队列</param>
+    /// <param name="actionQueue">行为队列</param>
     /// <param name="actionIndex">行动位置</param>
     /// <param name="executeTurn">行动执行回合</param>
     /// <param name="updateVisual">父组件更新视图</param>

@@ -56,8 +56,7 @@ public class ScriptiptableSOManager : MonoBehaviour
     public ActionSpeedSO GetActionSpeedSO(ActionSpeed actionSpeed)
     {
         foreach (ActionSpeedSO actionSpeedSO in actionSpeeds)
-        {
-            Debug.Log("Checking ActionSpeedSO: " + actionSpeedSO.actionSpeedType + " against ActionSpeed: " + actionSpeed);
+        {            
             if (actionSpeedSO.actionSpeedType == actionSpeed)
             {
                 return actionSpeedSO;
