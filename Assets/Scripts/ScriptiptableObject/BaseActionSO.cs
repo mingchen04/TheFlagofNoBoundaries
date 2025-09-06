@@ -36,6 +36,7 @@ public enum ActionType
 [CreateAssetMenu(menuName = "BaseActionSO")]
 public class BaseActionSO : ScriptableObject
 {
+    public string actionName;
     public Sprite baseActionIcon;
     public ActionType actionType;
     public ActionTags actionTags;

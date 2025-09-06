@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 415b40588c49e6b4a95d605cc0a992aa, type: 3}
   m_Name: InteractActionSO
   m_EditorClassIdentifier: 
-  actionType: 2
+  actionName: "\u4E92\u52A8"
   baseActionIcon: {fileID: 21300000, guid: 612697507b81c2640a11c7420a4492aa, type: 3}
+  actionType: 2
   actionTags: 0

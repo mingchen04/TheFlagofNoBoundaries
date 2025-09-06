@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 415b40588c49e6b4a95d605cc0a992aa, type: 3}
   m_Name: AttackMagicActionSO
   m_EditorClassIdentifier: 
-  actionType: 0
+  actionName: "\u653B\u51FB\u9B54\u6CD5"
   baseActionIcon: {fileID: 21300000, guid: 4bcacecf82826cb4989e607286830200, type: 3}
+  actionType: 0
   actionTags: 0

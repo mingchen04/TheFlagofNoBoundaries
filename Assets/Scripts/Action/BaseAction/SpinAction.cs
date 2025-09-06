@@ -38,11 +38,6 @@ public class SpinAction : BaseAction
         totalSpinAmount = 360f;
     }
 
-    public override string GetActionName()
-    {
-        return "旋转";
-    }
-
     public override List<GridPosition> GetValidActionGridPositionList()
     {
         GridPosition unitGridPosition = unit.GetGridPosition();

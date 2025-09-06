@@ -29,7 +29,7 @@ public class SrengthSystem : MonoBehaviour
 
     private void TurnSystem_OnTurnChanged(object sender, System.EventArgs e)
     {
-        if ((unit.IsEnemy() && !TurnSystem.Instance.IsPlayerTrun()) || (!unit.IsEnemy() && TurnSystem.Instance.IsPlayerTrun()))
+        if ((unit.IsEnemy() && !TurnSystem.Instance.IsPlayerTurn()) || (!unit.IsEnemy() && TurnSystem.Instance.IsPlayerTurn()))
         {
             actionPoints = actionPointMax;
             forecastActionPoints = actionPoints;

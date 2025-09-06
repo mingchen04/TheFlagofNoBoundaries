@@ -79,10 +79,6 @@ public class ActionQueueListUI : MonoBehaviour
         StartCoroutine(DelayedScroll());
     }
 
-    private void CreateBaseActionParametersUI(BaseActionParameter baseActionParameter)
-    {
-
-    }
 
     private IEnumerator DelayedScroll()
     {

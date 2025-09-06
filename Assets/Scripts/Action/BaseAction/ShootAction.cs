@@ -97,11 +97,6 @@ public class ShootAction : BaseAction
         }
     }
 
-    public override string GetActionName()
-    {
-        return "射击";
-    }
-
     public override List<GridPosition> GetValidActionGridPositionList()
     {
         GridPosition unitGridPosition = unit.GetGridPosition();

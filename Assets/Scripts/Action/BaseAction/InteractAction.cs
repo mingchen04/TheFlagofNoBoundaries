@@ -14,11 +14,6 @@ public class InteractAction : BaseAction
         }
     }
 
-    public override string GetActionName()
-    {
-        return "互动";
-    }
-
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {
         return new EnemyAIAction

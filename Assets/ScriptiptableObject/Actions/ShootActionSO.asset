@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 415b40588c49e6b4a95d605cc0a992aa, type: 3}
   m_Name: ShootActionSO
   m_EditorClassIdentifier: 
-  actionType: 5
+  actionName: "\u5C04\u51FB"
   baseActionIcon: {fileID: 21300000, guid: 5c8aae47c8934504eaad74b914163868, type: 3}
+  actionType: 5
   actionTags: 2

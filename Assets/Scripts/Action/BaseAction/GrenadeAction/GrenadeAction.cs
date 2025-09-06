@@ -15,11 +15,6 @@ public class GrenadeAction : BaseAction
         }
     }
 
-    public override string GetActionName()
-    {
-        return "手雷";
-    }
-
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {
         return new EnemyAIAction() { actionValue = 0, gridPosition = gridPosition };

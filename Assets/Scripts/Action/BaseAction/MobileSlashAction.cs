@@ -76,11 +76,6 @@ public class MobileSlashAction : BaseMoveAction
 
     }
 
-    public override string GetActionName()
-    {
-        return "移动斩";
-    }
-
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {
         return new EnemyAIAction

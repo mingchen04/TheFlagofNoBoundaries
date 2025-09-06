@@ -80,9 +80,6 @@ public class MoveAction : BaseMoveAction
         }
         return validTargets;
     }
-
-    public override string GetActionName() => "移动";
-
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {
         int targetCount = unit.GetAction<ShootAction>().GetTargetCountAtPosition(gridPosition);

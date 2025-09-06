@@ -17,7 +17,6 @@ public class UnitActionSystem : MonoBehaviour
     private BaseAction selectedAction;
     private bool isDeployAction; //是否部署行动
     private bool isBusy;
-    private bool isExecutingGlobalActions = false;
     private List<Unit> underwayUnits = new(); //正在进行的单位列表
 
     private void Awake()
@@ -33,6 +32,7 @@ public class UnitActionSystem : MonoBehaviour
 
     private void Start()
     {
+        isBusy = false;
         LevelGrid.Instance.OnAnyUnitMoveGridPosition += LevelGrid_OnAnyUnitPositionChanged;
         SelectionBoxGUI.OnClick += SelectionBoxGUI_OnClick;
     }
@@ -41,7 +41,7 @@ public class UnitActionSystem : MonoBehaviour
     {
         if (isBusy) return;
         //判断是否是玩家回合
-        if (!TurnSystem.Instance.IsPlayerTrun()) return;
+        if (!TurnSystem.Instance.IsPlayerTurn()) return;
         //检测鼠标指针是否在ui上
         if (EventSystem.current.IsPointerOverGameObject()) return;
 
@@ -60,6 +60,7 @@ public class UnitActionSystem : MonoBehaviour
 
     private bool TryHandleSelectedAction(GridPosition mouseGridPosition)
     {
+        if (TurnSystem.Instance.GetTurnState() == TurnSystem.TurnState.WaitCounter) return false;
         if (selectedUnits.Count == 0) return false;
         if (!LevelGrid.Instance.IsValidGridPosition(mouseGridPosition)) return false;
 
@@ -186,40 +187,38 @@ public class UnitActionSystem : MonoBehaviour
     /// <summary>
     /// 执行所有队列
     /// </summary>
-    public void ExecuteAllQueuedActions()
+    public void ExecuteAllQueuedActions(bool isPlayerTurn = true, Action actionCompleted = null)
     {
-        if (!isExecutingGlobalActions)
+        if (!isBusy)
         {
-            DeployActionEnd(); // 确保结束部署行动状态
-            //ClearSelectedUnits(false);
-            //AddSelectedUnit(UnitManager.Instance.GetFriendlyUnitList());
-            StartCoroutine(ExecuteGlobalActionsCoroutine());
+            DeployActionEnd();
+            Debug.Log($"执行{(isPlayerTurn ? "我方" : "敌方")}动作");
+            StartCoroutine(ExecuteGlobalActionsCoroutine(isPlayerTurn, actionCompleted));
         }
     }
 
-    private IEnumerator ExecuteGlobalActionsCoroutine()
+    private IEnumerator ExecuteGlobalActionsCoroutine(bool isPlayerTurn, Action actionCompleted)
     {
-        isExecutingGlobalActions = true;
         SetBusy();
-        List<Unit> closeUnit = new List<Unit>();
+        List<Unit> closeUnits = new List<Unit>();
 
         while (true)
         {
             // 获取所有单位中最小执行顺序
 
-            List<Unit> units = TurnSystem.Instance.IsPlayerTrun() ?
+            List<Unit> units = isPlayerTurn ?
                 UnitManager.Instance.GetFriendlyUnitList() :
                 UnitManager.Instance.GetEnemyUnitList();
-            units = units.FindAll(u => !closeUnit.Contains(u));
+            units = units.FindAll(u => !closeUnits.Contains(u));//只选择未关闭的单位
 
             int currentOrder = int.MaxValue;
-            if (units.Any()) 
+            if (units.Any())
             {
                 currentOrder = units
                 .Select(u => u.GetCurrentActionOrder())
                 .Min();
             }// 没有单位可执行
- 
+
             if (currentOrder == int.MaxValue)
             {
                 NextTurn();
@@ -229,44 +228,42 @@ public class UnitActionSystem : MonoBehaviour
             Debug.Log($"开始执行顺序: {currentOrder}");
 
             bool orderCompleted = false;
-            closeUnit.AddRange
+            closeUnits.AddRange
                 (
-                    ExecuteActionsAtOrder(currentOrder, () => { orderCompleted = true; })
+                    ExecuteActionsAtOrder(currentOrder, () => { orderCompleted = true; }, units)
                 );
 
 
             yield return new WaitUntil(() => orderCompleted);
         }
 
-        isExecutingGlobalActions = false;
         ClearBusy();
+        actionCompleted?.Invoke(); // 新增：所有行动完成后调用回调
     }
 
     /// <summary>
-    /// 执行指定顺序的所有单位行动 并输出正在进行的单位列表
+    /// 执行指定顺序的所有单位行动 并输出正在进行的单位列表 返回结束的单位列表
     /// </summary>
     /// <param name="order"></param>
     /// <param name="onComplete"></param>
 
-    private List<Unit> ExecuteActionsAtOrder(int order, Action onComplete)
+    private List<Unit> ExecuteActionsAtOrder(int order, Action onComplete,List<Unit> units)
     {
         List<Unit> closeUnit = new List<Unit>();
 
-        List<Unit> units = (TurnSystem.Instance.IsPlayerTrun() ?
-            UnitManager.Instance.GetFriendlyUnitList() :
-            UnitManager.Instance.GetEnemyUnitList())
+        underwayUnits = units
             .Where(u => u.GetCurrentActionOrder() == order)
             .OrderBy(u => u.GetPriority())
             .ToList();
-        underwayUnits = units; // 更新正在进行的单位列表
-        if (!units.Any())
+
+        if (!underwayUnits.Any())
         {
             onComplete?.Invoke();
             return closeUnit;
         }
 
         int completedCount = 0;
-        foreach (Unit unit in units)
+        foreach (Unit unit in underwayUnits)
         {
             unit.GetActionQueue().ExecuteActionsAtOrder(order, () =>
             {
@@ -277,7 +274,7 @@ public class UnitActionSystem : MonoBehaviour
                     closeUnit.Add(unit);
                 }
                 completedCount++;
-                if (completedCount == units.Count())
+                if (completedCount == underwayUnits.Count())
                 {
                     onComplete?.Invoke();// 所有单位完成后触发回调
                 }
@@ -303,10 +300,6 @@ public class UnitActionSystem : MonoBehaviour
     /// <summary>
     /// 检查一组单位的移动目标是否发生冲突（如多个单位目标格相同），
     /// 并停止所有冲突单位的集合。
-    /// 优化点：
-    /// 1. 支持多个单位同时冲突（如3个单位目标相同，全部判为无效）。
-    /// 2. 变量命名更语义化，注释更详细。
-    /// 3. 只处理正在进行的MoveAction。
     /// </summary>
     public void StopInvalidMoveUnits()
     {
@@ -381,11 +374,17 @@ public class UnitActionSystem : MonoBehaviour
         StopInvalidMoveUnits();
     }
 
+    //在敌方行动完成时切换到下一个回合
     private void NextTurn()
     {
-        if (!TurnSystem.Instance.IsPlayerTrun())
+        if (!TurnSystem.Instance.IsPlayerTurn())
         {
             TurnSystem.Instance.NextTurn();
         }
+    }
+
+    public bool IsBusy()
+    {
+        return isBusy;
     }
 }

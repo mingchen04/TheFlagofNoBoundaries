@@ -22,11 +22,6 @@ public class AttackMagicAction : BaseAction
         }
     }
 
-    public override string GetActionName()
-    {
-        return "攻击魔法";
-    }
-
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {
         return new EnemyAIAction

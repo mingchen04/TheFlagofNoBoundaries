@@ -447,7 +447,7 @@ public class ActionQueue : MonoBehaviour
     {
         foreach (BaseActionParameter action in pendingActions)
         {
-            if (action.baseAction.GetActionSpeed() == ActionSpeed.slow)
+            if (action.actionSpeed == ActionSpeed.slow)
             {
                 return true;
             }

@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 415b40588c49e6b4a95d605cc0a992aa, type: 3}
   m_Name: SpinActionSO
   m_EditorClassIdentifier: 
-  actionType: 6
+  actionName: "\u65CB\u8F6C"
   baseActionIcon: {fileID: 21300000, guid: 678c5fe465670c845b437246c192265a, type: 3}
+  actionType: 6
   actionTags: 0

@@ -26,7 +26,7 @@ public class GrenadeProjectile : MonoBehaviour
         float distance = Vector3.Distance(positionXZ, targetPosition);
         float distanceNormalized = 1 - distance / totalDistance; //获得距离进度百分比
 
-        float maxHeight = totalDistance / 4f;
+        float maxHeight = totalDistance / 4f; //抛物线的最大高度与总距离成正比
         float positionY = arcYAnimationCurve.Evaluate(distanceNormalized) * maxHeight;//抓取曲线上的值
         transform.position = new Vector3(positionXZ.x, positionY, positionXZ.z);
 

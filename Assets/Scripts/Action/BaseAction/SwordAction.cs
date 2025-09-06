@@ -64,10 +64,6 @@ public class SwordAction : BaseAction
         }
     }
 
-    public override string GetActionName()
-    {
-        return "劈砍";
-    }
 
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {

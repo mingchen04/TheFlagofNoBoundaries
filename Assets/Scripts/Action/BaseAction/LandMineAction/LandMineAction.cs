@@ -27,11 +27,6 @@ public class LandMineAction : BaseAction
         base.Awake();
     }
 
-    public override string GetActionName()
-    {
-        return "地雷";
-    }
-
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {
         return new EnemyAIAction

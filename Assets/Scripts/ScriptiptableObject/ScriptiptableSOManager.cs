@@ -29,6 +29,11 @@ public class ScriptiptableSOManager : MonoBehaviour
         return GetBaseActionSO(baseAction).actionTags;
     }
 
+    public string GetActionName(BaseAction baseAction)
+    {
+        return GetBaseActionSO(baseAction).actionName;
+    }
+
     private BaseActionSO GetBaseActionSO(BaseAction baseAction)
     {
         foreach (BaseActionSO baseActionSO in baseActionListSO)

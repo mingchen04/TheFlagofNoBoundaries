@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 415b40588c49e6b4a95d605cc0a992aa, type: 3}
   m_Name: GrenadeActionSO
   m_EditorClassIdentifier: 
-  actionType: 1
+  actionName: "\u624B\u96F7"
   baseActionIcon: {fileID: 21300000, guid: dc1f93f56695a204fa6fdee4895043d6, type: 3}
+  actionType: 1
   actionTags: 6

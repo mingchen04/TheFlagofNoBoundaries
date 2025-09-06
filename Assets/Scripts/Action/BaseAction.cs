@@ -29,7 +29,10 @@ public abstract class BaseAction : MonoBehaviour
     }
 
     /// <returns>动作名称</returns>
-    public abstract string GetActionName();
+    public string GetActionName()
+    { 
+        return ScriptiptableSOManager.Instance.GetActionName(this);
+    }
 
     public abstract void TakeAction(BaseActionParameter baseActionParameter, Action onActionComplete);
 
