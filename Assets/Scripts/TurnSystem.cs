@@ -48,15 +48,18 @@ public class TurnSystem : MonoBehaviour
         bool secondDone = false;
         UnitActionSystem.Instance.ExecuteAllQueuedActions(!IsPlayerTurn(), () => { secondDone = true; });
         yield return new WaitUntil(() => secondDone);
-
+        Debug.Log(IsPlayerTurn());
         if (turnState != TurnState.WaitCounter && turnState != TurnState.CounterTurn)
         {
-            if (!IsPlayerTurn())
+            if (!IsPlayerTurn()) //非玩家回合让玩家选择是否进入反制回合
             {
-                Debug.Log("反制");
                 turnState = TurnState.WaitCounter;
                 OnTurnChanged?.Invoke(this, EventArgs.Empty);
                 yield break;
+            }
+            else //敌方回合计算反制回合优先级
+            {
+                turnState = TurnState.WaitCounter;
             }
         }
 
@@ -79,15 +82,29 @@ public class TurnSystem : MonoBehaviour
     }
 
     public void EndTurn()
-    {
-        Debug.Log("回合结束");
+    {        
+        if (turnState == TurnState.CounterTurn)
+        {
+            Debug.Log("反制回合结束");
+            ExecuteAllQueuedActions(IsPlayerTurn());
+        }
+        else if (turnState == TurnState.WaitCounter)
+        {
+            Debug.Log("回合结束");
+            //若不进入反制回合则直接执行慢速动作并切换阵营
+            ExecuteAllQueuedActions(!IsPlayerTurn());
+        }
+
         turnState = TurnState.Main;
         turnNumber++;
-        //若不进入反制回合则直接执行慢速动作并切换阵营
-        UnitActionSystem.Instance.ExecuteAllQueuedActions(IsPlayerTurn());
-
         isPlayerTurn = !isPlayerTurn;
         OnTurnChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void ExecuteAllQueuedActions(bool playerTurn)
+    {
+        Debug.Log($"执行是否玩家回合 {playerTurn} - {isPlayerTurn}");
+        UnitActionSystem.Instance.ExecuteAllQueuedActions(playerTurn);
     }
 
     //反制回合

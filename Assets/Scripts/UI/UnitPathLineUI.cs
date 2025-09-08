@@ -80,6 +80,7 @@ public class UnitPathLineUI : MonoBehaviour
 
     public void HidePathLine()
     {
+        if (lineRenderer == null) return;
         lineRenderer.enabled = false;
     }
 
