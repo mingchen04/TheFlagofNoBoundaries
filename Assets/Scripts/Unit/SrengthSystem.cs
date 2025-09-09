@@ -29,13 +29,22 @@ public class SrengthSystem : MonoBehaviour
 
     private void TurnSystem_OnTurnChanged(object sender, System.EventArgs e)
     {
-        if ((unit.IsEnemy() && !TurnSystem.Instance.IsPlayerTurn()) || (!unit.IsEnemy() && TurnSystem.Instance.IsPlayerTurn()))
+        if (TurnSystem.Instance.GetTurnState() != TurnSystem.TurnState.Main)
         {
-            actionPoints = actionPointMax;
-            forecastActionPoints = actionPoints;
-            OnAnyActionPointsChanged?.Invoke(this, EventArgs.Empty);
-            OnActionPointsChanged?.Invoke(this, EventArgs.Empty);
+            return;
         }
+
+        if (unit.IsEnemy() != !TurnSystem.Instance.IsPlayerTurn())
+        {
+            return;
+        }
+
+        
+
+        actionPoints = actionPointMax;
+        forecastActionPoints = actionPoints;
+        OnAnyActionPointsChanged?.Invoke(this, EventArgs.Empty);
+        OnActionPointsChanged?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>

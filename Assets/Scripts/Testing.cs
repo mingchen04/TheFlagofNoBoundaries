@@ -14,7 +14,15 @@ public class Testing : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.T))
         {
-            TurnSystem.Instance.NextTurn();
+            if(TurnSystem.Instance.GetTurnState() == TurnSystem.TurnState.Main)
+            {
+                TurnSystem.Instance.NextTurn();
+            }
+            else
+            {
+                TurnSystem.Instance.EndTurn();
+            }
+           
         }
 
         if (Input.GetKeyDown(KeyCode.F))
