@@ -48,7 +48,7 @@ public class TurnSystem : MonoBehaviour
         bool secondDone = false;
         UnitActionSystem.Instance.ExecuteAllQueuedActions(!IsPlayerTurn(), () => { secondDone = true; });
         yield return new WaitUntil(() => secondDone);
-        Debug.Log(IsPlayerTurn());
+
         if (turnState != TurnState.WaitCounter && turnState != TurnState.CounterTurn)
         {
             if (!IsPlayerTurn()) //非玩家回合让玩家选择是否进入反制回合
@@ -64,21 +64,6 @@ public class TurnSystem : MonoBehaviour
         }
 
         EndTurn();
-    }
-
-    public int GetTurnNumber()
-    {
-        return turnNumber;
-    }
-
-    //判断是否为玩家回合
-    public bool IsPlayerTurn()
-    {
-        if (turnState == TurnState.CounterTurn || turnState == TurnState.WaitCounter)
-        {
-            return !isPlayerTurn;
-        }
-        return isPlayerTurn;
     }
 
     public void EndTurn()
@@ -118,5 +103,19 @@ public class TurnSystem : MonoBehaviour
     public TurnState GetTurnState()
     {
         return turnState;
+    }
+    public int GetTurnNumber()
+    {
+        return turnNumber;
+    }
+
+    //判断是否为玩家回合
+    public bool IsPlayerTurn()
+    {
+        if (turnState == TurnState.CounterTurn || turnState == TurnState.WaitCounter)
+        {
+            return !isPlayerTurn;
+        }
+        return isPlayerTurn;
     }
 }

@@ -110,8 +110,8 @@ public class UnitActionSystemUI : MonoBehaviour
 
         actionPointsText.enabled = true;
         string ActionPointString = "可用行动点数: " + unit.GetActionPoints().ToString();
-
-        if (unit.GetReductionPoints() != 0) ActionPointString += " - " + unit.GetReductionPoints();
+        
+        if (unit.GetReductionPoints() > 0) ActionPointString += " - " + unit.GetReductionPoints();
         actionPointsText.text = ActionPointString;
     }
 }

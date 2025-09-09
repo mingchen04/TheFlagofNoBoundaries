@@ -14,7 +14,7 @@ public class Testing : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.T))
         {
-            UnitActionSystem.Instance.ExecuteAllQueuedActions();
+            TurnSystem.Instance.NextTurn();
         }
 
         if (Input.GetKeyDown(KeyCode.F))
@@ -29,7 +29,7 @@ public class Testing : MonoBehaviour
                 new GridPosition(9, 0), //true
             };
 
-            foreach(GridPosition position in positions)
+            foreach (GridPosition position in positions)
             {
                 a.IsStraightLine(position);
             }
