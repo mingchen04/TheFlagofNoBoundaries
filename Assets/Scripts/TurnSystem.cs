@@ -8,13 +8,21 @@ public class TurnSystem : MonoBehaviour
     public event EventHandler OnTurnChanged;
     private int turnNumber = 1; //回合数
     private bool isPlayerTurn = true;
+    private Party actingParty = Party.Player; //当前行动阵营
     private TurnState turnState; //回合状态
+    [SerializeField] private EnemyAI enemyAI;
 
     public enum TurnState
     {
         Main, //主回合
         WaitCounter, //等待反制回合
         CounterTurn, //反制回合
+    }
+
+    public enum Party
+    {
+        Player,
+        Enemy,
     }
 
     private void Awake()
@@ -41,60 +49,75 @@ public class TurnSystem : MonoBehaviour
 
     private IEnumerator NextTurnCoroutine()
     {
+        //检查当前行动方 是否为玩家
+        bool isPlayerTurn = actingParty == Party.Player;
+
+
         bool firstDone = false;
-        UnitActionSystem.Instance.ExecuteAllQueuedActions(IsPlayerTurn(), () => { firstDone = true; });
+        UnitActionSystem.Instance.ExecuteAllQueuedActions(isPlayerTurn, () => { firstDone = true; });
         yield return new WaitUntil(() => firstDone);
 
         bool secondDone = false;
-        UnitActionSystem.Instance.ExecuteAllQueuedActions(!IsPlayerTurn(), () => { secondDone = true; });
+        UnitActionSystem.Instance.ExecuteAllQueuedActions(!isPlayerTurn, () => { secondDone = true; });
         yield return new WaitUntil(() => secondDone);
 
-        if (turnState != TurnState.WaitCounter && turnState != TurnState.CounterTurn)
+        if (turnState != TurnState.WaitCounter)
         {
-            if (!IsPlayerTurn()) //非玩家回合让玩家选择是否进入反制回合
+            turnState = TurnState.WaitCounter;
+
+            if (isPlayerTurn)//非敌方回合敌方计算反制回合优先级
             {
-                turnState = TurnState.WaitCounter;
+                Debug.Log("等待敌方反制回合");
+                if (enemyAI.ShouldEnterCounterTurn())
+                {
+                    EnterCounterTurn(Party.Enemy);
+                    yield break;
+                }
+            }
+            else //非玩家回合让玩家选择是否进入反制回合
+            {
+                Debug.Log("等待我方反制回合");
                 OnTurnChanged?.Invoke(this, EventArgs.Empty);
                 yield break;
             }
-            else //敌方回合计算反制回合优先级
-            {
-                turnState = TurnState.WaitCounter;
-            }
         }
 
-        EndTurn();
+        StartCoroutine(EndTurn());
     }
 
-    public void EndTurn()
-    {        
-        if (turnState == TurnState.CounterTurn)
-        {
-            Debug.Log("反制回合结束");
-            ExecuteAllQueuedActions(IsPlayerTurn());
-        }
-        else if (turnState == TurnState.WaitCounter)
-        {
-            Debug.Log("回合结束");
-            //若不进入反制回合则直接执行慢速动作并切换阵营
-            ExecuteAllQueuedActions(!IsPlayerTurn());
-        }
+    public IEnumerator EndTurn()
+    {
+        bool actionsDone = false;
+
+        Debug.Log("回合结束");
+        ExecuteAllQueuedActions(actingParty == Party.Player, () => { actionsDone = true; });
+
+        yield return new WaitUntil(() => actionsDone);
 
         turnState = TurnState.Main;
         turnNumber++;
         isPlayerTurn = !isPlayerTurn;
+
+        if (isPlayerTurn) { actingParty = Party.Player; }
+        else { actingParty = Party.Enemy; }
+
+
         OnTurnChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    private void ExecuteAllQueuedActions(bool playerTurn)
+    private void ExecuteAllQueuedActions(bool playerTurn, Action actionComplete = null)
     {
-        UnitActionSystem.Instance.ExecuteAllQueuedActions(playerTurn);
+        UnitActionSystem.Instance.ExecuteAllQueuedActions(playerTurn, actionComplete);
     }
 
-    //反制回合
-    public void CounterTurnNext()
+    /// <summary>
+    /// 进入反制回合
+    /// </summary>
+    /// <param name="actingParty">进入反制回合的一方</param>
+    public void EnterCounterTurn(Party actingParty = Party.Player)
     {
         Debug.Log("反制回合");
+        this.actingParty = actingParty;
         turnState = TurnState.CounterTurn;
         OnTurnChanged?.Invoke(this, EventArgs.Empty);
     }
@@ -111,10 +134,13 @@ public class TurnSystem : MonoBehaviour
     //判断是否为玩家回合
     public bool IsPlayerTurn()
     {
-        if (turnState == TurnState.CounterTurn || turnState == TurnState.WaitCounter)
-        {
-            return !isPlayerTurn;
-        }
         return isPlayerTurn;
     }
+
+    //获取当前行动阵营
+    public Party GetActingParty()
+    {
+        return actingParty;
+    }
+
 }

@@ -53,10 +53,11 @@ public class CameraController : MonoBehaviour
 
     private void HandleZoom()
     {
-        if (EventSystem.current.IsPointerOverGameObject())
-        {
-            return;
-        }
+        //if (EventSystem.current.IsPointerOverGameObject())
+        //{
+        //    return;
+        //}
+
         float zoomIncreaseAmount = 1f;
         targetFollowOffset.y += InputManager.Instance.GetCameraZoomAmout() * zoomIncreaseAmount;
 

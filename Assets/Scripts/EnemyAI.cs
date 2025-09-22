@@ -25,7 +25,9 @@ public class EnemyAI : MonoBehaviour
 
     private void TurnSystem_OnTurnChanged(object sender, System.EventArgs e)
     {
-        if (!TurnSystem.Instance.IsPlayerTurn())
+        if (TurnSystem.Instance.GetActingParty() == TurnSystem.Party.Enemy
+            &&
+            TurnSystem.Instance.GetTurnState() != TurnSystem.TurnState.WaitCounter)
         {
             state = State.TakingTurn;
             timer = 2f;
@@ -35,7 +37,7 @@ public class EnemyAI : MonoBehaviour
 
     private void Update()
     {
-        if (TurnSystem.Instance.IsPlayerTurn())
+        if (TurnSystem.Instance.GetActingParty() != TurnSystem.Party.Enemy)
         {
             return;
         }
@@ -153,5 +155,48 @@ public class EnemyAI : MonoBehaviour
         {
             return false;
         }
+    }
+
+    /// <summary>
+    /// 计算是否进入反制回合 当单位体力大于20并且距离4以内有敌方单位时返回真
+    /// </summary>
+    public bool ShouldEnterCounterTurn()
+    {
+        foreach (Unit enemyUnit in UnitManager.Instance.GetEnemyUnitList())
+        {
+            if (enemyUnit.GetActionPoints() > 20 && HasPlayerInRange(enemyUnit))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// 检查周围是否有玩家单位
+    /// </summary>    
+    private bool HasPlayerInRange(Unit enemyUnit)
+    {
+        foreach (Unit playerUnit in UnitManager.Instance.GetFriendlyUnitList())
+        {
+            GridPosition enemyPosition = enemyUnit.GetGridPosition();
+            GridPosition playerPosition = playerUnit.GetGridPosition();
+
+            if (Vector3.Distance(enemyPosition, playerPosition) < 4)
+            {
+                int pathfindingDistanceMultiplier = 10;
+                int PathLength = Pathfinding.Instance.GetPathLength(enemyPosition, playerPosition,
+                    new Pathfinding.PathfindingRules[] { Pathfinding.PathfindingRules.Walkable })
+                    / pathfindingDistanceMultiplier;
+                Debug.Log("距离小于4 检查路径长度" + PathLength);
+                Debug.Log($"{enemyUnit.name} 坐标 {enemyPosition} - {playerUnit.name} 坐标 {playerPosition}");
+
+                if (PathLength <= 2)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

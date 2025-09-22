@@ -44,6 +44,11 @@ public class SelectionBoxGUI : MonoBehaviour
 
         if (InputManager.Instance.IsMouseButtonDownThisFrame())
         {
+            if (EventSystem.current.IsPointerOverGameObject())
+            {
+                return;
+            }
+
             startScreenPos = InputManager.Instance.GetMouseScreenPosition();
             isSelecting = true;
         }
@@ -85,7 +90,7 @@ public class SelectionBoxGUI : MonoBehaviour
         // 获取选择框的矩形区域
         Rect selectionRect = GetScreenRect(guiStart, guiCurrent);
         // 绘制选择框(边框宽度2px，白色)
-        DrawScreenRect(selectionRect, 2, Color.white);
+        DrawScreenRect(selectionRect, 1, Color.white);
     }
 
     /// <summary>

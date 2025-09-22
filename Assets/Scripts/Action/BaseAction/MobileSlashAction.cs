@@ -2,6 +2,10 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 移动斩动作
+/// </summary>
+
 public class MobileSlashAction : BaseMoveAction
 {
     public override event EventHandler OnStartMoving;
@@ -14,10 +18,11 @@ public class MobileSlashAction : BaseMoveAction
     protected override void Awake()
     {
         base.Awake();
+        //设置寻路规则
         defaultPathfindingRules = new Pathfinding.PathfindingRules[]
         {
-            Pathfinding.PathfindingRules.Walkable,
-            Pathfinding.PathfindingRules.Straight
+            Pathfinding.PathfindingRules.Walkable, //障碍物判定
+            Pathfinding.PathfindingRules.Straight //只能走直线
         };
     }
 

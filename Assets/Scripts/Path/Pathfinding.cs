@@ -64,6 +64,7 @@ public class Pathfinding : MonoBehaviour
                 bool isWalkable = Physics.Raycast(
                    worldPosition + Vector3.down * raycastOffsetDistance,
                    Vector3.up,
+                   out RaycastHit raycastHit,
                    raycastOffsetDistance * 2,
                    obstaclesLayerMask);
 
@@ -293,7 +294,6 @@ public class Pathfinding : MonoBehaviour
 
             if (oddRow ? xReduceValid : xAddValid) neighbourList.Add(GetNode(gridPosition.x + (oddRow ? -1 : +1), gridPosition.z + 1));
         }
-        ;
 
         //Down
         if (zReduceValid)
@@ -301,7 +301,6 @@ public class Pathfinding : MonoBehaviour
             neighbourList.Add(GetNode(gridPosition.x + 0, gridPosition.z - 1));
             if (oddRow ? xReduceValid : xAddValid) neighbourList.Add(GetNode(gridPosition.x + (oddRow ? -1 : +1), gridPosition.z - 1));
         }
-        ;
 
         return neighbourList;
     }
@@ -352,7 +351,7 @@ public class Pathfinding : MonoBehaviour
     }
 
     /// <summary>
-    /// 检查是路径是否可行
+    /// 检查路径是否可行
     /// </summary>
     /// <param name="startGridPositionm">开始位置</param>
     /// <param name="endGridPositionm">结束位置</param>
@@ -385,9 +384,9 @@ public class Pathfinding : MonoBehaviour
     /// <param name="startGridPosition"></param>
     /// <param name="endGridPositionm"></param>
     /// <returns></returns>
-    public int GetPathLength(GridPosition startGridPosition, GridPosition endGridPositionm)
+    public int GetPathLength(GridPosition startGridPosition, GridPosition endGridPositionm, PathfindingRules[] pathfindingRules = null)
     {
-        FindPath(startGridPosition, endGridPositionm, out int pathLength);
+        FindPath(startGridPosition, endGridPositionm, out int pathLength, pathfindingRules);
         return pathLength;
     }
 }

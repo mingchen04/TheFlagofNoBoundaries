@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class TurnSystemUI : MonoBehaviour
 {
-    [SerializeField] private Button endTurnButton;
+    [SerializeField] private Button nextTurnButton; //回合开始
     [SerializeField] private Button counterTurnButton; //反制回合
     [SerializeField] private Button finishTurnButton; //结束回合
     [SerializeField] private TextMeshProUGUI turnNumberText;
@@ -13,19 +13,19 @@ public class TurnSystemUI : MonoBehaviour
 
     private void Start()
     {
-        endTurnButton.onClick.AddListener(() =>
+        nextTurnButton.onClick.AddListener(() =>
         {
             TurnSystem.Instance.NextTurn();
         });
 
         finishTurnButton.onClick.AddListener(() =>
-        {
-            TurnSystem.Instance.EndTurn();
+        {            
+            StartCoroutine(TurnSystem.Instance.EndTurn());
         });
 
         counterTurnButton.onClick.AddListener(() =>
         {
-            TurnSystem.Instance.CounterTurnNext();
+            TurnSystem.Instance.EnterCounterTurn();
         });
 
 
@@ -33,7 +33,6 @@ public class TurnSystemUI : MonoBehaviour
         UpdateTurnText();
         UpdateEnemyTurnVisual();
         UpdateEndTurnButtonVisibility();
-
     }
 
     private void OnDestroy()
@@ -58,7 +57,7 @@ public class TurnSystemUI : MonoBehaviour
 
     private void UpdateEnemyTurnVisual()
     {
-        enemyTurnVisualText.text = TurnSystem.Instance.IsPlayerTurn() ? "我方回合" : "敌方回合";
+        enemyTurnVisualText.text = TurnSystem.Instance.GetActingParty() +"回合";
     }
 
     private void UpdateEndTurnButtonVisibility()
@@ -67,19 +66,20 @@ public class TurnSystemUI : MonoBehaviour
         TurnSystem.TurnState turnState = TurnSystem.Instance.GetTurnState();
         bool isPlayerTurn = TurnSystem.Instance.IsPlayerTurn();
 
-        if (turnState != TurnSystem.TurnState.WaitCounter) 
-        { 
-            //反制回合 和 主回合时显示
-            endTurnButton.gameObject.SetActive(isPlayerTurn);
+        if (turnState != TurnSystem.TurnState.WaitCounter &&
+            TurnSystem.Instance.GetActingParty() == TurnSystem.Party.Player)            
+        {
+            //主回合和反制回合时显示
+            nextTurnButton.gameObject.SetActive(true);
         }
         else
-        {
-            //等待反制回合时隐藏结束按钮
-            endTurnButton.gameObject.SetActive(!isPlayerTurn);
+        {            
+            nextTurnButton.gameObject.SetActive(false);
         }
 
         //等待反制回合状态且非玩家回合时显示反制按钮和结束按钮
-        if (turnState == TurnSystem.TurnState.WaitCounter && isPlayerTurn)
+        if (turnState == TurnSystem.TurnState.WaitCounter &&
+            TurnSystem.Instance.GetActingParty() != TurnSystem.Party.Player)
         {
             counterTurnButton.gameObject.SetActive(true);
             finishTurnButton.gameObject.SetActive(true);
@@ -90,6 +90,5 @@ public class TurnSystemUI : MonoBehaviour
             finishTurnButton.gameObject.SetActive(false);
         }
 
-        
     }
 }

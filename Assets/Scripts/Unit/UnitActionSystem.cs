@@ -41,7 +41,7 @@ public class UnitActionSystem : MonoBehaviour
     {
         if (isBusy) return;
         //判断是否是玩家回合
-        if (!TurnSystem.Instance.IsPlayerTurn()) return;
+        if (TurnSystem.Instance.GetActingParty() != TurnSystem.Party.Player) return;
         //检测鼠标指针是否在ui上
         if (EventSystem.current.IsPointerOverGameObject()) return;
 
