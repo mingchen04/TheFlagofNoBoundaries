@@ -14,7 +14,7 @@ public abstract class BaseAction : MonoBehaviour
 {
     public static event EventHandler OnAnyActionStarted;
     public static event EventHandler OnAnyActionCompleted;
-    
+
     //protected 子类可以访问
     protected Unit unit;
     protected bool isActive;
@@ -30,7 +30,7 @@ public abstract class BaseAction : MonoBehaviour
 
     /// <returns>动作名称</returns>
     public string GetActionName()
-    { 
+    {
         return ScriptiptableSOManager.Instance.GetActionName(this);
     }
 
@@ -54,6 +54,11 @@ public abstract class BaseAction : MonoBehaviour
     /// <returns>消耗的体力点数</returns>
     public virtual int GetActionPointsCost(BaseActionParameter baseActionParameter = null)
     {
+        if(TurnSystem.Instance.IsCounterTurn())
+        {
+            return 10 * 2;
+        }
+
         return 10;
     }
 

@@ -34,14 +34,15 @@ public class SrengthSystem : MonoBehaviour
             return;
         }
 
-        if (unit.IsEnemy() != !TurnSystem.Instance.IsPlayerTurn())
+        if (unit.IsEnemy() == TurnSystem.Instance.IsPlayerTurn())
         {
             return;
         }
 
         
+        actionPoints += Mathf.FloorToInt(actionPointMax * 0.3f);
+        actionPoints = Mathf.Clamp(actionPoints, 0, actionPointMax);
 
-        actionPoints = actionPointMax;
         forecastActionPoints = actionPoints;
         OnAnyActionPointsChanged?.Invoke(this, EventArgs.Empty);
         OnActionPointsChanged?.Invoke(this, EventArgs.Empty);
@@ -52,7 +53,8 @@ public class SrengthSystem : MonoBehaviour
     /// </summary>
     public bool TrySpendActionPointsToTakeAction(BaseAction baseAction, BaseActionParameter actionParam)
     {
-        int baseActionPointsCost = baseAction.GetActionPointsCost(actionParam);//基础行动点数消耗
+        int baseActionPointsCost = baseAction.GetActionPointsCost(actionParam);//基础行动点数消耗        
+
         if (CanspendActionPointsToTakeAction(baseActionPointsCost))
         {
             SpendActionPoints(baseActionPointsCost);

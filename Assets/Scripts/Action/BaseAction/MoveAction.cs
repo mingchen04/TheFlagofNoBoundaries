@@ -96,7 +96,7 @@ public class MoveAction : BaseMoveAction
 
         List<GridPosition> path = BuildMovePathFromTargets(baseActionParameter.targetPositionList);
         movePathWorldPositions = path.Select(gridPosition => (Vector3)gridPosition).ToList();
-        int moveSteps = path.Count;
+        int moveSteps = path.Count;            
         return CalculateTotalMoveActionPoints(moveSteps);
     }
 
@@ -111,6 +111,11 @@ public class MoveAction : BaseMoveAction
         {
             total += GetMoveStepActionPointCost(alreadyPlannedSteps + i);
         }
+
+        if (TurnSystem.Instance.IsCounterTurn())
+        {
+            total *= 2; // 反击回合消耗翻倍
+        }
         return total;
     }
 
@@ -120,7 +125,8 @@ public class MoveAction : BaseMoveAction
     private int GetMoveStepActionPointCost(int stepIndex)
     {        
         if (stepIndex == 0) return 0;
-        float cost = moveCost;
+        float cost = moveCost;        
+
         for (int i = 1; i < stepIndex; i++)
         {
             cost *= 1.2f;

@@ -85,7 +85,7 @@ public class ActionQueue : MonoBehaviour
                 // 更新失败，可能是行动点不足或其他限制
                 return IsUpdateSuccess;
             }
-            Debug.Log($"{gameObject.name} 更新行动: {action.GetActionName()} (顺序:{executionOrder}, 目标:{targetPos}, 终位:{finalPos})");
+            Debug.Log($"{gameObject.name} 更新行动: {action.GetActionName()} (顺序:{executionOrder}, 目标:{targetPos}, 终位:{finalPos}) 体力消耗{actionParam.GetActionPoint()}");
         }
         else
         {
@@ -117,7 +117,7 @@ public class ActionQueue : MonoBehaviour
 
             pendingActions.Add(actionParam);
 
-            Debug.Log($"{gameObject.name}  添加行动: {action.GetActionName()} (顺序:{executionOrder}, 目标:{targetPos}, 终位:{finalPos})");
+            Debug.Log($"{gameObject.name}  添加行动: {action.GetActionName()} (顺序:{executionOrder}, 目标:{targetPos}, 终位:{finalPos}) 体力消耗 {actionParam.GetActionPoint()}");
         }
 
         if (isMove)

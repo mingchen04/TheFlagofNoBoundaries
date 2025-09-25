@@ -159,7 +159,7 @@ public class Unit : MonoBehaviour
     }
 
     public void TrySpendActionPointsToTakeAction(int actionPoint)
-    {
+    {        
         srengthSystem.SpendActionPoints(actionPoint);
     }
 
@@ -185,15 +185,18 @@ public class Unit : MonoBehaviour
     /// <summary>
     /// 添加带顺序的行动
     /// </summary>
-    public void HandleOrderedAction(BaseAction action, GridPosition targetPos, int executionOrder)
+    public bool HandleOrderedAction(BaseAction action, GridPosition targetPos, int executionOrder)
     {
         if (actionQueue.HandleOrderedAction(action, targetPos, executionOrder))
         {
             OnActionAddQueueSuccess?.Invoke(this, EventArgs.Empty);
+            return true;
         }
         else
         {
             OnActionAddQueueFailed?.Invoke(this, EventArgs.Empty);
+            SetDeselectAction(false);
+            return false;
         }
     }
 

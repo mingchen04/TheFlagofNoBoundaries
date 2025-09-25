@@ -148,7 +148,6 @@ public class EnemyAI : MonoBehaviour
 
             enemyUnit.HandleOrderedAction(bestBaseAction, bestEnemyAIAction.gridPosition, endOrder);
             onEnemyAIActionComplete?.Invoke();
-            //bestBaseAction.TakeAction(new List<GridPosition> { bestEnemyAIAction.gridPosition }, onEnemyAIActionComplete);
             return true;
         }
         else

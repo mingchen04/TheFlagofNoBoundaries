@@ -19,7 +19,7 @@ public class HealthSystem : MonoBehaviour
         health -= damageAmount;
         OnDamage?.Invoke(this, EventArgs.Empty);
 
-        if (health < 0) health = 0;
+        health = Mathf.Clamp(health, 0, healthMax);
 
         if (health == 0)
         {

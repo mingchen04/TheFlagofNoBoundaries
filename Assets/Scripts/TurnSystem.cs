@@ -143,4 +143,8 @@ public class TurnSystem : MonoBehaviour
         return actingParty;
     }
 
+    public bool IsCounterTurn()
+    {
+        return turnState == TurnState.CounterTurn;
+    }
 }
