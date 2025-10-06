@@ -13,7 +13,7 @@ public class ActionQueue : MonoBehaviour
 
     private List<BaseActionParameter> pendingActions; //行为队列
     private BaseActionParameter underwayAction; //正在进行的行动
-    private BaseActionParameter slowAction; //队列中的慢速行动
+    private BaseActionParameter slowAction = null; //队列中的慢速行动
     private Unit unit; //当前单位
 
     private void Awake()
@@ -217,9 +217,8 @@ public class ActionQueue : MonoBehaviour
     {
         List<BaseActionParameter> actions = GetActionsAtOrder(order);
 
-        if (slowAction != null)
+        if (slowAction != null && slowAction.baseAction != null)
         {
-            Debug.Log("执行慢速行动");
             slowAction.baseAction.TakeAction(slowAction, () =>
             {
                 slowAction = null; //清空慢速行动
@@ -378,23 +377,24 @@ public class ActionQueue : MonoBehaviour
         {
             // 检查下一个方法是否有效
             BaseActionParameter nextBaseActionParameter = pendingActions[0];
-
+            
             bool isMove = nextBaseActionParameter.baseAction.GetActionTags().HasFlag(ActionTags.Move);
 
             GridPosition unitFinalPosition = nextBaseActionParameter.unitFinalPosition;
             GridPosition targetPosition = nextBaseActionParameter.targetPositionList[0];
 
             isValid =
-                nextBaseActionParameter.baseAction.
-                IsValidActionGridPosition
+                nextBaseActionParameter.baseAction.IsValidActionGridPosition
                 (
                     isMove ? unitFinalPosition : targetPosition
                 );
+
+            Debug.Log($"{nextBaseActionParameter.baseAction.GetUnit().name} 检查动作合法 {nextBaseActionParameter.baseAction.name} : {isValid}");
         }
 
         unit.ReSetUnitParam(); // 重置单位参数
 
-        if (!isValid)
+        if (isValid)
         {
             //如果下一个行动有效，则重新计算消耗点数
             int actionPointsCost = 0;

@@ -180,20 +180,11 @@ public class EnemyAI : MonoBehaviour
         {
             GridPosition enemyPosition = enemyUnit.GetGridPosition();
             GridPosition playerPosition = playerUnit.GetGridPosition();
-
-            if (Vector3.Distance(enemyPosition, playerPosition) < 4)
+            if (GridPosition.Distance(enemyPosition, playerPosition) <= 2)
             {
-                int pathfindingDistanceMultiplier = 10;
-                int PathLength = Pathfinding.Instance.GetPathLength(enemyPosition, playerPosition,
-                    new Pathfinding.PathfindingRules[] { Pathfinding.PathfindingRules.Walkable })
-                    / pathfindingDistanceMultiplier;
-                Debug.Log("距离小于4 检查路径长度" + PathLength);
-                Debug.Log($"{enemyUnit.name} 坐标 {enemyPosition} - {playerUnit.name} 坐标 {playerPosition}");
-
-                if (PathLength <= 2)
-                {
-                    return true;
-                }
+                
+                Debug.Log($"{playerUnit.name} {enemyUnit.name}距离小于等于2,进入反制回合");
+                return true;
             }
         }
         return false;

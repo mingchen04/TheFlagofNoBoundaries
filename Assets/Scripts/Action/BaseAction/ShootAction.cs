@@ -124,7 +124,7 @@ public class ShootAction : BaseAction
             }
 
             Unit targetUnit = levelGrid.GetUnitAtGridPosition(testGridPosition);
-            if (targetUnit == null || targetUnit.IsEnemy() == isUnitEnemy)
+            if (targetUnit == null || targetUnit.IsEnemy() == isUnitEnemy) 
             {
                 continue;
             }

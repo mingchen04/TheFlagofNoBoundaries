@@ -100,6 +100,24 @@ public struct GridPosition : IEquatable<GridPosition>
     {
         return LevelGrid.Instance.GetGridPosition(worldPosition);
     }
+
+    public static int Distance(GridPosition a, GridPosition b)
+    {
+        // odd-r offset to cube
+        int a_cubeX = a.x - (a.z - (a.z & 1)) / 2;
+        int a_cubeZ = a.z;
+        int a_cubeY = -a_cubeX - a_cubeZ;
+
+        int b_cubeX = b.x - (b.z - (b.z & 1)) / 2;
+        int b_cubeZ = b.z;
+        int b_cubeY = -b_cubeX - b_cubeZ;
+
+        return Mathf.Max(
+            Mathf.Abs(a_cubeX - b_cubeX),
+            Mathf.Abs(a_cubeY - b_cubeY),
+            Mathf.Abs(a_cubeZ - b_cubeZ)
+        );
+    }
 }
 
 public static class GridPositionExtensions

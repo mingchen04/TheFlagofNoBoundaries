@@ -15,16 +15,19 @@ public class TurnSystemUI : MonoBehaviour
     {
         nextTurnButton.onClick.AddListener(() =>
         {
+            HeidAllButton();
             TurnSystem.Instance.NextTurn();
         });
 
         finishTurnButton.onClick.AddListener(() =>
-        {            
+        {
+            HeidAllButton();
             StartCoroutine(TurnSystem.Instance.EndTurn());
         });
 
         counterTurnButton.onClick.AddListener(() =>
         {
+            HeidAllButton();
             TurnSystem.Instance.EnterCounterTurn();
         });
 
@@ -57,7 +60,24 @@ public class TurnSystemUI : MonoBehaviour
 
     private void UpdateEnemyTurnVisual()
     {
-        enemyTurnVisualText.text = TurnSystem.Instance.GetActingParty() +"回合";
+        TurnSystem.TurnState turnState = TurnSystem.Instance.GetTurnState();
+
+        string turnVisualText = turnState.ToString();
+        string party = TurnSystem.Instance.GetActingParty().ToString();
+        switch (turnState)
+        {
+            case TurnSystem.TurnState.Main:
+                turnVisualText = party + "回合";
+                break;
+            case TurnSystem.TurnState.WaitCounter:
+                turnVisualText = "等待反制";
+                break;
+            case TurnSystem.TurnState.CounterTurn:
+                turnVisualText = party + "反制回合";
+                break;
+        }
+
+        enemyTurnVisualText.text = turnVisualText;
     }
 
     private void UpdateEndTurnButtonVisibility()
@@ -67,13 +87,13 @@ public class TurnSystemUI : MonoBehaviour
         bool isPlayerTurn = TurnSystem.Instance.IsPlayerTurn();
 
         if (turnState != TurnSystem.TurnState.WaitCounter &&
-            TurnSystem.Instance.GetActingParty() == TurnSystem.Party.Player)            
+            TurnSystem.Instance.GetActingParty() == TurnSystem.Party.Player)
         {
             //主回合和反制回合时显示
             nextTurnButton.gameObject.SetActive(true);
         }
         else
-        {            
+        {
             nextTurnButton.gameObject.SetActive(false);
         }
 
@@ -89,6 +109,12 @@ public class TurnSystemUI : MonoBehaviour
             counterTurnButton.gameObject.SetActive(false);
             finishTurnButton.gameObject.SetActive(false);
         }
+    }
 
+    private void HeidAllButton()
+    {
+        nextTurnButton.gameObject.SetActive(false);
+        counterTurnButton.gameObject.SetActive(false);
+        finishTurnButton.gameObject.SetActive(false);
     }
 }
