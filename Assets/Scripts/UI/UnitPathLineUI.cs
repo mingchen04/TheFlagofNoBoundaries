@@ -70,7 +70,7 @@ public class UnitPathLineUI : MonoBehaviour
 
         for (int i = 0; i < worldPositions.Count; i++)
         {
-            worldPositions[i] = new Vector3(worldPositions[i].x, 0.1f, worldPositions[i].z); // 调整高度
+            worldPositions[i] = new Vector3(worldPositions[i].x, 1f, worldPositions[i].z); // 调整高度
         }
 
         lineRenderer.positionCount = worldPositions.Count;
