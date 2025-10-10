@@ -6,13 +6,14 @@ public class GridObject
     private GridSystemHex<GridObject> gridSystem;
     private GridPosition gridPosition;
     private IInteractable interactable;
-
+    private bool isVisible;
 
     public GridObject(GridSystemHex<GridObject> gridSystem, GridPosition gridPosition)
     {
         this.gridSystem = gridSystem;
         this.gridPosition = gridPosition;
         unitList = new List<Unit>();
+        isVisible = false;
     }
 
     public void AddUnit(Unit unit)
@@ -67,5 +68,15 @@ public class GridObject
     public void SetInteractable(IInteractable interactable)
     {
         this.interactable = interactable;
+    }
+
+    public bool IsVisible()
+    {
+        return isVisible;
+    }
+
+    public void SetIsVisible(bool isVisible)
+    {
+        this.isVisible = isVisible;
     }
 }

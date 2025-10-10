@@ -46,6 +46,7 @@ public class MobileSlashAction : BaseMoveAction
 
         if (currentPathIndex + 1 == movePathWorldPositions.Count)
         {
+            Debug.Log("检查目标位置");
             if (TargetPositionStance())
             {
                 OnStartMoving?.Invoke(this, EventArgs.Empty);

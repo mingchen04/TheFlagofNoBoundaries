@@ -13,11 +13,19 @@ public class Testing : MonoBehaviour
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.T))
-        {            
-            GridPosition a = new GridPosition(3, 7);
-            GridPosition b = new GridPosition(5, 5);
+        {
+            Unit unit= UnitActionSystem.Instance.GetSelectedUnit();
 
-            Debug.Log("距离为：" + GridPosition.Distance(a, b));
+            // 例如在刷新战争迷雾时
+            LevelGrid.Instance.ComputeHexShadowcastingSector(
+                unit.GetGridPosition(),
+                unit.GetVisionRange(),
+                pos => 
+                {
+                    /*障碍物判定*/
+                    return !Pathfinding.Instance.IsWalkableGridPosition(pos);
+                }
+             );
 
         }
 

@@ -41,6 +41,7 @@ public abstract class BaseMoveAction : BaseAction
             else
             {
                 // 如果目标单位不再移动，路径被占用停止行动
+                Debug.Log("目标格被占用，停止行动"+unit.name);
                 unit.GetActionQueue().ActionQueueStop();
             }
         }

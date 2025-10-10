@@ -367,9 +367,9 @@ public class ActionQueue : MonoBehaviour
     /// </summary>
     public void ActionQueueStop()
     {
-        if (pendingActions.Count == 0) return; // 如果没有待执行的行动则不执行
-
         underwayAction.baseAction.ActionStop(); // 如果有正在进行的行动则结束它
+        if (pendingActions.Count == 0) return; // 如果没有待执行的行动则不执行
+        
         pendingActions.RemoveAll(a => a.executeTurn == underwayAction.executeTurn); // 移除所有与正在进行的行动相同执行顺序的行动
 
         bool isValid = false;

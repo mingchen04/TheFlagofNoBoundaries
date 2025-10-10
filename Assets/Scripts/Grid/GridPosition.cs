@@ -5,7 +5,6 @@ using UnityEngine;
 //IEquatable<T> 是 .NET 中的一个接口，用于为类型提供强类型的相等性比较方法 Equals
 public struct GridPosition : IEquatable<GridPosition>
 {
-
     public static GridPosition nullGridPosition = new(-1, -1); //定义一个空的网格位置
 
     //结构体作为函数参数时可被改变 class作为引用类型参数不能改变
@@ -120,8 +119,22 @@ public struct GridPosition : IEquatable<GridPosition>
     }
 }
 
+/// <summary>
+/// 网格位置的扩展方法
+/// </summary>
 public static class GridPositionExtensions
 {
+    // 六边形网格的六个基本方向
+    public static List<GridPosition> hexDirections = new List<GridPosition>
+    {
+        new(+1, 0),  // 右
+        new(-1, 0),  // 左
+        new(0, -1), // 右下
+        new(0, +1),  // 右上
+        new(-1, -1),  // 左下
+        new(-1, +1), // 左上
+    };
+
     /// <summary>
     /// 检查两点是否在一条直线上 夹角为0则表示在一条直线上 返回true
     /// </summary>
@@ -131,18 +144,7 @@ public static class GridPositionExtensions
     //this 关键字表示这是一个扩展方法
     public static bool IsStraightLine(this GridPosition from, GridPosition to)
     {
-        Vector2 delta = (Vector2)to - (Vector2)from;
-
-        // 六边形网格的六个基本方向
-        List<GridPosition> hexDirections = new List<GridPosition>
-        {
-            new(+1, 0),  // 右
-            new(-1, 0),  // 左
-            new(0, -1), // 右下
-            new(0, +1),  // 右上
-            new(-1, -1),  // 左下
-            new(-1, +1), // 左上           
-        };
+        Vector2 delta = (Vector2)to - (Vector2)from;        
 
         // 找到最接近的方向
         GridPosition closestDirection = hexDirections[0];

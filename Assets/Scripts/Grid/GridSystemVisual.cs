@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using static GridSystemVisual;
 
 public class GridSystemVisual : MonoBehaviour
 {
@@ -69,6 +70,8 @@ public class GridSystemVisual : MonoBehaviour
         UpdateGridVisual();
     }
 
+   
+
     private void OnDestroy()
     {
         UnitActionSystem.Instance.OnSelectActionChanged -= UnitActionSystem_OnSelectActionChanged;
@@ -116,9 +119,9 @@ public class GridSystemVisual : MonoBehaviour
         GridPosition gridPosition = LevelGrid.Instance.GetGridPosition(mouseWorld);
         if (LevelGrid.Instance.IsValidGridPosition(gridPosition))
         {
-            if (lastSelectedGridSystemVisualSingle != null) lastSelectedGridSystemVisualSingle.hideSelected();
+            if (lastSelectedGridSystemVisualSingle != null) lastSelectedGridSystemVisualSingle.HideSelected();
             lastSelectedGridSystemVisualSingle = gridSystemVisualSingleArray[gridPosition.x, gridPosition.z];
-            lastSelectedGridSystemVisualSingle.showSelected();
+            lastSelectedGridSystemVisualSingle.ShowSelected();
         }
 
         //UpdateGridVisual();
@@ -235,5 +238,21 @@ public class GridSystemVisual : MonoBehaviour
 
         Debug.LogError("Could not find GridVisualTypeMaterial for GridVisualType " + gridVisualType);
         return null;
+    }
+
+    /// <summary>
+    /// 战争迷雾显形
+    /// </summary>
+    /// <param name="gridPositions"></param>
+    public void AreaDiscovered(List<GridPosition> gridPositions)
+    {
+        foreach (GridSystemVisualSingle gridSystemVisualSingle in gridSystemVisualSingleArray)
+        {
+            gridSystemVisualSingle.ShowFogOfWar();
+        }
+
+        foreach (GridPosition gridPosition in gridPositions) {
+            gridSystemVisualSingleArray[gridPosition.x, gridPosition.z].HideFogOfWar();
+        }
     }
 }

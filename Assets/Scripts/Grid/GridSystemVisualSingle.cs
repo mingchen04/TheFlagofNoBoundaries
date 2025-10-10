@@ -2,8 +2,9 @@ using UnityEngine;
 
 public class GridSystemVisualSingle : MonoBehaviour
 {
+    [SerializeField] private SpriteRenderer fogOfWar; //战争迷雾
     [SerializeField] private MeshRenderer meshRenderer;
-    [SerializeField] private GameObject SelectedGameObject;
+    [SerializeField] private MeshRenderer selectedView;
 
     public void Show(Material material)
     {
@@ -16,13 +17,23 @@ public class GridSystemVisualSingle : MonoBehaviour
         meshRenderer.enabled = false;
     }
 
-    public void showSelected()
+    public void ShowSelected()
     {
-        SelectedGameObject.SetActive(true);
+        selectedView.enabled = true;
     }
 
-    public void hideSelected()
+    public void HideSelected()
     {
-        SelectedGameObject.SetActive(false);
+        selectedView.enabled = false;
+    }
+
+    public void ShowFogOfWar()
+    {
+        fogOfWar.enabled = true;
+    }
+
+    public void HideFogOfWar()
+    {
+        fogOfWar.enabled = false;
     }
 }
