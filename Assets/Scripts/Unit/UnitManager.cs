@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class UnitManager : MonoBehaviour
@@ -116,4 +117,18 @@ public class UnitManager : MonoBehaviour
         }
         return endOrder;
     }
+
+    /// <summary>
+    /// 更新单位可见状态
+    /// </summary>
+    /// <param name="visiblePositions"></param>
+    public void UpdateAnyUnitIsVisible(List<GridPosition> visiblePositions)
+    {        
+        foreach (Unit unit in unitList)
+        {
+            unit.SetVisible(visiblePositions.Contains(unit.GetGridPosition()));
+        }
+    }
+
+    
 }

@@ -17,7 +17,7 @@ public class Testing : MonoBehaviour
             Unit unit= UnitActionSystem.Instance.GetSelectedUnit();
 
             // 例如在刷新战争迷雾时
-            LevelGrid.Instance.ComputeHexShadowcastingSector(
+            FogOfWarManager.Instance.ComputeHexShadowcastingSector(
                 unit.GetGridPosition(),
                 unit.GetVisionRange(),
                 pos => 

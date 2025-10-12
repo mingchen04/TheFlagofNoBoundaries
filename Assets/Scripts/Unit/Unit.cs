@@ -32,10 +32,13 @@ public class Unit : MonoBehaviour
     private bool isForecast; // 是否为预测模式
     private bool isBusy; // 是否忙碌
     private bool isDeployAction; //是否部署行动
+    private UnitVision unitVision; // 视野组件
+
 
     private void Awake()
     {
         isForecast = true;
+        unitVision = GetComponent<UnitVision>();
         buffList = new List<BaseBuff>();
         actionQueue = GetComponent<ActionQueue>();
         srengthSystem = GetComponent<SrengthSystem>();
@@ -159,7 +162,7 @@ public class Unit : MonoBehaviour
     }
 
     public void TrySpendActionPointsToTakeAction(int actionPoint)
-    {        
+    {
         srengthSystem.SpendActionPoints(actionPoint);
     }
 
@@ -324,5 +327,10 @@ public class Unit : MonoBehaviour
     public List<BaseBuff> GetBuffList()
     {
         return buffList;
+    }
+
+    public void SetVisible(bool visible)
+    {
+        unitVision.SetVisible(visible);
     }
 }
