@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class UnitPathLineUI : MonoBehaviour
@@ -17,8 +18,21 @@ public class UnitPathLineUI : MonoBehaviour
     
     private void Start()
     {
+        ActionQueue.OnAnyActionCompleted += ActionQueue_OnAnyActionCompleted;
         UnitActionSystem.Instance.OnSelectedUnitChanged += UnitActionSystem_OnSelectedUnitChanged;
         Unit.OnAnyUnitPositionChanged += Unit_OnAnyUnitPositionChanged;
+    }
+
+    private void OnDestroy()
+    {
+        ActionQueue.OnAnyActionCompleted -= ActionQueue_OnAnyActionCompleted;
+        UnitActionSystem.Instance.OnSelectedUnitChanged -= UnitActionSystem_OnSelectedUnitChanged;
+        Unit.OnAnyUnitPositionChanged -= Unit_OnAnyUnitPositionChanged;
+    }
+
+    private void ActionQueue_OnAnyActionCompleted(object sender, System.EventArgs e)
+    {
+        UpdatePathLine();
     }
 
     private void Unit_OnAnyUnitPositionChanged(object sender, System.EventArgs e)
@@ -29,11 +43,6 @@ public class UnitPathLineUI : MonoBehaviour
     private void UnitPathLineUI_OnStopMoving(object sender, System.EventArgs e)
     {
         UpdatePathLine();
-    }
-
-    private void OnDestroy()
-    {
-        UnitActionSystem.Instance.OnSelectedUnitChanged -= UnitActionSystem_OnSelectedUnitChanged;
     }
 
     private void UnitActionSystem_OnSelectedUnitChanged(object sender, System.EventArgs e)

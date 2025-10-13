@@ -73,6 +73,7 @@ public class UnitActionSystem : MonoBehaviour
             BaseAction currentUnitAction = unit.GetBaseActionOfType(selectedAction); //获取当前单位的同一类型的行动
             if (unit.GetDeselectAction()) isDeployAction = true;
             int actionExecutionOrder = unit.GetActionQueue().EndActionExecuteTurnGet() + (isDeployAction ? 0 : 1);
+            if (actionExecutionOrder == -1) actionExecutionOrder = 0;            
 
             if (!currentUnitAction.IsValidActionGridPosition(mouseGridPosition)) continue;
             if (currentUnitAction == null) continue;

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class ShootAction : BaseAction
@@ -123,19 +124,19 @@ public class ShootAction : BaseAction
                 continue;
             }
 
-            Unit targetUnit = levelGrid.GetUnitAtGridPosition(testGridPosition);
-            if (targetUnit == null || targetUnit.IsEnemy() == isUnitEnemy) 
+            if(testGridPosition == unitGridPosition)
             {
+                //不能攻击自己
                 continue;
             }
-
+           
             Vector3 unitWorldPosition = levelGrid.GetWorldPosition(unitGridPosition);
-            Vector3 shootDir = (targetUnit.GetWorldPosition() - unitWorldPosition).normalized;
+            Vector3 shootDir = ((Vector3)testGridPosition - unitWorldPosition).normalized;
 
             //发射射线检测途中有无障碍物
             if (Physics.Raycast(unitShoulderPos, //射线开始位置
                 shootDir, //射线方向
-                Vector3.Distance(unitWorldPosition, targetUnit.GetWorldPosition()), //射线距离
+                Vector3.Distance(unitWorldPosition, (Vector3)testGridPosition), //射线距离
                 obstaclesLayerMask)) //射线命中图层
             {
                 continue;
@@ -145,6 +146,33 @@ public class ShootAction : BaseAction
         }
 
         return validActionGridPositionList;
+    }
+
+    /// <summary>
+    /// 获取有的可以攻击到单位的网格坐标集合
+    /// </summary>
+    /// <param name="unitGridPosition"></param>
+    /// <returns></returns>
+    public List<GridPosition> GetEffectiveUnitGridPositionList(GridPosition unitGridPosition)
+    {
+        List<GridPosition> gridPositions = GetValidActionGridPositionList(unitGridPosition);
+        gridPositions.RemoveAll(gridPosition => {
+
+            if (LevelGrid.Instance.HasAnyUnitOnGridPosition(gridPosition))
+            {
+                Unit targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
+                if (targetUnit.IsEnemy() == unit.IsEnemy())
+                {                    
+                    return true;
+                }
+                return false;
+            }
+
+            //不存在单位则删除
+            return true;            
+        });
+
+        return gridPositions;
     }
 
     public override void TakeAction(BaseActionParameter baseActionParameter, Action onActionComplete)
@@ -173,17 +201,24 @@ public class ShootAction : BaseAction
 
     public int GetTargetCountAtPosition(GridPosition gridPosition)
     {
-        return GetValidActionGridPositionList(gridPosition).Count;
+        return GetEffectiveUnitGridPositionList(gridPosition).Count;
     }
 
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {
         Unit targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
+        int actionValue = 0;
+        //单位不为空且是敌人
+        if (targetUnit != null && targetUnit.IsEnemy() != unit.IsEnemy())
+        {
+            //优先攻击可以击杀的单位
+            actionValue += 100 + Mathf.RoundToInt((1 - targetUnit.GetHealthNormalized()) * 100f);
+        }
 
         return new EnemyAIAction
         {
             gridPosition = gridPosition,
-            actionValue = 100 + Mathf.RoundToInt((1 - targetUnit.GetHealthNormalized()) * 100f),
+            actionValue = actionValue,
         };
     }
 }

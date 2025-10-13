@@ -32,6 +32,5 @@ public class UnitVision : MonoBehaviour
         {
             canvas.enabled = isVisible;
         }
-
     }
 }

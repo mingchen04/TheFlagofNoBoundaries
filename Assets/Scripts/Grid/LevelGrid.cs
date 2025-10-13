@@ -94,7 +94,6 @@ public class LevelGrid : MonoBehaviour
 
     /// <summary>
     /// 生成以center为中心、半径为radius的六边形区域所有坐标
-    /// （保持你原来的实现）
     /// </summary>
     public List<GridPosition> GenerateHexArea(GridPosition center, int radius)
     {
@@ -160,8 +159,6 @@ public class LevelGrid : MonoBehaviour
     {
         DamageUnitForGridPosition(gridPosition, damageInt, out Unit unit);
     }
-
-    
 
     public GridSystemHex<GridObject> GetGridSystem() => gridSystem;
 }

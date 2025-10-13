@@ -63,7 +63,7 @@ public class ActionQueue : MonoBehaviour
             targetPositionList = new List<GridPosition> { targetPos };
         }
 
-        if (unit.GetDeselectAction())
+        if (unit.GetDeselectAction()&& !unit.GetActionQueue().IsActionQueueComplete())
         {
             // 复制上一次参数
             BaseActionParameter lastParam = CopyLastMoveActionParameter();
