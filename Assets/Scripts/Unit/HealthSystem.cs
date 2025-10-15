@@ -36,4 +36,10 @@ public class HealthSystem : MonoBehaviour
     {
         return (float)health / healthMax;
     }
+
+    public bool IsDie()
+    {
+        return health == 0;
+    }
+
 }

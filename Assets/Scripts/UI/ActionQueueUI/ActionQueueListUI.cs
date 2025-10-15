@@ -22,6 +22,7 @@ public class ActionQueueListUI : MonoBehaviour
 
     private void UpdateVisual()
     {
+        if (unit == null) return;
         unitName.text = unit.name;
         //销毁队列中的按钮
         foreach (Transform baseActionButton in actionQueueList)

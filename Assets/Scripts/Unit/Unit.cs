@@ -333,4 +333,12 @@ public class Unit : MonoBehaviour
     {
         unitVision.SetVisible(visible);
     }
+
+    /// <summary>
+    /// 判断单位是否死亡
+    /// </summary>
+    public bool IsDie()
+    {
+        return healthSystem.IsDie();
+    }
 }

@@ -133,8 +133,6 @@ public class FogOfWarManager : MonoBehaviour
             }
         }
 
-        
-        
         return visible;
     }
 

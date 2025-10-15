@@ -367,6 +367,7 @@ public class ActionQueue : MonoBehaviour
     /// </summary>
     public void ActionQueueStop()
     {
+        unit.ReSetUnitParam(); // 重置单位参数
         underwayAction.baseAction.ActionStop(); // 如果有正在进行的行动则结束它
         if (pendingActions.Count == 0) return; // 如果没有待执行的行动则不执行
         
@@ -390,9 +391,7 @@ public class ActionQueue : MonoBehaviour
                 );
 
             Debug.Log($"{nextBaseActionParameter.baseAction.GetUnit().name} 检查动作合法 {nextBaseActionParameter.baseAction.name} : {isValid}");
-        }
-
-        unit.ReSetUnitParam(); // 重置单位参数
+        }       
 
         if (isValid)
         {

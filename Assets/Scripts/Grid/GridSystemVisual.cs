@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
-using static GridSystemVisual;
 
 public class GridSystemVisual : MonoBehaviour
 {
@@ -69,8 +68,6 @@ public class GridSystemVisual : MonoBehaviour
         Unit.OnAnyUnitPositionChanged += Unit_OnMoveActionUnitPositionChange;
         UpdateGridVisual();
     }
-
-   
 
     private void OnDestroy()
     {
@@ -161,7 +158,6 @@ public class GridSystemVisual : MonoBehaviour
 
     private void UpdateGridVisual()
     {
-        //如果UpdateGridVisualTime大于0，说明还没有到更新网格视觉的时间，直接返回
         HidegridSystemVisual();
 
         List<Unit> selectedUnits = UnitActionSystem.Instance.GetSelectedUnits();

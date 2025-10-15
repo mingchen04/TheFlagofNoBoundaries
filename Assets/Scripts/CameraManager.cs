@@ -6,8 +6,8 @@ public class CameraManager : MonoBehaviour
 
     private void Start()
     {
-        BaseAction.OnAnyActionStarted += BaseAction_OnAnyActionStarted;
-        BaseAction.OnAnyActionCompleted += BaseAction_OnAnyActionCompleted;
+        //BaseAction.OnAnyActionStarted += BaseAction_OnAnyActionStarted;
+        //BaseAction.OnAnyActionCompleted += BaseAction_OnAnyActionCompleted;
 
         HideActionCamera();
     }

@@ -35,6 +35,22 @@ public class UnitActionSystem : MonoBehaviour
         isBusy = false;
         LevelGrid.Instance.OnAnyUnitMoveGridPosition += LevelGrid_OnAnyUnitPositionChanged;
         SelectionBoxGUI.OnClick += SelectionBoxGUI_OnClick;
+        Unit.OnAnyUnitDead += Unit_OnAnyUnitDead;
+
+    }
+
+    private void OnDestroy()
+    {
+        LevelGrid.Instance.OnAnyUnitMoveGridPosition -= LevelGrid_OnAnyUnitPositionChanged;
+        SelectionBoxGUI.OnClick -= SelectionBoxGUI_OnClick;
+        Unit.OnAnyUnitDead -= Unit_OnAnyUnitDead;
+    }
+
+    private void Unit_OnAnyUnitDead(object sender, EventArgs e)
+    {
+        //删除死亡的单位
+        selectedUnits.RemoveAll(unit => unit.IsDie());
+        OnSelectedUnitChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void SelectionBoxGUI_OnClick(object sender, EventArgs e)
@@ -73,7 +89,7 @@ public class UnitActionSystem : MonoBehaviour
             BaseAction currentUnitAction = unit.GetBaseActionOfType(selectedAction); //获取当前单位的同一类型的行动
             if (unit.GetDeselectAction()) isDeployAction = true;
             int actionExecutionOrder = unit.GetActionQueue().EndActionExecuteTurnGet() + (isDeployAction ? 0 : 1);
-            if (actionExecutionOrder == -1) actionExecutionOrder = 0;            
+            if (actionExecutionOrder == -1) actionExecutionOrder = 0;
 
             if (!currentUnitAction.IsValidActionGridPosition(mouseGridPosition)) continue;
             if (currentUnitAction == null) continue;
@@ -248,7 +264,7 @@ public class UnitActionSystem : MonoBehaviour
     /// <param name="order"></param>
     /// <param name="onComplete"></param>
 
-    private List<Unit> ExecuteActionsAtOrder(int order, Action onComplete,List<Unit> units)
+    private List<Unit> ExecuteActionsAtOrder(int order, Action onComplete, List<Unit> units)
     {
         List<Unit> closeUnit = new List<Unit>();
 

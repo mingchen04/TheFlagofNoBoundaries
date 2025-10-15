@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Testing : MonoBehaviour
@@ -14,19 +15,20 @@ public class Testing : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.T))
         {
-            Unit unit= UnitActionSystem.Instance.GetSelectedUnit();
+            GridPosition gridPoison = new GridPosition(0, 0);
+            GridPosition mousePosition = MouseWorld.GetPosition();
 
-            // 例如在刷新战争迷雾时
-            FogOfWarManager.Instance.ComputeHexShadowcastingSector(
-                unit.GetGridPosition(),
-                unit.GetVisionRange(),
-                pos => 
-                {
-                    /*障碍物判定*/
-                    return !Pathfinding.Instance.IsWalkableGridPosition(pos);
-                }
-             );
+            Cube cube = Cube.OffsetToCube(gridPoison);
+            Cube mCube = Cube.OffsetToCube(mousePosition);
 
+            List<Cube> cubes = Cube.HexRing(mCube, 3);
+
+            List<GridPosition> gridPositions = cubes
+                .Select(cube => Cube.CubeToOffset(cube))
+                .ToList();
+            gridPositions.RemoveAll(gridPoison => !LevelGrid.Instance.IsValidGridPosition(gridPoison));
+
+            GridSystemVisual.Instance.ShowGridPositionList(gridPositions, GridSystemVisual.GridVisualType.Red);
         }
 
         if (Input.GetKeyDown(KeyCode.F))
