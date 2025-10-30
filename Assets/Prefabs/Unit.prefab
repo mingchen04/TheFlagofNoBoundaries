@@ -943,7 +943,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isEnemy: 0
-  baseAttack: 10
+  baseAttack: 30
   baseDefense: 5
   fastActionPointsCost: 1
   baseVisionRange: 5

@@ -16,6 +16,7 @@ public class FogOfWarManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+        Instance = this;
     }
 
     private void Start()
@@ -95,7 +96,7 @@ public class FogOfWarManager : MonoBehaviour
     /// radius: 半径
     /// isOpaque: 判断某格是否遮挡（true = 阻挡）
     /// </summary>
-    public HashSet<GridPosition> ComputeHexShadowcastingSector(GridPosition origin, int radius, Func<GridPosition, bool> isOpaque, int sideOffset = 1)
+    public HashSet<GridPosition> ComputeHexShadowcastingSector(GridPosition origin, int radius, Func<GridPosition, bool> isOpaque)
     {
         // visible 集合
         HashSet<GridPosition> visible = new HashSet<GridPosition>();
